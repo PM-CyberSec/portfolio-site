@@ -3,3 +3,9 @@ dist/
 .astro/
 *.pdf
 .auth
+
+# root-level duplicates (public/ is canonical)
+/index.html
+/ProfilePicture.jpeg
+/rick_don't_care.jpeg
+/rickandmortythemerickdefender_bluer_compressed.png
