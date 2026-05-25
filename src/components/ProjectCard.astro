@@ -1,0 +1,277 @@
+---
+export interface Props {
+  title: string;
+  objective: string;
+  tags?: string[];
+  severity?: 'critical' | 'high' | 'medium' | 'low';
+  timeline?: string;
+  stack?: string[];
+  details?: string[];
+  href?: string;
+}
+
+const {
+  title,
+  objective,
+  tags = [],
+  severity = 'medium',
+  timeline,
+  stack = [],
+  details = [],
+  href,
+} = Astro.props;
+---
+
+<div class="project-card" data-href={href}>
+  {href && <a href={href} class="card-link-overlay" aria-label={`View details for ${title}`}></a>}
+  <div class="card-top">
+    <div class="card-severity" data-severity={severity}>
+      <span class="sev-dot" aria-hidden="true"></span>
+      <span class="sev-label">{severity.toUpperCase()}</span>
+    </div>
+    {timeline && <span class="card-timeline">&#x25C6; {timeline}</span>}
+  </div>
+
+  <h3 class="card-title">{title}</h3>
+  <p class="card-objective">{objective}</p>
+
+  {
+    details.length > 0 && (
+      <ul class="card-details">
+        {details.map(d => <li><span class="li-marker" aria-hidden="true">&#x203A;</span> {d}</li>)}
+      </ul>
+    )
+  }
+
+  {
+    stack.length > 0 && (
+      <div class="card-stack">
+        <span class="stack-label">stack:</span>
+        <div class="stack-items">
+          {stack.map(s => <span class="stack-chip">{s}</span>)}
+        </div>
+      </div>
+    )
+  }
+
+  {
+    tags.length > 0 && (
+      <div class="card-tags">
+        {tags.map(t => <span class="tag">#{t}</span>)}
+      </div>
+    )
+  }
+</div>
+
+<style>
+  .project-card {
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    padding: 20px;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .project-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: var(--color-accent);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .project-card:hover {
+    border-color: var(--color-accent);
+    box-shadow: 0 0 20px var(--color-glow);
+    transform: translateY(-2px);
+  }
+
+  .project-card:hover::before {
+    opacity: 0.6;
+  }
+
+  .card-top {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+  }
+
+  .card-severity {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 2px 10px;
+    border-radius: 3px;
+    font-size: 0.55rem;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    border: 1px solid;
+  }
+
+  .card-severity[data-severity="critical"] {
+    color: var(--color-danger);
+    border-color: rgba(255, 51, 102, 0.3);
+  }
+
+  .card-severity[data-severity="high"] {
+    color: #FF8C00;
+    border-color: rgba(255, 140, 0, 0.3);
+  }
+
+  .card-severity[data-severity="medium"] {
+    color: var(--color-warning);
+    border-color: rgba(255, 184, 0, 0.3);
+  }
+
+  .card-severity[data-severity="low"] {
+    color: var(--color-text-muted);
+    border-color: var(--color-border);
+  }
+
+  .sev-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: currentColor;
+    animation: sev-pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes sev-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+
+  .card-timeline {
+    font-size: 0.6rem;
+    color: var(--color-text-muted);
+    letter-spacing: 0.3px;
+  }
+
+  .card-title {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--color-text);
+    margin-bottom: 8px;
+    letter-spacing: -0.3px;
+  }
+
+  .card-objective {
+    font-size: 0.78rem;
+    color: var(--color-text-muted);
+    line-height: 1.6;
+    font-weight: 300;
+    margin-bottom: 12px;
+  }
+
+  .card-details {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .card-details li {
+    font-size: 0.72rem;
+    color: var(--color-text-muted);
+    font-weight: 300;
+    line-height: 1.5;
+    padding-left: 4px;
+  }
+
+  .li-marker {
+    color: var(--color-accent);
+    margin-right: 6px;
+  }
+
+  .card-stack {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+  }
+
+  .stack-label {
+    font-size: 0.6rem;
+    color: var(--color-text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .stack-items {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+
+  .stack-chip {
+    font-size: 0.6rem;
+    padding: 2px 8px;
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid var(--color-border);
+    border-radius: 3px;
+    color: var(--color-text-muted);
+    letter-spacing: 0.3px;
+  }
+
+  .card-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .tag {
+    font-size: 0.55rem;
+    padding: 3px 8px;
+    border: 1px solid var(--color-border);
+    border-radius: 3px;
+    color: var(--color-accent);
+    letter-spacing: 0.3px;
+    transition: all 0.3s ease;
+  }
+
+  .tag:hover {
+    border-color: var(--color-accent);
+    background: var(--color-accent-dim);
+  }
+
+  .card-link-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+
+  .project-card { cursor: pointer; position: relative; }
+  .project-card:hover .card-link-overlay { outline: none; }
+
+  .card-top, .card-title, .card-objective, .card-details, .card-stack, .card-tags {
+    position: relative;
+    z-index: 2;
+    pointer-events: none;
+  }
+
+  .card-top a, .card-top button, .card-stack a, .card-tags a {
+    pointer-events: auto;
+  }
+
+  @media (max-width: 640px) {
+    .project-card { padding: 16px; }
+    .card-title { font-size: 0.85rem; }
+    .card-objective { font-size: 0.72rem; }
+  }
+</style>

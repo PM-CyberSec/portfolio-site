@@ -1,0 +1,312 @@
+---
+import type { Project } from '../data/projects';
+
+export interface Props {
+  project: Project;
+}
+
+const { project } = Astro.props as Props;
+const { tabs } = project;
+---
+
+<div class="tabs-container" id="projectTabs">
+  <div class="tabs-bar" role="tablist">
+    <button class="tab-btn active" role="tab" aria-selected="true" data-tab="brief">
+      <span class="tab-icon" aria-hidden="true">&#x25B8;</span>
+      system_brief.md
+    </button>
+    <button class="tab-btn" role="tab" aria-selected="false" data-tab="arch">
+      <span class="tab-icon" aria-hidden="true">&#x7B; &#x7D;</span>
+      system_architecture.json
+    </button>
+    <button class="tab-btn" role="tab" aria-selected="false" data-tab="telemetry">
+      <span class="tab-icon" aria-hidden="true">&#x2691;</span>
+      telemetry.log
+    </button>
+  </div>
+
+  <div class="tab-panels">
+    <!-- TAB 1: SYSTEM BRIEF -->
+    <div class="tab-panel active" role="tabpanel" id="panel-brief">
+      <div class="brief-block">
+        <div class="brief-row">
+          <span class="brief-label">bottleneck</span>
+          <p class="brief-value">{tabs?.brief.bottleneck}</p>
+        </div>
+        <div class="brief-row">
+          <span class="brief-label">north_star_metric</span>
+          <p class="brief-value">{tabs?.brief.northStar}</p>
+        </div>
+        <div class="brief-row">
+          <span class="brief-label">stack</span>
+          <div class="brief-chips">
+            {project.stack.map(s => <span class="chip">{s}</span>)}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 2: SYSTEM ARCHITECTURE -->
+    <div class="tab-panel" role="tabpanel" id="panel-arch">
+      <div class="arch-block">
+        <pre class="arch-json"><code>{JSON.stringify(tabs?.architecture ?? {}, null, 2)}</code></pre>
+      </div>
+    </div>
+
+    <!-- TAB 3: TELEMETRY -->
+    <div class="tab-panel" role="tabpanel" id="panel-telemetry">
+      <div class="telemetry-block">
+        <div class="telemetry-log-header">
+          <span class="log-timestamp">{new Date().toISOString().replace('T', ' ').slice(0, 19)}</span>
+          <span class="log-level">INFO</span>
+        </div>
+        <div class="telemetry-metrics">
+          {tabs?.telemetry.metrics.map((m, i) => (
+            <div class="metric-line">
+              <span class="metric-num">{String(i + 1).padStart(2, '0')}</span>
+              <span class="metric-marker" aria-hidden="true">&#x25B8;</span>
+              <span class="metric-text">{m}</span>
+            </div>
+          ))}
+        </div>
+        {project.github && (
+          <a href={project.github} class="telemetry-repo" target="_blank" rel="noopener noreferrer">
+            <span aria-hidden="true">&#x2387;</span> view repository
+          </a>
+        )}
+        {tabs?.telemetry.repoUrl && tabs?.telemetry.repoUrl !== project.github && (
+          <a href={tabs.telemetry.repoUrl} class="telemetry-repo" target="_blank" rel="noopener noreferrer">
+            <span aria-hidden="true">&#x2387;</span> view repository
+          </a>
+        )}
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  (function() {
+    var container = document.getElementById('projectTabs');
+    if (!container) return;
+    var btns = container.querySelectorAll('.tab-btn');
+    var panels = container.querySelectorAll('.tab-panel');
+    btns.forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        var tab = btn.getAttribute('data-tab');
+        btns.forEach(function(b) { b.classList.remove('active'); b.setAttribute('aria-selected', 'false'); });
+        panels.forEach(function(p) { p.classList.remove('active'); });
+        btn.classList.add('active');
+        btn.setAttribute('aria-selected', 'true');
+        var panel = document.getElementById('panel-' + tab);
+        if (panel) panel.classList.add('active');
+      });
+    });
+  })();
+</script>
+
+<style>
+  .tabs-container {
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    overflow: hidden;
+    background: var(--color-bg-card);
+  }
+
+  .tabs-bar {
+    display: flex;
+    gap: 0;
+    background: rgba(0, 0, 0, 0.2);
+    border-bottom: 1px solid var(--color-border);
+    overflow-x: auto;
+  }
+
+  .tab-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 16px;
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 0.7rem;
+    font-weight: 500;
+    color: var(--color-text-muted);
+    letter-spacing: 0.3px;
+    white-space: nowrap;
+    transition: all 0.25s ease;
+    text-transform: uppercase;
+  }
+
+  .tab-btn:hover {
+    color: var(--color-text);
+    background: rgba(255, 255, 255, 0.03);
+  }
+
+  .tab-btn.active {
+    color: var(--color-accent);
+    border-bottom-color: var(--color-accent);
+    background: rgba(0, 255, 204, 0.04);
+  }
+
+  .tab-icon {
+    font-size: 0.65rem;
+    opacity: 0.6;
+  }
+
+  .tab-panels {
+    padding: 20px;
+  }
+
+  .tab-panel {
+    display: none;
+  }
+
+  .tab-panel.active {
+    display: block;
+  }
+
+  /* TAB 1: BRIEF */
+  .brief-block {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .brief-row {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .brief-label {
+    font-size: 0.6rem;
+    font-weight: 700;
+    color: var(--color-accent);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  .brief-value {
+    margin: 0;
+    font-size: 0.78rem;
+    color: var(--color-text);
+    line-height: 1.6;
+  }
+
+  .brief-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .chip {
+    padding: 3px 10px;
+    background: var(--color-accent-dim);
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+    font-size: 0.65rem;
+    color: var(--color-accent);
+    font-weight: 500;
+  }
+
+  /* TAB 2: ARCHITECTURE */
+  .arch-block {
+    overflow-x: auto;
+  }
+
+  .arch-json {
+    margin: 0;
+    font-family: inherit;
+    font-size: 0.72rem;
+    line-height: 1.7;
+    color: var(--color-text);
+    tab-size: 2;
+  }
+
+  .arch-json code {
+    white-space: pre;
+  }
+
+  /* TAB 3: TELEMETRY */
+  .telemetry-block {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .telemetry-log-header {
+    display: flex;
+    gap: 12px;
+    font-size: 0.6rem;
+    color: var(--color-text-dim);
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .log-level {
+    color: var(--color-success);
+    font-weight: 600;
+  }
+
+  .telemetry-metrics {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .metric-line {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    font-size: 0.75rem;
+    line-height: 1.6;
+  }
+
+  .metric-num {
+    color: var(--color-text-dim);
+    font-size: 0.6rem;
+    min-width: 22px;
+    text-align: right;
+    flex-shrink: 0;
+  }
+
+  .metric-marker {
+    color: var(--color-accent);
+    font-size: 0.6rem;
+    flex-shrink: 0;
+  }
+
+  .metric-text {
+    color: var(--color-text-muted);
+  }
+
+  .telemetry-repo {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    background: var(--color-bg-elevated);
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+    color: var(--color-accent);
+    font-size: 0.7rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    align-self: flex-start;
+  }
+
+  .telemetry-repo:hover {
+    border-color: var(--color-accent);
+    box-shadow: 0 0 12px var(--color-glow);
+  }
+
+  @media (max-width: 640px) {
+    .tab-btn { padding: 8px 10px; font-size: 0.6rem; }
+    .tab-panels { padding: 14px; }
+    .brief-value { font-size: 0.72rem; }
+    .arch-json { font-size: 0.65rem; }
+  }
+</style>

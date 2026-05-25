@@ -1,0 +1,234 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="404 · ERR_CONNECTION_LOST">
+  <main class="error-page">
+    <div class="error-glow" aria-hidden="true"></div>
+
+    <div class="error-terminal">
+      <div class="term-header">
+        <div class="term-dots">
+          <span class="dot dot-red"></span>
+          <span class="dot dot-yellow"></span>
+          <span class="dot dot-green"></span>
+        </div>
+        <span class="term-title">ERROR_DIAGNOSTIC</span>
+        <span class="term-spacer"></span>
+      </div>
+
+      <div class="term-body">
+        <div class="error-code">
+          <span class="error-num">4</span>
+          <span class="error-num blink">0</span>
+          <span class="error-num">4</span>
+        </div>
+
+        <div class="error-msg">
+          <span class="error-label">STATUS:</span>
+          <span class="error-value">NOT_FOUND</span>
+        </div>
+
+        <div class="error-msg">
+          <span class="error-label">DESCRIPTION:</span>
+          <span class="error-value">The requested resource could not be located on this server.</span>
+        </div>
+
+        <div class="error-msg">
+          <span class="error-label">SUGGESTED_ACTION:</span>
+          <span class="error-value">Return to base and re-route.</span>
+        </div>
+
+        <div class="error-trace" id="traceLines">
+          <div class="trace-line">[0x0000] scanning routing tables...</div>
+          <div class="trace-line">[0x0001] destination unreachable</div>
+          <div class="trace-line err">[0x0002] ERR_CONNECTION_LOST</div>
+          <div class="trace-line">[0x0003] aborting request</div>
+        </div>
+
+        <a href="/" class="error-btn">
+          <span class="btn-arrow" aria-hidden="true">&#x25C0;</span>
+          RETURN TO BASE
+        </a>
+      </div>
+    </div>
+
+    <p class="error-footer">SYSTEM_INTEGRITY :: COMPROMISED &mdash; RECOMMEND IMMEDIATE EVACUATION</p>
+  </main>
+</Layout>
+
+<style>
+  .error-page {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 24px;
+    position: relative;
+    gap: 32px;
+  }
+
+  .error-glow {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    width: 600px;
+    height: 600px;
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    background: radial-gradient(ellipse at center, var(--color-danger) 0%, transparent 70%);
+    opacity: 0.08;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .error-terminal {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 560px;
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-danger);
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 0 40px rgba(255, 51, 102, 0.12);
+  }
+
+  .term-header {
+    display: flex;
+    align-items: center;
+    padding: 10px 16px;
+    background: rgba(0, 0, 0, 0.2);
+    border-bottom: 1px solid var(--color-danger);
+    gap: 12px;
+  }
+
+  .term-dots { display: flex; gap: 6px; }
+  .dot { width: 10px; height: 10px; border-radius: 50%; }
+  .dot-red { background: #ff5f56; }
+  .dot-yellow { background: #ffbd2e; }
+  .dot-green { background: #27c93f; }
+  .term-title {
+    flex: 1;
+    text-align: center;
+    font-size: 0.7rem;
+    font-weight: 500;
+    color: var(--color-text-muted);
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+  .term-spacer { width: 44px; }
+
+  .term-body {
+    padding: 32px 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .error-code {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+
+  .error-num {
+    font-size: 4rem;
+    font-weight: 800;
+    color: var(--color-danger);
+    line-height: 1;
+    text-shadow: 0 0 30px rgba(255, 51, 102, 0.4);
+  }
+
+  .blink {
+    animation: blink 1s step-end infinite;
+  }
+
+  @keyframes blink {
+    50% { opacity: 0; }
+  }
+
+  .error-msg {
+    display: flex;
+    gap: 8px;
+    font-size: 0.75rem;
+    width: 100%;
+    max-width: 380px;
+  }
+
+  .error-label {
+    color: var(--color-text-muted);
+    flex-shrink: 0;
+  }
+
+  .error-value {
+    color: var(--color-text);
+  }
+
+  .error-trace {
+    width: 100%;
+    max-width: 380px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-top: 8px;
+    padding: 12px;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 4px;
+    font-size: 0.7rem;
+  }
+
+  .trace-line {
+    color: var(--color-text-muted);
+  }
+
+  .trace-line.err {
+    color: var(--color-danger);
+    font-weight: 600;
+  }
+
+  .error-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 8px;
+    padding: 10px 24px;
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-danger);
+    border-radius: 4px;
+    color: var(--color-danger);
+    font-family: inherit;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-decoration: none;
+    text-transform: uppercase;
+    transition: all 0.3s ease;
+  }
+
+  .error-btn:hover {
+    background: var(--color-danger);
+    color: #fff;
+    box-shadow: 0 0 20px rgba(255, 51, 102, 0.3);
+  }
+
+  .error-btn:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+
+  .btn-arrow {
+    font-size: 0.7rem;
+  }
+
+  .error-footer {
+    position: relative;
+    z-index: 1;
+    font-size: 0.6rem;
+    color: var(--color-text-dim);
+    letter-spacing: 1px;
+    text-align: center;
+  }
+</style>

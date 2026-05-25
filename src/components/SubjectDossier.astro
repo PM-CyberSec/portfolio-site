@@ -1,0 +1,133 @@
+---
+const dossier = [
+  { key: 'AGENT_DESIGNATION', value: 'Paula Maged Habib Basta' },
+  { key: 'CLASSIFICATION', value: 'Junior Cybersecurity Professional' },
+  { key: 'CURRENT_OBJECTIVE', value: 'Become one of the world\'s top cybersecurity professionals' },
+  { key: 'MISSION_PROFILE', value: 'Build secure digital ecosystems through continuous learning and meaningful contributions' },
+  { key: 'EDUCATION', value: 'B.Tech Networking & Cybersecurity — El Sewedy University (2028)' },
+  { key: 'CGPA', value: '4.1 / 4.3  |  IEEE & AESS Board Member' },
+];
+---
+
+<div class="dossier">
+  <div class="dossier-header">
+    <span class="dossier-icon" aria-hidden="true">&#x25C8;</span>
+    <span>CLASSIFIED DOSSIER // LOG_01</span>
+  </div>
+
+  <div class="dossier-divider" aria-hidden="true">
+    <span>-----BEGIN ENCRYPTED PROFILE-----</span>
+  </div>
+
+  <p class="dossier-description">
+    Analytical, organised, and detail-oriented cybersecurity professional with a strong passion for understanding the complexities of networking, digital forensics, and cryptography. Eager to continuously learn and grow while making meaningful contributions to the field. Board member of IEEE and AESS societies, leading projects and mentoring peers.
+  </p>
+
+  <div class="dossier-vars">
+    {
+      dossier.map((entry) => (
+        <div class="dossier-line">
+          <span class="dollar">$</span>
+          <span class="var-name">{entry.key}</span>
+          <span class="var-eq">=</span>
+          <span class="var-val">&quot;{entry.value}&quot;</span>
+        </div>
+      ))
+    }
+  </div>
+
+  <div class="dossier-divider" aria-hidden="true">
+    <span>-----END ENCRYPTED PROFILE-----</span>
+  </div>
+</div>
+
+<style>
+  .dossier {
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    padding: 24px;
+    transition: all 0.3s ease;
+  }
+
+  .dossier:hover {
+    border-color: var(--color-accent);
+    box-shadow: 0 0 20px var(--color-glow);
+  }
+
+  .dossier-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 1.2px;
+    color: var(--color-accent);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  .dossier-icon {
+    font-size: 1rem;
+  }
+
+  .dossier-divider {
+    text-align: center;
+    font-size: 0.6rem;
+    color: var(--color-text-dim);
+    letter-spacing: 1px;
+    padding: 12px 0;
+    position: relative;
+  }
+
+  .dossier-divider::before,
+  .dossier-divider::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    width: 30%;
+    height: 1px;
+    background: var(--color-border);
+  }
+
+  .dossier-divider::before { left: 0; }
+  .dossier-divider::after { right: 0; }
+
+  .dossier-description {
+    font-size: 0.82rem;
+    color: var(--color-text-muted);
+    line-height: 1.8;
+    margin-bottom: 20px;
+    font-weight: 300;
+  }
+
+  .dossier-vars {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 16px;
+    background: rgba(0, 0, 0, 0.15);
+    border-radius: 6px;
+    border: 1px solid var(--color-border);
+  }
+
+  .dossier-line {
+    font-size: 0.78rem;
+    line-height: 1.8;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 4px;
+  }
+
+  .dollar { color: var(--color-accent); font-weight: 600; }
+  .var-name { color: var(--color-text); font-weight: 500; }
+  .var-eq { color: var(--color-text-dim); }
+  .var-val { color: var(--color-accent); }
+
+  @media (max-width: 640px) {
+    .dossier { padding: 16px; }
+    .dossier-description { font-size: 0.75rem; }
+    .dossier-line { font-size: 0.7rem; }
+  }
+</style>

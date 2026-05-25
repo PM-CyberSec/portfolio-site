@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>0x0men212 · portfolio</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;600;700&display=swap');
+
+  :root {
+    --accent: #00FFCC;
+    --accent-dim: #00ccaa;
+    --primary: #0052CC;
+    --bg: #001F4D;
+    --bg-card: #002a6b;
+    --text: #FFFFFF;
+    --text-muted: rgba(255,255,255,0.55);
+    --border: rgba(0,255,204,0.15);
+    --glow: 0 0 30px rgba(0,255,204,0.08);
+  }
+
+  [data-theme="htb"] {
+    --accent: #9FEF00;
+    --accent-dim: #85cc00;
+    --primary: #9FEF00;
+    --bg: #1A1919;
+    --bg-card: #252525;
+    --text: #FFFFFF;
+    --text-muted: rgba(255,255,255,0.50);
+    --border: rgba(159,239,0,0.12);
+    --glow: 0 0 20px rgba(159,239,0,0.06);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'JetBrains Mono', monospace;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    min-height: 100vh;
+    transition: background .35s, color .35s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .container {
+    max-width: 960px;
+    width: 100%;
+    padding: 40px 24px;
+  }
+
+  header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 60px;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+
+  .logo h1 {
+    font-size: 1.3rem;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    color: var(--accent);
+    transition: color .35s;
+  }
+
+  .logo .tagline {
+    font-size: .75rem;
+    color: var(--text-muted);
+    font-weight: 300;
+    letter-spacing: .3px;
+    margin-top: 2px;
+  }
+
+  .theme-toggle {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 10px 20px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: .75rem;
+    cursor: pointer;
+    border-radius: 6px;
+    transition: all .3s;
+    letter-spacing: .5px;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+
+  .theme-toggle:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    box-shadow: var(--glow);
+  }
+
+  .theme-toggle .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--accent);
+    transition: background .35s;
+    display: inline-block;
+  }
+
+  .hero {
+    margin-bottom: 64px;
+  }
+
+  .hero .badge {
+    display: inline-block;
+    font-size: .65rem;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    padding: 4px 12px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--accent);
+    margin-bottom: 16px;
+    transition: all .35s;
+  }
+
+  .hero h2 {
+    font-size: 2.4rem;
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 16px;
+    letter-spacing: -1px;
+  }
+
+  .hero h2 span {
+    color: var(--accent);
+    transition: color .35s;
+  }
+
+  .hero p {
+    font-size: .95rem;
+    color: var(--text-muted);
+    max-width: 640px;
+    font-weight: 300;
+  }
+
+  .section-title {
+    font-size: .7rem;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--accent);
+    margin-bottom: 24px;
+    font-weight: 600;
+    transition: color .35s;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+    margin-bottom: 48px;
+  }
+
+  .card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 24px;
+    transition: all .3s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 2px;
+    background: var(--accent);
+    opacity: .4;
+    transition: opacity .3s, background .35s;
+  }
+
+  .card:hover {
+    border-color: var(--accent);
+    box-shadow: var(--glow);
+    transform: translateY(-2px);
+  }
+
+  .card:hover::before { opacity: 1; }
+
+  .card .icon {
+    font-size: 1.5rem;
+    margin-bottom: 12px;
+    display: block;
+    color: var(--accent);
+    transition: color .35s;
+  }
+
+  .card h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 8px;
+    letter-spacing: -.3px;
+  }
+
+  .card p {
+    font-size: .8rem;
+    color: var(--text-muted);
+    font-weight: 300;
+    line-height: 1.5;
+  }
+
+  .card .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 14px;
+  }
+
+  .card .tags span {
+    font-size: .6rem;
+    padding: 3px 10px;
+    border-radius: 4px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    letter-spacing: .3px;
+    text-transform: uppercase;
+    transition: all .35s;
+  }
+
+  .stats {
+    display: flex;
+    gap: 32px;
+    margin-bottom: 48px;
+    flex-wrap: wrap;
+    padding: 24px 0;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    transition: border .35s;
+  }
+
+  .stat-value {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--accent);
+    transition: color .35s;
+  }
+
+  .stat-label {
+    font-size: .7rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    font-weight: 300;
+  }
+
+  .contact {
+    display: flex;
+    gap: 20px;
+    margin-top: 8px;
+    flex-wrap: wrap;
+  }
+
+  .contact a {
+    color: var(--text-muted);
+    text-decoration: none;
+    font-size: .8rem;
+    transition: color .3s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .contact a:hover { color: var(--accent); }
+
+  footer {
+    width: 100%;
+    text-align: center;
+    padding: 32px 0 16px;
+    font-size: .7rem;
+    color: var(--text-muted);
+    border-top: 1px solid var(--border);
+    transition: border .35s;
+    letter-spacing: .3px;
+  }
+
+  @media (max-width: 600px) {
+    .container { padding: 24px 16px; }
+    .hero h2 { font-size: 1.6rem; }
+    .grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <div class="logo">
+      <h1>0x0men212</h1>
+      <div class="tagline">// security engineer · ctf player</div>
+    </div>
+    <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+      <span class="dot"></span>
+      <span id="themeLabel">htb</span>
+    </button>
+  </header>
+
+  <section class="hero">
+    <div class="badge">Active</div>
+    <h2>breaking things<br>so i can <span>fix them</span></h2>
+    <p>Security researcher focused on binary exploitation, reverse engineering, and red team tooling. I write code that bends systems and docs that bend minds.</p>
+  </section>
+
+  <div class="section-title">/ featured work</div>
+  <div class="grid">
+    <div class="card">
+      <span class="icon">⎔</span>
+      <h3>shellcoder</h3>
+      <p>Multi-architecture shellcode compiler with polymorphic encoding engine. Supports x86, x64, ARM, MIPS.</p>
+      <div class="tags"><span>rust</span><span>asm</span><span>exploit</span></div>
+    </div>
+    <div class="card">
+      <span class="icon">◉</span>
+      <h3>packetforge</h3>
+      <p>Raw packet crafting & injection toolkit for network protocol fuzzing and MITM testing.</p>
+      <div class="tags"><span>c</span><span>pcap</span><span>net</span></div>
+    </div>
+    <div class="card">
+      <span class="icon">⌘</span>
+      <h3>dissectre</h3>
+      <p>Interactive disassembler with symbolic execution and graph-based control flow analysis.</p>
+      <div class="tags"><span>python</span><span>binary</span><span>re</span></div>
+    </div>
+  </div>
+
+  <div class="section-title">/ arsenal</div>
+  <div class="grid">
+    <div class="card">
+      <span class="icon">⚡</span>
+      <h3>exploit dev</h3>
+      <p>ROP chains, heap feng shui, format string leaks, and kernel-mode privilege escalation techniques.</p>
+    </div>
+    <div class="card">
+      <span class="icon">▤</span>
+      <h3>reverse eng.</h3>
+      <p>Static & dynamic analysis, deobfuscation, malware unpacking, and firmware extraction workflows.</p>
+    </div>
+    <div class="card">
+      <span class="icon">⎇</span>
+      <h3>red team ops</h3>
+      <p>C2 framework development, adversary simulation, EDR evasion, and covert channel design.</p>
+    </div>
+  </div>
+
+  <div class="stats">
+    <div><div class="stat-value">47</div><div class="stat-label">ctf flags</div></div>
+    <div><div class="stat-value">12</div><div class="stat-label">cvEs</div></div>
+    <div><div class="stat-value">9</div><div class="stat-label">tools shipped</div></div>
+    <div><div class="stat-value">∞</div><div class="stat-label">curiosity</div></div>
+  </div>
+
+  <div class="section-title">/ connect</div>
+  <div class="contact">
+    <a href="#">⎇ github</a>
+    <a href="#">◈ twitter</a>
+    <a href="#">⌨ discord</a>
+    <a href="#">✉ signal</a>
+  </div>
+
+  <footer>
+    0x0men212 · portfolio · 2026
+  </footer>
+</div>
+
+<script>
+  (function() {
+    const btn = document.getElementById('themeToggle');
+    const label = document.getElementById('themeLabel');
+
+    function setTheme(theme) {
+      document.documentElement.setAttribute('data-theme', theme);
+      label.textContent = theme;
+      try { localStorage.setItem('portfolio-theme', theme); } catch(e) {}
+    }
+
+    const saved = (() => { try { return localStorage.getItem('portfolio-theme'); } catch(e) {} })();
+    if (saved === 'htb' || saved === 'cyber') {
+      setTheme(saved === 'cyber' ? '' : 'htb');
+      if (saved === 'cyber') document.documentElement.removeAttribute('data-theme');
+    }
+
+    btn.addEventListener('click', () => {
+      const current = document.documentElement.getAttribute('data-theme');
+      setTheme(current === 'htb' ? '' : 'htb');
+      if (current === 'htb') document.documentElement.removeAttribute('data-theme');
+    });
+  })();
+</script>
+
+</body>
+</html>

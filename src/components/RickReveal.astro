@@ -1,0 +1,263 @@
+---
+export interface Props {
+  name: string;
+  title: string;
+}
+
+const { name, title } = Astro.props as Props;
+const base = import.meta.env.BASE_URL;
+const firstSrc = base + '/rick_dont_care.jpeg';
+const secondSrc = base + '/rickandmortythemerickdefender_bluer_compressed.png';
+const paulaSrc = base + '/ProfilePicture.jpeg';
+---
+
+<link rel="preload" as="image" href={firstSrc} />
+<link rel="preload" as="image" href={secondSrc} />
+<link rel="preload" as="image" href={paulaSrc} />
+
+<div class="reveal-wrapper" id="reveal">
+  <div class="reveal-stage" id="revealStage">
+    <div class="reveal-panel" id="firstPanel">
+      <img src={firstSrc} alt="" class="reveal-img" loading="eager" />
+      <div class="rick-overlay">
+        <span class="rick-quote" id="rickQuote"></span>
+      </div>
+    </div>
+    <div class="reveal-panel hidden" id="secondPanel">
+      <img src={secondSrc} alt="" class="reveal-img" loading="eager" />
+    </div>
+    <div class="reveal-panel hidden" id="paulaPanel">
+      <img src={paulaSrc} alt={name} class="reveal-img" loading="eager" />
+      <div class="paula-info">
+        <span class="paula-name" id="paulaName"></span>
+        <span class="paula-title" id="paulaTitle"></span>
+      </div>
+    </div>
+  </div>
+  <div class="reveal-sub">
+    <span class="reveal-status" id="revealStatus">INITIALIZING...</span>
+    <button class="reveal-btn" id="revealBtn">
+      <span class="btn-icon" aria-hidden="true">&#x25B6;</span>
+      <span class="btn-label">SKIP INTRO</span>
+    </button>
+  </div>
+</div>
+
+<script>
+  (function () {
+    const firstPanel = document.getElementById('firstPanel');
+    const secondPanel = document.getElementById('secondPanel');
+    const paulaPanel = document.getElementById('paulaPanel');
+    const rickQuote = document.getElementById('rickQuote');
+    const paulaName = document.getElementById('paulaName');
+    const paulaTitle = document.getElementById('paulaTitle');
+    const status = document.getElementById('revealStatus');
+    const btn = document.getElementById('revealBtn');
+
+    const quote = 'Never gonna give you up... Just RICKKING!';
+    const fullName = 'PAULA MAGED';
+    const fullTitle = 'Junior Cybersecurity Analyst';
+
+    let revealed = false;
+
+    function typeWriter(el, text, speed, cb) {
+      let i = 0;
+      el.textContent = '';
+      function tick() {
+        if (i < text.length) {
+          el.textContent += text[i];
+          i++;
+          setTimeout(tick, speed);
+        } else if (cb) {
+          cb();
+        }
+      }
+      tick();
+    }
+
+    function transition(from, to) {
+      from.classList.add('fade-out');
+      setTimeout(function() {
+        from.classList.add('hidden');
+        to.classList.remove('hidden');
+        to.classList.add('fade-in');
+      }, 600);
+    }
+
+    function reveal() {
+      if (revealed) return;
+      revealed = true;
+      btn.disabled = true;
+      status.textContent = 'DECRYPTING IDENTITY...';
+      transition(firstPanel, secondPanel);
+      setTimeout(function() {
+        transition(secondPanel, paulaPanel);
+        setTimeout(function() {
+          status.textContent = 'IDENTITY CONFIRMED';
+          typeWriter(paulaName, fullName, 80, function () {
+            setTimeout(function () {
+              typeWriter(paulaTitle, fullTitle, 50);
+            }, 300);
+          });
+          btn.textContent = 'DONE';
+          btn.disabled = false;
+          btn.classList.add('done');
+        }, 600);
+      }, 1200);
+    }
+
+    typeWriter(rickQuote, quote, 40, function () {
+      setTimeout(reveal, 2500);
+    });
+
+    btn.addEventListener('click', reveal);
+  })();
+</script>
+
+<style>
+  .reveal-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .reveal-stage {
+    position: relative;
+    width: 280px;
+    height: 180px;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 2px solid var(--color-border-strong);
+    box-shadow: 0 0 30px var(--color-glow), 0 0 60px var(--color-accent-dim);
+    transition: all 0.4s ease;
+  }
+
+  .reveal-stage:hover {
+    box-shadow: 0 0 40px var(--color-glow), 0 0 80px var(--color-accent-dim);
+  }
+
+  .reveal-panel {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+
+  .reveal-panel.hidden {
+    display: none;
+  }
+
+  .reveal-panel.fade-out {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+
+  .reveal-panel.fade-in {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  .reveal-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .rick-overlay {
+    position: absolute;
+    inset: auto 0 0 0;
+    background: linear-gradient(transparent, rgba(0, 0, 0, 0.85));
+    padding: 40px 12px 12px;
+    text-align: center;
+  }
+
+  .rick-quote {
+    font-size: 0.6rem;
+    color: var(--color-accent);
+    letter-spacing: 0.5px;
+    min-height: 1.4em;
+    display: block;
+  }
+
+  .paula-info {
+    position: absolute;
+    inset: auto 0 0 0;
+    display: flex;
+    flex-direction: column;
+    background: linear-gradient(transparent, rgba(0, 0, 0, 0.85));
+    padding: 40px 12px 12px;
+    text-align: center;
+    gap: 2px;
+  }
+
+  .paula-name {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--color-accent);
+    letter-spacing: 1px;
+    min-height: 1.2em;
+  }
+
+  .paula-title {
+    font-size: 0.55rem;
+    color: var(--color-text-muted);
+    letter-spacing: 0.5px;
+    min-height: 1.2em;
+  }
+
+  .reveal-sub {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .reveal-status {
+    font-size: 0.6rem;
+    color: var(--color-text-muted);
+    letter-spacing: 1px;
+    min-width: 120px;
+  }
+
+  .reveal-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 0.6rem;
+    font-weight: 500;
+    color: var(--color-text-muted);
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease;
+  }
+
+  .reveal-btn:hover {
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+    box-shadow: 0 0 12px var(--color-glow);
+  }
+
+  .reveal-btn:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+
+  .reveal-btn.done {
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+    opacity: 0.6;
+    cursor: default;
+  }
+
+  .btn-icon {
+    font-size: 0.55rem;
+  }
+</style>

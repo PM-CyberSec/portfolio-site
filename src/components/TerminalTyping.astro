@@ -1,0 +1,185 @@
+---
+interface Line {
+  text: string;
+  type: 'prompt' | 'output' | 'system' | 'highlight' | 'logo';
+  delay?: number;
+}
+
+export interface Props {
+  lines?: Line[];
+  bootSequence?: boolean;
+  class?: string;
+}
+
+const defaultLines: Line[] = [
+  { text: '┌──────────────────────────────────────────┐', type: 'logo', delay: 10 },
+  { text: '│                                          │', type: 'logo', delay: 10 },
+  { text: '│               RICKOMENDER                │', type: 'logo', delay: 30 },
+  { text: '│                   OMEN                   │', type: 'logo', delay: 30 },
+  { text: '│                                          │', type: 'logo', delay: 10 },
+  { text: '│               Paula Maged                │', type: 'logo', delay: 30 },
+  { text: '│           Junior Cybersecurity           │', type: 'logo', delay: 30 },
+  { text: '│                                          │', type: 'logo', delay: 10 },
+  { text: '└──────────────────────────────────────────┘', type: 'logo', delay: 20 },
+  { text: '', type: 'output', delay: 200 },
+  { text: 'TERMINAL v1.0 — BOOT SEQUENCE INITIALIZED', type: 'system', delay: 80 },
+  { text: '[◉] LOADING USER PROFILE...', type: 'output', delay: 100 },
+  { text: '[◉] INITIALIZING SKILL MATRIX...', type: 'output', delay: 130 },
+  { text: '[◉] ESTABLISHING SECURE CHANNEL...', type: 'output', delay: 150 },
+  { text: '[✓] ALL SYSTEMS OPERATIONAL', type: 'highlight', delay: 180 },
+  { text: '', type: 'output', delay: 200 },
+  { text: 'guest@cyber-portfolio:~$ whoami', type: 'prompt', delay: 230 },
+  { text: 'Paula Maged Habib Basta', type: 'output', delay: 280 },
+  { text: '', type: 'output', delay: 300 },
+  { text: 'guest@cyber-portfolio:~$ cat /etc/profile', type: 'prompt', delay: 330 },
+  { text: 'Junior Cybersecurity Professional', type: 'highlight', delay: 380 },
+  { text: '', type: 'output', delay: 400 },
+  { text: 'guest@cyber-portfolio:~$ echo $EDUCATION', type: 'prompt', delay: 430 },
+  { text: 'B.Tech Networking & Cybersecurity — El Sewedy University', type: 'output', delay: 480 },
+  { text: 'CGPA 4.1/4.3 | IEEE & AESS Board Member', type: 'output', delay: 530 },
+  { text: '', type: 'output', delay: 580 },
+  { text: 'guest@cyber-portfolio:~$ echo $LOCATION', type: 'prompt', delay: 600 },
+  { text: 'Cairo, Egypt', type: 'output', delay: 650 },
+  { text: '', type: 'output', delay: 680 },
+  { text: 'guest@cyber-portfolio:~$ export READY=true', type: 'prompt', delay: 700 },
+];
+
+const { lines = defaultLines } = Astro.props;
+const dataId = 'typing-' + Math.random().toString(36).slice(2, 8);
+const jsonData = JSON.stringify(lines);
+const htmlScript = `
+(function() {
+  var root = document.querySelector('[data-typing-id="${dataId}"]');
+  if (!root) return;
+  var content = root.querySelector('.typing-content');
+  if (!content) return;
+
+  var lines = ${jsonData};
+
+  var lineIdx = 0, charIdx = 0, isTyping = false, timer = null;
+
+  function getDelay(line) {
+    return isTyping ? 1 + Math.random() * 3 : Math.floor(line.delay / 1.5);
+  }
+
+  function scrollBottom() {
+    var w = root.closest('.terminal-body') || root.parentElement;
+    if (w) w.scrollTop = w.scrollHeight;
+  }
+
+  function typeNext() {
+    if (lineIdx >= lines.length) return;
+    scrollBottom();
+    var line = lines[lineIdx];
+
+    if (!isTyping) {
+      timer = setTimeout(function() {
+        isTyping = true;
+        charIdx = 0;
+        if (line.text === '') {
+          content.innerHTML += '<br>';
+          lineIdx++;
+          isTyping = false;
+          typeNext();
+          return;
+        }
+        typeNext();
+      }, getDelay(line));
+      return;
+    }
+
+    if (charIdx === 0 && line.text) {
+      var prefix = '';
+      switch (line.type) {
+        case 'prompt': prefix = '<span class="prompt-symbol">$ </span>'; break;
+        case 'system': prefix = '<span class="sys-symbol">[ ] </span>'; break;
+        case 'highlight': prefix = '<span class="highlight-symbol">\\u25b8 </span>'; break;
+        case 'logo': prefix = ''; break;
+      }
+      content.innerHTML += prefix;
+    }
+
+    if (charIdx < line.text.length) {
+      var cls = '';
+      if (line.type === 'system') cls = ' text-system';
+      else if (line.type === 'highlight') cls = ' text-highlight';
+      else if (line.type === 'logo') cls = ' text-logo';
+      var ch = line.text.charAt(charIdx);
+      content.innerHTML += '<span class="char' + cls + '">' + (ch === ' ' ? '\\xa0' : ch) + '</span>';
+      charIdx++;
+      timer = setTimeout(typeNext, getDelay(line));
+    } else {
+      content.innerHTML += '<br>';
+      lineIdx++;
+      isTyping = false;
+      timer = setTimeout(typeNext, getDelay(line));
+    }
+  }
+
+  if (document.visibilityState === 'visible') {
+    typeNext();
+  } else {
+    document.addEventListener('visibilitychange', function handler() {
+      if (document.visibilityState === 'visible') {
+        typeNext();
+        document.removeEventListener('visibilitychange', handler);
+      }
+    });
+  }
+})();
+`;
+---
+
+<div class="terminal-output" data-typing-id={dataId}>
+  <div class="typing-content"></div>
+  <span class="cursor" aria-hidden="true">&#x2588;</span>
+</div>
+
+<script is:inline set:html={htmlScript}></script>
+
+<style>
+  .terminal-output {
+    font-size: 0.82rem;
+    line-height: 1.7;
+    font-weight: 400;
+    min-height: 120px;
+  }
+
+  .typing-content {
+    display: inline;
+  }
+
+  .cursor {
+    display: inline-block;
+    color: var(--color-accent);
+    font-size: 0.82rem;
+    animation: blink-cursor 1s step-end infinite;
+    vertical-align: text-bottom;
+    margin-left: 2px;
+    opacity: 0;
+  }
+
+  .typing-content:empty ~ .cursor {
+    opacity: 1;
+  }
+
+  @keyframes blink-cursor {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+  }
+
+  .char { color: var(--color-text-muted); }
+  .text-system { color: var(--color-warning); }
+  .text-highlight { color: var(--color-accent); }
+  .text-logo { color: var(--color-accent); font-weight: 700; }
+
+  .prompt-symbol { color: var(--color-accent); }
+  .sys-symbol { color: var(--color-warning); }
+  .highlight-symbol { color: var(--color-accent); }
+  .output-pad { }
+
+  @media (max-width: 640px) {
+    .terminal-output { font-size: 0.75rem; }
+    .cursor { font-size: 0.75rem; }
+  }
+</style>

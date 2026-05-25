@@ -1,0 +1,19 @@
+{
+  "name": "Paula Maged — SOC Portfolio",
+  "short_name": "PM-CyberSec",
+  "description": "Junior Cybersecurity Analyst — Blue Team Operations & Incident Response Portfolio",
+  "start_url": "/portfolio-site/",
+  "display": "standalone",
+  "background_color": "#0B1426",
+  "theme_color": "#0B1426",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["cybersecurity", "portfolio", "technology"],
+  "lang": "en"
+}

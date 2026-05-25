@@ -1,0 +1,374 @@
+---
+export interface Props {
+  title?: string;
+  description?: string;
+  image?: string;
+}
+
+const { title = 'Paula Maged · SOC Operations', description = 'Blue Team Operations & Incident Response Portfolio', image = 'https://PM-CyberSec.github.io/portfolio-site/ProfilePicture.jpeg' } = Astro.props;
+const canonical = 'https://PM-CyberSec.github.io/portfolio-site/';
+---
+
+<!DOCTYPE html>
+<html lang="en" data-theme="">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content={description} />
+  <meta name="theme-color" content="#0B1426" />
+  <meta name="color-scheme" content="dark" />
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large" />
+  <meta name="author" content="Paula Maged" />
+  <meta name="keywords" content="cybersecurity, blue team, SOC, incident response, threat detection, Paula Maged, PM-CyberSec" />
+  <link rel="canonical" href={canonical} />
+  <title>{title}</title>
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content={canonical} />
+  <meta property="og:site_name" content="Paula Maged — SOC Portfolio" />
+  <meta property="og:title" content={title} />
+  <meta property="og:description" content={description} />
+  <meta property="og:image" content={image} />
+  <meta property="og:image:width" content="963" />
+  <meta property="og:image:height" content="1280" />
+  <meta property="og:image:alt" content="Paula Maged — Junior Cybersecurity Analyst" />
+  <meta property="og:locale" content="en_US" />
+
+  <!-- Twitter / X -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content={title} />
+  <meta name="twitter:description" content={description} />
+  <meta name="twitter:image" content={image} />
+  <meta name="twitter:image:alt" content="Paula Maged — Junior Cybersecurity Analyst" />
+
+  <!-- JSON-LD Structured Data -->
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Person",
+      "name": "Paula Maged",
+      "alternateName": "PM-CyberSec",
+      "url": "https://PM-CyberSec.github.io/portfolio-site/",
+      "image": "https://PM-CyberSec.github.io/portfolio-site/ProfilePicture.jpeg",
+      "jobTitle": ["Junior Cybersecurity Analyst", "Blue Team Operator", "SOC Analyst"],
+      "description": "Junior Cybersecurity Analyst with a B.Tech in Networking &amp; Cybersecurity, active IEEE/AESS board member, and hands-on experience in incident response, threat detection, and secure software development.",
+      "email": "paulamagedcyber@gmail.com",
+      "telephone": "+201289990678",
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": "Cairo",
+        "addressCountry": "EG"
+      },
+      "sameAs": [
+        "https://github.com/PM-CyberSec",
+        "https://linkedin.com/in/paula-maged-04a721249"
+      ],
+      "alumniOf": {
+        "@type": "CollegeOrUniversity",
+        "name": "El Sewedy University of Technology"
+      },
+      "knowsAbout": [
+        "Incident Response", "Threat Detection", "SIEM", "SOC Operations",
+        "Penetration Testing", "Vulnerability Assessment", "Network Security",
+        "Python", "Linux Security", "Wireshark", "Nmap", "Metasploit",
+        "Burp Suite", "OWASP Top 10", "CTF", "Blue Team", "Cyber Threat Intelligence"
+      ],
+      "offers": {
+        "@type": "Offer",
+        "description": "Available for entry-level SOC analyst and cybersecurity roles.",
+        "availability": "https://schema.org/InStock"
+      }
+    }
+  </script>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700;800&display=swap" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700;800&display=swap" media="print" onload="this.media='all'" />
+  <noscript>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  </noscript>
+
+  <!-- Icons -->
+  <link rel="icon" type="image/svg+xml" href={import.meta.env.BASE_URL + '/favicon.svg'} />
+  <link rel="icon" type="image/png" sizes="32x32" href={import.meta.env.BASE_URL + '/favicon.svg'} />
+  <link rel="apple-touch-icon" href={import.meta.env.BASE_URL + '/ProfilePicture.jpeg'} />
+  <link rel="manifest" href={import.meta.env.BASE_URL + '/manifest.webmanifest'} />
+
+  <style is:global>
+    :root {
+      --color-accent: #00FFCC;
+      --color-accent-dim: rgba(0, 255, 204, 0.12);
+      --color-primary: #0052CC;
+      --color-bg: #0B1426;
+      --color-bg-card: #131D33;
+      --color-bg-card-hover: #1A2740;
+      --color-bg-elevated: #0F1A2E;
+      --color-text: #FFFFFF;
+      --color-text-muted: rgba(255, 255, 255, 0.5);
+      --color-text-dim: rgba(255, 255, 255, 0.25);
+      --color-border: rgba(0, 255, 204, 0.1);
+      --color-border-strong: rgba(0, 255, 204, 0.25);
+      --color-success: #00FFCC;
+      --color-warning: #FFB800;
+      --color-danger: #FF3366;
+      --color-grid: rgba(0, 255, 204, 0.03);
+      --color-glow: rgba(0, 255, 204, 0.06);
+      --color-scanline: rgba(0, 0, 0, 0.05);
+    }
+
+    [data-theme="htb"] {
+      --color-accent: #9FEF00;
+      --color-accent-dim: rgba(159, 239, 0, 0.12);
+      --color-primary: #9FEF00;
+      --color-bg: #121212;
+      --color-bg-card: #1E1E1E;
+      --color-bg-card-hover: #2A2A2A;
+      --color-bg-elevated: #181818;
+      --color-text: #FFFFFF;
+      --color-text-muted: rgba(255, 255, 255, 0.48);
+      --color-text-dim: rgba(255, 255, 255, 0.22);
+      --color-border: rgba(159, 239, 0, 0.1);
+      --color-border-strong: rgba(159, 239, 0, 0.28);
+      --color-success: #9FEF00;
+      --color-warning: #FFB800;
+      --color-danger: #FF3366;
+      --color-grid: rgba(159, 239, 0, 0.03);
+      --color-glow: rgba(159, 239, 0, 0.05);
+      --color-scanline: rgba(0, 0, 0, 0.05);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+
+    html {
+      scroll-behavior: smooth;
+      background-color: var(--color-bg);
+    }
+
+    body {
+      margin: 0;
+      font-family: 'JetBrains Mono', 'Fira Code', 'IBM Plex Mono', monospace;
+      background-color: var(--color-bg);
+      color: var(--color-text);
+      line-height: 1.6;
+      min-height: 100vh;
+      transition: background-color 0.4s ease, color 0.4s ease;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    ::selection {
+      background-color: var(--color-accent);
+      color: var(--color-bg);
+    }
+
+    :focus-visible {
+      outline: 2px solid var(--color-accent);
+      outline-offset: 2px;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      background:
+        linear-gradient(90deg, var(--color-grid) 1px, transparent 1px),
+        linear-gradient(0deg, var(--color-grid) 1px, transparent 1px);
+      background-size: 50px 50px;
+    }
+
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        var(--color-scanline) 2px,
+        var(--color-scanline) 4px
+      );
+    }
+
+    .glow-radial {
+      position: fixed;
+      top: -30%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 800px;
+      height: 600px;
+      border-radius: 50%;
+      background: radial-gradient(ellipse at center, var(--color-glow) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .glow-radial-secondary {
+      position: fixed;
+      bottom: -20%;
+      right: -10%;
+      width: 500px;
+      height: 500px;
+      border-radius: 50%;
+      background: radial-gradient(ellipse at center, var(--color-accent-dim) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .content-wrapper {
+      position: relative;
+      z-index: 2;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    @media (min-width: 768px) {
+      .content-wrapper {
+        padding: 0 48px;
+      }
+    }
+
+    @media (min-width: 1024px) {
+      .content-wrapper {
+        padding: 0 64px;
+      }
+    }
+
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: var(--color-bg);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--color-border-strong);
+      border-radius: 3px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--color-accent);
+    }
+
+    @keyframes border-shimmer {
+      0% { border-color: var(--color-border); }
+      50% { border-color: var(--color-border-strong); }
+      100% { border-color: var(--color-border); }
+    }
+
+    @keyframes telemetry-pulse {
+      0%, 100% { opacity: 0.4; }
+      50% { opacity: 1; }
+    }
+
+    @keyframes page-enter {
+      0% { opacity: 0; transform: translateY(6px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+
+    .content-wrapper {
+      animation: page-enter 0.35s ease-out;
+    }
+
+    .copy-toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: var(--color-bg-card);
+      border: 1px solid var(--color-accent);
+      color: var(--color-accent);
+      padding: 10px 20px;
+      border-radius: 6px;
+      font-size: 0.7rem;
+      font-family: inherit;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      z-index: 9999;
+      opacity: 0;
+      transition: opacity 0.3s ease, transform 0.3s ease;
+      pointer-events: none;
+      box-shadow: 0 0 20px var(--color-glow);
+    }
+
+    .copy-toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+  </style>
+</head>
+<body>
+  <div class="glow-radial" aria-hidden="true"></div>
+  <div class="glow-radial-secondary" aria-hidden="true"></div>
+
+  <div class="content-wrapper">
+    <slot />
+  </div>
+
+  <script>
+    (function() {
+      var theme = (function() {
+        try { return localStorage.getItem('portfolio-theme'); } catch(e) {}
+      })();
+      if (theme === 'htb') {
+        document.documentElement.setAttribute('data-theme', 'htb');
+      } else {
+        document.documentElement.removeAttribute('data-theme');
+      }
+
+      var target;
+      try { target = sessionStorage.getItem('scrollTo'); } catch(e) {}
+      if (target) {
+        try { sessionStorage.removeItem('scrollTo'); } catch(e) {}
+        setTimeout(function() {
+          var el = document.getElementById(target);
+          if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 100);
+      }
+
+      function showCopyToast() {
+        var existing = document.querySelector('.copy-toast');
+        if (existing) return;
+        var toast = document.createElement('div');
+        toast.className = 'copy-toast';
+        toast.textContent = '[✓] COPIED TO CLIPBOARD';
+        document.body.appendChild(toast);
+        setTimeout(function() { toast.classList.add('show'); }, 10);
+        setTimeout(function() {
+          toast.classList.remove('show');
+          setTimeout(function() { toast.remove(); }, 300);
+        }, 1200);
+      }
+
+      document.addEventListener('copy', showCopyToast);
+
+      document.addEventListener('mouseup', function() {
+        var sel = window.getSelection();
+        if (sel && sel.toString().trim().length > 0) {
+          showCopyToast();
+        }
+      });
+    })();
+  </script>
+</body>
+</html>

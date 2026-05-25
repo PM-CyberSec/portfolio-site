@@ -1,0 +1,212 @@
+---
+interface ChecklistItem {
+  label: string;
+  status: 'verified' | 'in-progress' | 'pending' | 'researching';
+}
+
+const certifications: ChecklistItem[] = [
+  { label: 'Cisco Junior Cybersecurity Analyst', status: 'in-progress' },
+  { label: 'Cryptography 1 — Stanford / Coursera', status: 'in-progress' },
+  { label: 'Cisco Networking Basics — Issued Jul 2023', status: 'verified' },
+  { label: 'Master C++ — Yat Learning, Issued Sep 2022', status: 'verified' },
+  { label: 'DELF B2 — French Proficiency', status: 'verified' },
+];
+
+const languages: ChecklistItem[] = [
+  { label: 'Arabic — Native', status: 'verified' },
+  { label: 'French — DELF B2 Certified', status: 'verified' },
+  { label: 'English — B2 / C1 Proficiency', status: 'verified' },
+  { label: 'Russian — Beginner', status: 'researching' },
+];
+
+const leadership: ChecklistItem[] = [
+  { label: 'Board Member — IEEE Society', status: 'verified' },
+  { label: 'Board Member — AESS Society', status: 'verified' },
+  { label: 'Team Project Management & Coordination', status: 'verified' },
+  { label: 'Peer Mentoring & Concept Explanation', status: 'verified' },
+];
+
+const goals: ChecklistItem[] = [
+  { label: 'Complete Cisco Junior Cybersecurity Analyst cert', status: 'in-progress' },
+  { label: 'Finish Cryptography 1 — Stanford / Coursera', status: 'in-progress' },
+  { label: 'Become one of the world\'s top cybersecurity professionals', status: 'in-progress' },
+  { label: 'Contribute to building secure digital ecosystems', status: 'pending' },
+];
+
+type SectionDef = {
+  title: string;
+  items: ChecklistItem[];
+};
+
+const sections: SectionDef[] = [
+  { title: 'CERTIFICATIONS', items: certifications },
+  { title: 'LANGUAGES', items: languages },
+  { title: 'LEADERSHIP', items: leadership },
+  { title: 'ACTIVE GOALS', items: goals },
+];
+
+function statusIcon(status: string): string {
+  switch (status) {
+    case 'verified': return '&#x2713;';
+    case 'in-progress': return '&#x25D4;';
+    case 'pending': return '&#x25CB;';
+    case 'researching': return '&#x25D7;';
+    default: return '&#x25CB;';
+  }
+}
+---
+
+<div class="sys-update">
+  <div class="sys-header">
+    <span class="sys-icon" aria-hidden="true">&#x2691;</span>
+    <span>SYSTEM_UPDATE // STATUS_CHECK</span>
+  </div>
+
+  <div class="sys-grid">
+    {
+      sections.map(section => (
+        <div class="sys-section">
+          <h4 class="sys-section-title">&#x25B8; {section.title}</h4>
+          <div class="sys-items">
+            {
+              section.items.map(item => {
+                const icon = statusIcon(item.status);
+                return (
+                  <div class="sys-item" data-status={item.status}>
+                    <span class="sys-status-icon" aria-hidden="true" set:html={icon}></span>
+                    <span class="sys-item-label">{item.label}</span>
+                    <span class="sys-status-label">{item.status.replace('-', ' ')}</span>
+                  </div>
+                );
+              })
+            }
+          </div>
+        </div>
+      ))
+    }
+  </div>
+</div>
+
+<style>
+  .sys-update {
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    padding: 24px;
+    transition: all 0.3s ease;
+  }
+
+  .sys-update:hover {
+    border-color: var(--color-accent);
+    box-shadow: 0 0 20px var(--color-glow);
+  }
+
+  .sys-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 1.2px;
+    color: var(--color-accent);
+    text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+
+  .sys-icon { font-size: 1rem; }
+
+  .sys-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+  }
+
+  .sys-section { min-width: 0; }
+
+  .sys-section-title {
+    font-size: 0.6rem;
+    font-weight: 600;
+    letter-spacing: 1px;
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .sys-items {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .sys-item {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    font-size: 0.72rem;
+    padding: 4px 8px;
+    border-radius: 4px;
+    transition: background 0.2s;
+  }
+
+  .sys-item:hover {
+    background: rgba(0, 0, 0, 0.15);
+  }
+
+  .sys-item[data-status="verified"] {
+    color: var(--color-text-muted);
+  }
+
+  .sys-item[data-status="in-progress"] {
+    color: var(--color-text);
+  }
+
+  .sys-item[data-status="pending"] {
+    color: var(--color-text-dim);
+  }
+
+  .sys-item[data-status="researching"] {
+    color: var(--color-text-dim);
+    font-style: italic;
+  }
+
+  .sys-status-icon {
+    width: 14px;
+    text-align: center;
+    flex-shrink: 0;
+    font-size: 0.75rem;
+  }
+
+  .sys-item[data-status="verified"] .sys-status-icon { color: var(--color-success); }
+  .sys-item[data-status="in-progress"] .sys-status-icon { color: var(--color-warning); }
+  .sys-item[data-status="pending"] .sys-status-icon { color: var(--color-text-dim); }
+  .sys-item[data-status="researching"] .sys-status-icon { color: var(--color-primary); }
+
+  .sys-item-label {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .sys-status-label {
+    font-size: 0.55rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    opacity: 0.6;
+    flex-shrink: 0;
+    padding: 1px 6px;
+    border: 1px solid var(--color-border);
+    border-radius: 3px;
+    background: rgba(0, 0, 0, 0.1);
+  }
+
+  @media (max-width: 768px) {
+    .sys-grid { grid-template-columns: 1fr; gap: 20px; }
+  }
+
+  @media (max-width: 640px) {
+    .sys-update { padding: 16px; }
+    .sys-item { font-size: 0.65rem; flex-wrap: wrap; }
+    .sys-status-label { font-size: 0.5rem; }
+  }
+</style>

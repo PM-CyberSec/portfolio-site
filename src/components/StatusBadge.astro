@@ -1,0 +1,98 @@
+---
+export interface Props {
+  label: string;
+  value: string;
+  variant?: 'accent' | 'warning' | 'danger' | 'info' | 'success';
+  pulse?: boolean;
+}
+
+const { label, value, variant = 'accent', pulse = false } = Astro.props;
+---
+
+<div class="badge" data-variant={variant} data-pulse={pulse}>
+  <span class="badge-dot" aria-hidden="true"></span>
+  <span class="badge-label">{label}</span>
+  <span class="badge-sep" aria-hidden="true">|</span>
+  <span class="badge-value">{value}</span>
+</div>
+
+<style>
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 12px;
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+    font-size: 0.6rem;
+    font-weight: 500;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+  }
+
+  .badge[data-variant="accent"] {
+    border-color: var(--color-border);
+    color: var(--color-accent);
+  }
+
+  .badge[data-variant="warning"] {
+    border-color: rgba(255, 184, 0, 0.3);
+    color: var(--color-warning);
+  }
+
+  .badge[data-variant="danger"] {
+    border-color: rgba(255, 51, 102, 0.3);
+    color: var(--color-danger);
+  }
+
+  .badge[data-variant="info"] {
+    border-color: rgba(0, 82, 204, 0.3);
+    color: var(--color-primary);
+  }
+
+  .badge[data-variant="success"] {
+    border-color: rgba(0, 255, 204, 0.3);
+    color: var(--color-success);
+  }
+
+  .badge:hover {
+    border-color: var(--color-accent);
+    box-shadow: 0 0 10px var(--color-glow);
+  }
+
+  .badge-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--color-accent);
+    flex-shrink: 0;
+  }
+
+  .badge[data-pulse="true"] .badge-dot {
+    animation: badge-pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes badge-pulse {
+    0%, 100% { opacity: 1; box-shadow: 0 0 0 0 var(--color-accent); }
+    50% { opacity: 0.5; box-shadow: 0 0 6px 2px var(--color-accent); }
+  }
+
+  .badge-label {
+    color: var(--color-text-muted);
+  }
+
+  .badge-sep {
+    color: var(--color-text-dim);
+    font-weight: 300;
+  }
+
+  .badge-value {
+    font-weight: 600;
+  }
+
+  @media (max-width: 640px) {
+    .badge { font-size: 0.55rem; padding: 3px 8px; }
+  }
+</style>

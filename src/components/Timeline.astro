@@ -1,0 +1,262 @@
+---
+interface Entry {
+  year: string;
+  title: string;
+  subtitle: string;
+  description: string;
+  type: 'education' | 'work' | 'project' | 'cert';
+}
+
+const entries: Entry[] = [
+  {
+    year: '2022',
+    title: 'DELF B2 Certification',
+    subtitle: 'French Ministry of Education',
+    description: 'Upper-Intermediate French proficiency certification.',
+    type: 'cert',
+  },
+  {
+    year: '2024',
+    title: 'B.Tech in Networking & Cybersecurity',
+    subtitle: 'El Sewedy University of Technology',
+    description: 'CGPA 4.0/4.3. Active IEEE & AESS board member. Expected graduation June 2028.',
+    type: 'education',
+  },
+  {
+    year: '2024',
+    title: 'IEEE Student Branch Member',
+    subtitle: 'Tech & R&D Departments',
+    description: 'Multidisciplinary team collaboration bridging theoretical research and practical technical implementation.',
+    type: 'education',
+  },
+  {
+    year: 'Dec 2024',
+    title: 'E-Commerce Product Catalogue',
+    subtitle: 'Academic Project',
+    description: 'Built a scalable product management system in Python. Led team planning and coordinated development.',
+    type: 'project',
+  },
+  {
+    year: 'Apr 2025',
+    title: 'Packet Sniffer · Network Traffic Analyser',
+    subtitle: 'Independent Project',
+    description: 'Python-based real-time packet capture and analysis tool with GUI, protocol filtering, and Wireshark validation.',
+    type: 'project',
+  },
+  {
+    year: 'Apr 2025',
+    title: 'Online Purchase System',
+    subtitle: 'Database Design Project',
+    description: 'Fully normalized relational database (3NF) for e-commerce with ERD, complex SQL queries, and MySQL implementation.',
+    type: 'project',
+  },
+  {
+    year: 'Aug 2025',
+    title: 'IT Intern',
+    subtitle: 'Al Dahra Agriculture, Cairo',
+    description: 'Administered network security controls, firewall monitoring, Active Directory management. Built REST API for precision farming dashboard.',
+    type: 'work',
+  },
+  {
+    year: 'Sep 2025',
+    title: 'CyberNest SOAR Platform',
+    subtitle: 'Team Lead — SOAR Architect',
+    description: 'Full SOAR ecosystem: Wazuh, TheHive, Velociraptor, Kafka, ELK. AI-driven severity scoring, automated IR playbooks, Docker Compose deployment.',
+    type: 'project',
+  },
+  {
+    year: '2025',
+    title: 'Cisco Cyber Threat Management',
+    subtitle: 'Cisco Networking Academy',
+    description: 'Completed certification in cyber threat management fundamentals.',
+    type: 'cert',
+  },
+  {
+    year: '2025',
+    title: 'Cisco Networking Basics',
+    subtitle: 'Cisco Networking Academy',
+    description: 'Foundational networking certification covering protocols, addressing, and network design.',
+    type: 'cert',
+  },
+  {
+    year: 'Apr 2026',
+    title: 'AI-Assisted Network Forensics',
+    subtitle: 'Machine Learning Project',
+    description: 'ML pipeline for PCAP analysis detecting C2 and data exfiltration. Scikit-learn, Pandas, Arkime integration.',
+    type: 'project',
+  },
+  {
+    year: 'Apr 2026',
+    title: 'AutoConfigLab',
+    subtitle: 'Network Automation Project',
+    description: 'Ansible playbooks, GNS3 topologies, Laravel web interface for IaC and reproducible deployments.',
+    type: 'project',
+  },
+  {
+    year: 'Active',
+    title: 'TryHackMe — Cyber Security 101',
+    subtitle: 'Continuous Learning',
+    description: 'Advancing through hands-on cybersecurity challenges and defensive security modules.',
+    type: 'cert',
+  },
+  {
+    year: 'Active',
+    title: 'CompTIA Security+',
+    subtitle: 'In Training',
+    description: 'Currently preparing for Security+ certification covering network security, compliance, and threat management.',
+    type: 'cert',
+  },
+];
+---
+
+<div class="timeline">
+  <div class="timeline-track" aria-hidden="true"></div>
+  {
+    entries.map((entry, i) => (
+      <div class="timeline-entry" data-type={entry.type}>
+        <div class="timeline-marker">
+          <span class="marker-dot"></span>
+          <span class="marker-line" aria-hidden="true"></span>
+        </div>
+        <div class="timeline-card">
+          <span class="timeline-year">{entry.year}</span>
+          <h3 class="timeline-title">{entry.title}</h3>
+          <span class="timeline-subtitle">{entry.subtitle}</span>
+          <p class="timeline-desc">{entry.description}</p>
+          <span class="timeline-badge" data-type={entry.type}>{entry.type}</span>
+        </div>
+      </div>
+    ))
+  }
+</div>
+
+<style>
+  .timeline {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .timeline-track {
+    position: absolute;
+    left: 32px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: linear-gradient(180deg, var(--color-accent) 0%, var(--color-accent-dim) 50%, transparent 100%);
+    opacity: 0.3;
+  }
+
+  .timeline-entry {
+    display: flex;
+    gap: 20px;
+    position: relative;
+  }
+
+  .timeline-marker {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 64px;
+    flex-shrink: 0;
+    padding-top: 20px;
+  }
+
+  .marker-dot {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--color-bg);
+    border: 2px solid var(--color-accent);
+    z-index: 1;
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+  }
+
+  .timeline-entry[data-type="education"] .marker-dot { border-color: var(--color-primary); }
+  .timeline-entry[data-type="work"] .marker-dot { border-color: var(--color-warning); }
+  .timeline-entry[data-type="project"] .marker-dot { border-color: var(--color-accent); }
+  .timeline-entry[data-type="cert"] .marker-dot { border-color: var(--color-success); }
+
+  .timeline-entry:hover .marker-dot {
+    box-shadow: 0 0 12px var(--color-glow);
+    transform: scale(1.2);
+  }
+
+  .timeline-card {
+    flex: 1;
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin: 12px 0;
+    transition: all 0.3s ease;
+    position: relative;
+    min-width: 0;
+  }
+
+  .timeline-card:hover {
+    border-color: var(--color-accent);
+    box-shadow: 0 0 20px var(--color-glow);
+  }
+
+  .timeline-year {
+    display: inline-block;
+    font-size: 0.6rem;
+    font-weight: 700;
+    color: var(--color-accent);
+    letter-spacing: 1px;
+    padding: 2px 8px;
+    border: 1px solid var(--color-border);
+    border-radius: 3px;
+    margin-bottom: 8px;
+  }
+
+  .timeline-entry[data-type="education"] .timeline-year { color: var(--color-primary); border-color: var(--color-primary); }
+  .timeline-entry[data-type="work"] .timeline-year { color: var(--color-warning); border-color: rgba(255, 184, 0, 0.3); }
+  .timeline-entry[data-type="cert"] .timeline-year { color: var(--color-success); border-color: rgba(0, 255, 204, 0.3); }
+
+  .timeline-title {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--color-text);
+    margin: 4px 0 2px;
+  }
+
+  .timeline-subtitle {
+    font-size: 0.7rem;
+    color: var(--color-text-muted);
+    display: block;
+  }
+
+  .timeline-desc {
+    font-size: 0.7rem;
+    color: var(--color-text-muted);
+    margin: 6px 0 0;
+    line-height: 1.5;
+    opacity: 0.8;
+  }
+
+  .timeline-badge {
+    display: inline-block;
+    margin-top: 8px;
+    font-size: 0.5rem;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 2px 8px;
+    border-radius: 3px;
+  }
+
+  .timeline-badge[data-type="education"] { background: rgba(0, 82, 204, 0.15); color: var(--color-primary); }
+  .timeline-badge[data-type="work"] { background: rgba(255, 184, 0, 0.12); color: var(--color-warning); }
+  .timeline-badge[data-type="project"] { background: var(--color-accent-dim); color: var(--color-accent); }
+  .timeline-badge[data-type="cert"] { background: rgba(0, 255, 204, 0.1); color: var(--color-success); }
+
+  @media (max-width: 640px) {
+    .timeline-marker { width: 40px; }
+    .timeline-card { padding: 12px 14px; }
+    .timeline-title { font-size: 0.78rem; }
+  }
+</style>

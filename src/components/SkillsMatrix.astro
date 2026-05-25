@@ -1,0 +1,190 @@
+---
+interface SkillSection {
+  heading: string;
+  items: string[];
+}
+
+const sections: SkillSection[] = [
+  {
+    heading: 'PROGRAMMING & SCRIPTING',
+    items: ['Python', 'FastAPI', 'Flask', 'Bash', 'SQL', 'YAML', 'Java', 'C++', 'PHP'],
+  },
+  {
+    heading: 'SECURITY OPERATIONS',
+    items: ['SIEM Monitoring', 'Alert Triage', 'Log Analysis', 'Threat Hunting', 'Vulnerability Management', 'Incident Response', 'Network Traffic Analysis'],
+  },
+  {
+    heading: 'SECURITY TOOLS',
+    items: ['Wazuh', 'TheHive', 'Velociraptor', 'Zeek', 'Suricata', 'Arkime', 'Wireshark', 'Cortex', 'Scapy'],
+  },
+  {
+    heading: 'INFRASTRUCTURE & SYSTEMS',
+    items: ['Linux (Ubuntu/Debian)', 'Docker', 'Docker Compose', 'Ansible', 'Active Directory', 'SSH', 'DNS', 'Virtualization'],
+  },
+  {
+    heading: 'FRAMEWORKS & STANDARDS',
+    items: ['MITRE ATT&CK', 'NIST IR Framework', 'STIX/TAXII', 'OWASP Top 10'],
+  },
+  {
+    heading: 'FORENSICS & ANALYSIS',
+    items: ['Packet Analysis', 'PCAP Analysis', 'Memory Forensics', 'Network Forensics', 'Digital Forensics'],
+  },
+  {
+    heading: 'WEB & API DEVELOPMENT',
+    items: ['Laravel', 'Blade', 'React', 'JavaScript', 'HTML/CSS', 'REST APIs'],
+  },
+  {
+    heading: 'DATABASES & STORAGE',
+    items: ['PostgreSQL', 'MySQL', 'SQL', 'Redis', 'Schema Design', 'ERD Modelling'],
+  },
+  {
+    heading: 'MACHINE LEARNING & AI',
+    items: ['Scikit-learn', 'Pandas', 'NLP', 'Anomaly Detection', 'Feature Engineering'],
+  },
+  {
+    heading: 'DEVOPS & AUTOMATION',
+    items: ['Docker', 'Ansible', 'CI/CD', 'Kafka', 'ELK Stack', 'GNS3'],
+  },
+];
+---
+
+<div class="skills">
+  <div class="skills-header">
+    <span class="skills-icon" aria-hidden="true">&#x2691;</span>
+    TOOLKIT_DECRYPTED
+    <span class="skills-count">{sections.length} modules</span>
+  </div>
+
+  <div class="skills-body">
+    {
+      sections.map((section, si) => (
+        <div class="module">
+          <div class="module-heading">
+            <span class="module-marker">&#x25B8;</span>
+            <span class="module-label">{section.heading}</span>
+            <span class="module-dash" aria-hidden="true">&#x2500;</span>
+          </div>
+          <div class="module-items">
+            {
+              section.items.map((item, ii) => (
+                <span class="module-item">
+                  <span class="item-name">{item}</span>
+                  {ii < section.items.length - 1 && <span class="item-sep" aria-hidden="true">&#x22C5;</span>}
+                </span>
+              ))
+            }
+          </div>
+        </div>
+      ))
+    }
+  </div>
+</div>
+
+<style>
+  .skills {
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    padding: 24px;
+    font-size: 0.78rem;
+    line-height: 1.6;
+    transition: all 0.3s ease;
+    overflow-x: auto;
+  }
+
+  .skills:hover {
+    border-color: var(--color-accent);
+    box-shadow: 0 0 20px var(--color-glow);
+  }
+
+  .skills-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 1px;
+    color: var(--color-accent);
+    margin-bottom: 24px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--color-border);
+    text-transform: uppercase;
+  }
+
+  .skills-icon { font-size: 0.85rem; }
+
+  .skills-count {
+    margin-left: auto;
+    color: var(--color-text-dim);
+    font-weight: 400;
+    font-size: 0.6rem;
+  }
+
+  .skills-body {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .module-heading {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+
+  .module-marker {
+    color: var(--color-accent);
+    font-size: 0.65rem;
+    flex-shrink: 0;
+  }
+
+  .module-label {
+    color: var(--color-text);
+    font-weight: 600;
+    font-size: 0.7rem;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .module-dash {
+    flex: 1;
+    min-width: 20px;
+    color: var(--color-border);
+    overflow: hidden;
+    letter-spacing: -1px;
+  }
+
+  .module-items {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 4px 0;
+    padding-left: 18px;
+  }
+
+  .module-item {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0;
+  }
+
+  .item-name {
+    color: var(--color-primary);
+    font-weight: 400;
+    padding: 1px 0;
+  }
+
+  .item-sep {
+    color: var(--color-text-dim);
+    margin: 0 6px;
+    font-weight: 700;
+    opacity: 0.4;
+  }
+
+  @media (max-width: 640px) {
+    .skills { padding: 16px; font-size: 0.7rem; }
+    .module-items { padding-left: 12px; }
+  }
+</style>

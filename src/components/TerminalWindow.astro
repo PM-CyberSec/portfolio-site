@@ -1,0 +1,123 @@
+---
+export interface Props {
+  title?: string;
+  class?: string;
+  glow?: boolean;
+}
+
+const { title = 'terminal', glow = true } = Astro.props;
+---
+
+<div class="terminal-window group" data-glow={glow}>
+  <div class="terminal-header">
+    <div class="terminal-dots">
+      <span class="dot dot-red" aria-hidden="true"></span>
+      <span class="dot dot-yellow" aria-hidden="true"></span>
+      <span class="dot dot-green" aria-hidden="true"></span>
+    </div>
+    <span class="terminal-title">{title}</span>
+    <span class="terminal-logo" aria-label="0x0men">0x0M</span>
+  </div>
+  <div class="terminal-body">
+    <slot />
+  </div>
+</div>
+
+<style>
+  .terminal-window {
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    position: relative;
+  }
+
+  .terminal-window[data-glow="true"]:hover {
+    border-color: var(--color-accent);
+    box-shadow: 0 0 20px var(--color-glow), 0 0 40px var(--color-glow);
+  }
+
+  .terminal-header {
+    display: flex;
+    align-items: center;
+    padding: 10px 16px;
+    background: rgba(0, 0, 0, 0.2);
+    border-bottom: 1px solid var(--color-border);
+    gap: 12px;
+    transition: border-color 0.3s ease;
+  }
+
+  .terminal-dots {
+    display: flex;
+    gap: 6px;
+    flex-shrink: 0;
+  }
+
+  .dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    transition: opacity 0.2s;
+  }
+
+  .dot-red { background: #FF5F56; }
+  .dot-yellow { background: #FFBD2E; }
+  .dot-green { background: #27C93F; }
+
+  .terminal-title {
+    font-size: 0.7rem;
+    font-weight: 500;
+    color: var(--color-text-muted);
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    flex: 1;
+    text-align: center;
+  }
+
+  .terminal-logo {
+    font-size: 0.6rem;
+    font-weight: 700;
+    color: var(--color-accent);
+    letter-spacing: 1px;
+    padding: 2px 8px;
+    border: 1px solid var(--color-accent);
+    border-radius: 3px;
+    opacity: 0.7;
+    flex-shrink: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .terminal-window:hover .terminal-logo {
+    opacity: 1;
+  }
+
+  .terminal-body {
+    padding: 20px;
+    height: 340px;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+
+  .terminal-body::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  .terminal-body::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .terminal-body::-webkit-scrollbar-thumb {
+    background: var(--color-border-strong);
+    border-radius: 2px;
+  }
+
+  .terminal-body::-webkit-scrollbar-thumb:hover {
+    background: var(--color-accent);
+  }
+
+  @media (max-width: 640px) {
+    .terminal-body { padding: 16px; height: 280px; }
+    .terminal-logo { display: none; }
+  }
+</style>
