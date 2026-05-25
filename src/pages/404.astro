@@ -13,49 +13,105 @@ import Layout from '../layouts/Layout.astro';
           <span class="dot dot-yellow"></span>
           <span class="dot dot-green"></span>
         </div>
-        <span class="term-title">ERROR_DIAGNOSTIC</span>
-        <span class="term-spacer"></span>
+        <span class="term-title">KERNEL_PANIC_404</span>
+        <span class="term-logo" aria-label="0x0men">0x0M</span>
       </div>
 
       <div class="term-body">
         <div class="error-code">
-          <span class="error-num">4</span>
-          <span class="error-num blink">0</span>
-          <span class="error-num">4</span>
+          <span class="error-num" data-glitch="4">4</span>
+          <span class="error-num error-zero" data-glitch="0">0</span>
+          <span class="error-num" data-glitch="4">4</span>
         </div>
 
-        <div class="error-msg">
-          <span class="error-label">STATUS:</span>
-          <span class="error-value">NOT_FOUND</span>
-        </div>
+        <div class="error-grid">
+          <div class="error-msg">
+            <span class="error-label">STATUS</span>
+            <span class="error-sep">:</span>
+            <span class="error-value err">NOT_FOUND</span>
+          </div>
 
-        <div class="error-msg">
-          <span class="error-label">DESCRIPTION:</span>
-          <span class="error-value">The requested resource could not be located on this server.</span>
-        </div>
+          <div class="error-msg">
+            <span class="error-label">SEVERITY</span>
+            <span class="error-sep">:</span>
+            <span class="error-value badge-danger">CRITICAL</span>
+          </div>
 
-        <div class="error-msg">
-          <span class="error-label">SUGGESTED_ACTION:</span>
-          <span class="error-value">Return to base and re-route.</span>
+          <div class="error-msg">
+            <span class="error-label">ROUTE</span>
+            <span class="error-sep">:</span>
+            <span class="error-value route-val" id="routeDisplay">/unknown</span>
+          </div>
+
+          <div class="error-msg">
+            <span class="error-label">TIMESTAMP</span>
+            <span class="error-sep">:</span>
+            <span class="error-value" id="timestampDisplay">--:--:--</span>
+          </div>
         </div>
 
         <div class="error-trace" id="traceLines">
-          <div class="trace-line">[0x0000] scanning routing tables...</div>
-          <div class="trace-line">[0x0001] destination unreachable</div>
-          <div class="trace-line err">[0x0002] ERR_CONNECTION_LOST</div>
-          <div class="trace-line">[0x0003] aborting request</div>
+          <div class="trace-line ok">[OK]  system::boot sequence initiated</div>
+          <div class="trace-line ok">[OK]  kernel::modules loaded</div>
+          <div class="trace-line ok">[OK]  network::interface active</div>
+          <div class="trace-line ok">[OK]  routing::table resolved</div>
+          <div class="trace-line err">[ERR] router::destination unreachable — 404</div>
+          <div class="trace-line warn">[WARN]  signal::packet lost in transit</div>
+          <div class="trace-line info">[INFO]  diagnostic::correlation complete</div>
+          <div class="trace-line info">[INFO]  system::awaiting re-route directive...</div>
         </div>
 
-        <a href={import.meta.env.BASE_URL} class="error-btn">
-          <span class="btn-arrow" aria-hidden="true">&#x25C0;</span>
-          RETURN TO BASE
-        </a>
+        <div class="error-actions">
+          <a href={import.meta.env.BASE_URL} class="error-btn primary">
+            <span class="btn-arrow" aria-hidden="true">&#x25C0;</span>
+            RETURN TO BASE
+          </a>
+          <button class="error-btn secondary" id="retryBtn" type="button">
+            <span class="btn-icon" aria-hidden="true">&#x21BB;</span>
+            RETRY
+          </button>
+        </div>
       </div>
     </div>
 
-    <p class="error-footer">SYSTEM_INTEGRITY :: COMPROMISED &mdash; RECOMMEND IMMEDIATE EVACUATION</p>
+    <p class="error-footer">
+      <span class="footer-blink" aria-hidden="true">&#x25C6;</span>
+      SYSTEM_INTEGRITY :: COMPROMISED &mdash; RECOMMEND IMMEDIATE EVACUATION
+      <span class="footer-blink" aria-hidden="true">&#x25C6;</span>
+    </p>
   </main>
 </Layout>
+
+<script>
+  var routeEl = document.getElementById('routeDisplay');
+  var tsEl = document.getElementById('timestampDisplay');
+
+  if (routeEl) {
+    routeEl.textContent = window.location.pathname;
+  }
+
+  function pad(n) { return String(n).padStart(2, '0'); }
+  function updateTime() {
+    if (!tsEl) return;
+    var d = new Date();
+    tsEl.textContent = pad(d.getHours()) + ':' + pad(d.getMinutes()) + ':' + pad(d.getSeconds());
+  }
+  updateTime();
+  setInterval(updateTime, 1000);
+
+  var retryBtn = document.getElementById('retryBtn');
+  if (retryBtn) {
+    retryBtn.addEventListener('click', function () {
+      var btn = retryBtn;
+      btn.disabled = true;
+      btn.textContent = '⟳ RETRYING...';
+      btn.classList.add('loading');
+      setTimeout(function () {
+        window.location.reload();
+      }, 1200);
+    });
+  }
+</script>
 
 <style>
   .error-page {
@@ -73,162 +129,370 @@ import Layout from '../layouts/Layout.astro';
     position: fixed;
     top: 50%;
     left: 50%;
-    width: 600px;
-    height: 600px;
+    width: 700px;
+    height: 700px;
     transform: translate(-50%, -50%);
     border-radius: 50%;
     background: radial-gradient(ellipse at center, var(--color-danger) 0%, transparent 70%);
-    opacity: 0.08;
+    opacity: 0.06;
     pointer-events: none;
     z-index: 0;
+    animation: glow-pulse 3s ease-in-out infinite;
+  }
+
+  @keyframes glow-pulse {
+    0%, 100% { opacity: 0.04; transform: translate(-50%, -50%) scale(1); }
+    50% { opacity: 0.1; transform: translate(-50%, -50%) scale(1.05); }
   }
 
   .error-terminal {
     position: relative;
     z-index: 1;
     width: 100%;
-    max-width: 560px;
+    max-width: 580px;
     background: var(--color-bg-card);
-    border: 1px solid var(--color-danger);
+    border: 1px solid rgba(255, 51, 102, 0.3);
     border-radius: 8px;
     overflow: hidden;
-    box-shadow: 0 0 40px rgba(255, 51, 102, 0.12);
+    box-shadow: 0 0 40px rgba(255, 51, 102, 0.1), inset 0 0 40px rgba(255, 51, 102, 0.02);
+    transition: border-color 0.3s ease;
+  }
+
+  .error-terminal:hover {
+    border-color: rgba(255, 51, 102, 0.5);
+    box-shadow: 0 0 60px rgba(255, 51, 102, 0.15);
   }
 
   .term-header {
     display: flex;
     align-items: center;
     padding: 10px 16px;
-    background: rgba(0, 0, 0, 0.2);
-    border-bottom: 1px solid var(--color-danger);
+    background: rgba(0, 0, 0, 0.25);
+    border-bottom: 1px solid rgba(255, 51, 102, 0.2);
     gap: 12px;
   }
 
-  .term-dots { display: flex; gap: 6px; }
+  .term-dots { display: flex; gap: 6px; flex-shrink: 0; }
   .dot { width: 10px; height: 10px; border-radius: 50%; }
-  .dot-red { background: #ff5f56; }
-  .dot-yellow { background: #ffbd2e; }
-  .dot-green { background: #27c93f; }
+  .dot-red { background: #FF5F56; }
+  .dot-yellow { background: #FFBD2E; }
+  .dot-green { background: #27C93F; }
+
   .term-title {
     flex: 1;
     text-align: center;
     font-size: 0.7rem;
     font-weight: 500;
-    color: var(--color-text-muted);
-    letter-spacing: 0.5px;
+    color: var(--color-danger);
+    letter-spacing: 1.5px;
     text-transform: uppercase;
   }
-  .term-spacer { width: 44px; }
+
+  .term-logo {
+    font-size: 0.6rem;
+    font-weight: 700;
+    color: var(--color-danger);
+    letter-spacing: 1px;
+    padding: 2px 8px;
+    border: 1px solid rgba(255, 51, 102, 0.4);
+    border-radius: 3px;
+    opacity: 0.6;
+    flex-shrink: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .error-terminal:hover .term-logo { opacity: 1; }
 
   .term-body {
     padding: 32px 24px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 16px;
+    gap: 20px;
   }
 
+  /* GLITCH 404 */
   .error-code {
     display: flex;
-    gap: 8px;
-    margin-bottom: 8px;
+    gap: 4px;
+    margin-bottom: 4px;
+    position: relative;
   }
 
   .error-num {
-    font-size: 4rem;
+    font-size: 5rem;
     font-weight: 800;
     color: var(--color-danger);
     line-height: 1;
-    text-shadow: 0 0 30px rgba(255, 51, 102, 0.4);
+    text-shadow:
+      0 0 30px rgba(255, 51, 102, 0.4),
+      0 0 60px rgba(255, 51, 102, 0.2);
+    position: relative;
+    display: inline-block;
+    animation: glitch-skew 4s infinite linear alternate-reverse;
   }
 
-  .blink {
-    animation: blink 1s step-end infinite;
+  .error-num::before,
+  .error-num::after {
+    content: attr(data-glitch);
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
   }
 
-  @keyframes blink {
+  .error-num::before {
+    color: var(--color-accent);
+    animation: glitch-top 3s infinite linear alternate-reverse;
+    clip-path: polygon(0 0, 100% 0, 100% 35%, 0 35%);
+  }
+
+  .error-num::after {
+    color: var(--color-warning);
+    animation: glitch-bottom 2.5s infinite linear alternate-reverse;
+    clip-path: polygon(0 65%, 100% 65%, 100% 100%, 0 100%);
+  }
+
+  @keyframes glitch-skew {
+    0% { transform: skew(0deg); }
+    10% { transform: skew(-2deg); }
+    20% { transform: skew(0deg); }
+    90% { transform: skew(0deg); }
+    95% { transform: skew(1deg); }
+    100% { transform: skew(0deg); }
+  }
+
+  @keyframes glitch-top {
+    0% { opacity: 0; transform: translateX(0); }
+    2% { opacity: 0.8; transform: translateX(-3px); }
+    4% { opacity: 0; transform: translateX(0); }
+    42% { opacity: 0; }
+    44% { opacity: 0.6; transform: translateX(2px); }
+    46% { opacity: 0; transform: translateX(0); }
+    100% { opacity: 0; }
+  }
+
+  @keyframes glitch-bottom {
+    0% { opacity: 0; transform: translateX(0); }
+    3% { opacity: 0.7; transform: translateX(3px); }
+    5% { opacity: 0; transform: translateX(0); }
     50% { opacity: 0; }
+    52% { opacity: 0.5; transform: translateX(-2px); }
+    54% { opacity: 0; transform: translateX(0); }
+    100% { opacity: 0; }
+  }
+
+  .error-zero {
+    animation: zero-blink 1.2s step-end infinite;
+  }
+
+  @keyframes zero-blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.15; }
+  }
+
+  /* INFO GRID */
+  .error-grid {
+    width: 100%;
+    max-width: 380px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 12px 16px;
+    background: rgba(0, 0, 0, 0.25);
+    border: 1px solid rgba(255, 51, 102, 0.1);
+    border-radius: 4px;
   }
 
   .error-msg {
     display: flex;
-    gap: 8px;
-    font-size: 0.75rem;
-    width: 100%;
-    max-width: 380px;
+    gap: 6px;
+    font-size: 0.72rem;
+    font-weight: 400;
+    align-items: center;
   }
 
   .error-label {
     color: var(--color-text-muted);
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    min-width: 80px;
     flex-shrink: 0;
+  }
+
+  .error-sep {
+    color: var(--color-text-dim);
   }
 
   .error-value {
     color: var(--color-text);
+    font-weight: 400;
+    word-break: break-all;
   }
 
+  .error-value.err {
+    color: var(--color-danger);
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+
+  .badge-danger {
+    display: inline-block;
+    padding: 1px 8px;
+    border: 1px solid rgba(255, 51, 102, 0.3);
+    border-radius: 3px;
+    color: var(--color-danger);
+    font-size: 0.6rem;
+    font-weight: 600;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    animation: badge-pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes badge-pulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(255, 51, 102, 0.2); }
+    50% { box-shadow: 0 0 8px 2px rgba(255, 51, 102, 0.3); }
+  }
+
+  .route-val {
+    font-size: 0.65rem;
+    color: var(--color-text-muted);
+    font-weight: 300;
+  }
+
+  /* TRACE */
   .error-trace {
     width: 100%;
     max-width: 380px;
     display: flex;
     flex-direction: column;
-    gap: 4px;
-    margin-top: 8px;
-    padding: 12px;
+    gap: 3px;
+    padding: 12px 14px;
     background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.05);
     border-radius: 4px;
-    font-size: 0.7rem;
   }
 
   .trace-line {
-    color: var(--color-text-muted);
+    font-size: 0.62rem;
+    font-weight: 400;
+    letter-spacing: 0.2px;
+    padding: 2px 0;
+    font-family: 'JetBrains Mono', monospace;
   }
 
+  .trace-line.ok { color: var(--color-success); }
+  .trace-line.err { color: var(--color-danger); font-weight: 600; }
+  .trace-line.warn { color: var(--color-warning); }
+  .trace-line.info { color: var(--color-text-muted); }
+
   .trace-line.err {
-    color: var(--color-danger);
-    font-weight: 600;
+    animation: trace-err-glow 1.5s ease-in-out infinite;
+  }
+
+  @keyframes trace-err-glow {
+    0%, 100% { text-shadow: 0 0 0 transparent; }
+    50% { text-shadow: 0 0 8px rgba(255, 51, 102, 0.4); }
+  }
+
+  /* ACTIONS */
+  .error-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 4px;
+    width: 100%;
+    max-width: 380px;
   }
 
   .error-btn {
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: 8px;
-    margin-top: 8px;
-    padding: 10px 24px;
-    background: var(--color-bg-card);
-    border: 1px solid var(--color-danger);
+    padding: 10px 20px;
     border-radius: 4px;
-    color: var(--color-danger);
     font-family: inherit;
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     font-weight: 600;
     letter-spacing: 1px;
     text-decoration: none;
     text-transform: uppercase;
+    cursor: pointer;
     transition: all 0.3s ease;
+    flex: 1;
   }
 
-  .error-btn:hover {
+  .error-btn.primary {
+    background: rgba(255, 51, 102, 0.08);
+    border: 1px solid rgba(255, 51, 102, 0.4);
+    color: var(--color-danger);
+  }
+
+  .error-btn.primary:hover {
     background: var(--color-danger);
     color: #fff;
     box-shadow: 0 0 20px rgba(255, 51, 102, 0.3);
   }
+
+  .error-btn.secondary {
+    background: transparent;
+    border: 1px solid var(--color-border);
+    color: var(--color-text-muted);
+  }
+
+  .error-btn.secondary:hover {
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+    box-shadow: 0 0 12px var(--color-glow);
+  }
+
+  .error-btn.secondary.loading {
+    color: var(--color-accent);
+    border-color: var(--color-accent);
+    background: var(--color-accent-dim);
+    cursor: not-allowed;
+  }
+
+  .btn-arrow { font-size: 0.7rem; }
+  .btn-icon { font-size: 0.85rem; }
 
   .error-btn:focus-visible {
     outline: 2px solid var(--color-accent);
     outline-offset: 2px;
   }
 
-  .btn-arrow {
-    font-size: 0.7rem;
-  }
-
+  /* FOOTER */
   .error-footer {
     position: relative;
     z-index: 1;
     font-size: 0.6rem;
     color: var(--color-text-dim);
-    letter-spacing: 1px;
+    letter-spacing: 2px;
     text-align: center;
+    text-transform: uppercase;
+  }
+
+  .footer-blink {
+    animation: footer-blink 1.5s step-end infinite;
+    margin: 0 6px;
+  }
+
+  @keyframes footer-blink {
+    50% { opacity: 0; }
+  }
+
+  /* RESPONSIVE */
+  @media (max-width: 640px) {
+    .error-num { font-size: 3.5rem; }
+    .term-body { padding: 24px 16px; gap: 16px; }
+    .error-grid { padding: 10px 12px; }
+    .error-msg { font-size: 0.65rem; }
+    .error-label { min-width: 64px; }
+    .error-trace { padding: 10px 12px; }
+    .trace-line { font-size: 0.55rem; }
+    .error-actions { flex-direction: column; }
+    .error-btn { padding: 10px 16px; }
   }
 </style>
