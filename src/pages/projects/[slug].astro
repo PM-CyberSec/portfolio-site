@@ -17,7 +17,7 @@ const { project } = Astro.props;
 <Layout title={`${project.title} · Paula Maged`}>
   <main class="detail-page">
     <nav class="back-nav">
-      <a href="/" class="back-link" onclick="sessionStorage.setItem('scrollTo','projects')">
+      <a href={import.meta.env.BASE_URL} class="back-link" onclick="sessionStorage.setItem('scrollTo','projects')">
         <span aria-hidden="true">&larr;</span> back to projects
       </a>
     </nav>
