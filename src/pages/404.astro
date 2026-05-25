@@ -46,7 +46,7 @@ import Layout from '../layouts/Layout.astro';
           <div class="trace-line">[0x0003] aborting request</div>
         </div>
 
-        <a href="/" class="error-btn">
+        <a href={import.meta.env.BASE_URL} class="error-btn">
           <span class="btn-arrow" aria-hidden="true">&#x25C0;</span>
           RETURN TO BASE
         </a>
