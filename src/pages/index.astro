@@ -825,10 +825,41 @@ import { projects } from '../data/projects';
   }
 
   @media (max-width: 640px) {
-    .nav-inner { flex-wrap: wrap; }
+    .nav-inner { flex-wrap: wrap; gap: 8px; }
     .nav-links { order: 3; width: 100%; justify-content: center; }
-    .badge-strip { gap: 6px; }
+    .nav-link { padding: 8px 10px; font-size: 0.55rem; }
+    .badge-strip { gap: 4px; }
+    .badge-strip .badge { font-size: 0.5rem; padding: 3px 6px; }
     .contact-strip { gap: 4px; }
-    .contact-link { font-size: 0.65rem; padding: 4px 10px; }
+    .contact-link { font-size: 0.6rem; padding: 6px 10px; }
+    .stats-row { gap: 8px; }
+    .stat-number { font-size: 1.2rem; }
+    .contact-section { padding: 16px; }
+    .contact-layout { gap: 16px; }
+    .channel-card { padding: 10px 12px; }
+    .channel-value { font-size: 0.65rem; }
+    .projects-grid { gap: 10px; }
+  }
+
+  @media (max-width: 480px) {
+    .stats-row { flex-wrap: wrap; gap: 4px; }
+    .stat-cell { flex: 1 1 45%; padding: 6px 4px; }
+    .stat-number { font-size: 1rem; }
+    .stat-desc { font-size: 0.5rem; }
+    .hero-split { gap: 16px; }
+    .badge-strip .badge { font-size: 0.45rem; padding: 2px 5px; gap: 3px; }
+    .nav-link { padding: 6px 6px; font-size: 0.5rem; letter-spacing: 0; }
+    .nav-brand { font-size: 0.75rem; }
+    .theme-btn { padding: 6px 10px; font-size: 0.6rem; gap: 4px; }
+    .section { padding: 24px 0; }
+    .section-title { font-size: 0.75rem; }
+    .projects-toolbar { gap: 8px; }
+    .search-box { padding: 6px 10px; }
+    .search-input { font-size: 0.65rem; }
+    .contact-link { font-size: 0.55rem; padding: 6px 8px; }
+    .contact-strip { gap: 3px; }
+    .form-row { gap: 8px; }
+    .form-submit { width: 100%; justify-content: center; }
+    .metrics-card { padding: 8px; }
   }
 </style>

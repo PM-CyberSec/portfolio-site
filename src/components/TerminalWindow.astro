@@ -117,7 +117,11 @@ const { title = 'terminal', glow = true } = Astro.props;
   }
 
   @media (max-width: 640px) {
-    .terminal-body { padding: 16px; height: 280px; }
+    .terminal-body { padding: 14px; height: 260px; }
     .terminal-logo { display: none; }
+  }
+
+  @media (max-width: 480px) {
+    .terminal-body { height: 220px; padding: 10px; }
   }
 </style>

@@ -304,9 +304,20 @@ const { tabs } = project;
   }
 
   @media (max-width: 640px) {
-    .tab-btn { padding: 8px 10px; font-size: 0.6rem; }
-    .tab-panels { padding: 14px; }
+    .tab-btn { padding: 8px 10px; font-size: 0.55rem; }
+    .tab-panels { padding: 12px; }
     .brief-value { font-size: 0.72rem; }
-    .arch-json { font-size: 0.65rem; }
+    .arch-json { font-size: 0.6rem; }
+    .metric-line { font-size: 0.65rem; gap: 6px; }
+    .telemetry-repo { width: 100%; justify-content: center; }
+  }
+
+  @media (max-width: 480px) {
+    .tabs-bar { gap: 0; }
+    .tab-btn { padding: 6px 8px; font-size: 0.5rem; gap: 3px; }
+    .tab-btn .tab-icon { display: none; }
+    .tab-panels { padding: 10px; }
+    .chip { font-size: 0.55rem; padding: 2px 7px; }
+    .brief-block { gap: 14px; }
   }
 </style>

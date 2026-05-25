@@ -260,4 +260,17 @@ const paulaSrc = base + '/ProfilePicture.jpeg';
   .btn-icon {
     font-size: 0.55rem;
   }
+
+  @media (max-width: 640px) {
+    .reveal-stage { width: 220px; height: 140px; }
+    .rick-quote { font-size: 0.5rem; }
+    .paula-name { font-size: 0.65rem; }
+    .paula-title { font-size: 0.5rem; }
+    .reveal-sub { flex-direction: column; gap: 8px; }
+    .reveal-status { min-width: auto; text-align: center; }
+  }
+
+  @media (max-width: 480px) {
+    .reveal-stage { width: 180px; height: 120px; }
+  }
 </style>
