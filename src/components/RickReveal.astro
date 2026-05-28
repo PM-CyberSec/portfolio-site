@@ -25,6 +25,9 @@ const paulaSrc = base + '/ProfilePicture.jpeg';
     </div>
     <div class="reveal-panel hidden" id="secondPanel">
       <img src={secondSrc} alt="" class="reveal-img" loading="eager" />
+      <div class="rick-overlay">
+        <span class="rick-quote" id="secondQuote"></span>
+      </div>
     </div>
     <div class="reveal-panel hidden" id="paulaPanel">
       <img src={paulaSrc} alt={name} class="reveal-img" loading="eager" />
@@ -49,12 +52,14 @@ const paulaSrc = base + '/ProfilePicture.jpeg';
     const secondPanel = document.getElementById('secondPanel');
     const paulaPanel = document.getElementById('paulaPanel');
     const rickQuote = document.getElementById('rickQuote');
+    const secondQuote = document.getElementById('secondQuote');
     const paulaName = document.getElementById('paulaName');
     const paulaTitle = document.getElementById('paulaTitle');
     const status = document.getElementById('revealStatus');
     const btn = document.getElementById('revealBtn');
 
-    const quote = 'Never gonna give you up... Just RICKKING!';
+    const quote = 'Loading interdimensional developer\u2026';
+    const secondText = 'Welcome to my cyber domain';
     const fullName = 'PAULA MAGED';
     const fullTitle = 'Junior Cybersecurity Analyst';
 
@@ -81,7 +86,7 @@ const paulaSrc = base + '/ProfilePicture.jpeg';
         from.classList.add('hidden');
         to.classList.remove('hidden');
         to.classList.add('fade-in');
-      }, 600);
+      }, 400);
     }
 
     function reveal() {
@@ -91,23 +96,27 @@ const paulaSrc = base + '/ProfilePicture.jpeg';
       status.textContent = 'DECRYPTING IDENTITY...';
       transition(firstPanel, secondPanel);
       setTimeout(function() {
-        transition(secondPanel, paulaPanel);
-        setTimeout(function() {
-          status.textContent = 'IDENTITY CONFIRMED';
-          typeWriter(paulaName, fullName, 80, function () {
-            setTimeout(function () {
-              typeWriter(paulaTitle, fullTitle, 50);
-            }, 300);
-          });
-          btn.textContent = 'DONE';
-          btn.disabled = false;
-          btn.classList.add('done');
-        }, 600);
-      }, 1200);
+        typeWriter(secondQuote, secondText, 25, function () {
+          setTimeout(function() {
+            transition(secondPanel, paulaPanel);
+            setTimeout(function() {
+              status.textContent = 'IDENTITY CONFIRMED';
+              typeWriter(paulaName, fullName, 45, function () {
+                setTimeout(function () {
+                  typeWriter(paulaTitle, fullTitle, 35);
+                }, 200);
+              });
+              btn.textContent = 'DONE';
+              btn.disabled = false;
+              btn.classList.add('done');
+            }, 450);
+          }, 700);
+        });
+      }, 700);
     }
 
-    typeWriter(rickQuote, quote, 40, function () {
-      setTimeout(reveal, 2500);
+    typeWriter(rickQuote, quote, 25, function () {
+      setTimeout(reveal, 800);
     });
 
     btn.addEventListener('click', reveal);
@@ -143,7 +152,7 @@ const paulaSrc = base + '/ProfilePicture.jpeg';
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: opacity 0.6s ease, transform 0.6s ease;
+    transition: opacity 0.4s ease, transform 0.4s ease;
   }
 
   .reveal-panel.hidden {

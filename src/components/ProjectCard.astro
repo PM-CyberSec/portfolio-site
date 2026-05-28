@@ -22,7 +22,7 @@ const {
 } = Astro.props;
 ---
 
-<div class="project-card" data-href={href}>
+<div class="project-card" data-href={href} data-title={title.toLowerCase()} data-severity={severity} data-tags={tags.join(',')} data-stack={stack.join(',')}>
   {href && <a href={href} class="card-link-overlay" aria-label={`View details for ${title}`}></a>}
   <div class="card-top">
     <div class="card-severity" data-severity={severity}>

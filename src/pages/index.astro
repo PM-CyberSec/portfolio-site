@@ -46,7 +46,7 @@ import { projects } from '../data/projects';
             <StatusBadge label="CLASSIFICATION" value="OPEN TO WORK" variant="warning" />
             <StatusBadge label="ROLE" value="JUNIOR CYBERSECURITY" variant="info" />
             <StatusBadge label="LOCATION" value="CAIRO, EGYPT" variant="info" />
-            <StatusBadge label="CGPA" value="4.1 / 4.3" variant="accent" />
+            <StatusBadge label="CGPA" value="4.0 / 4.3" variant="accent" />
           </div>
 
           <div class="contact-strip">
@@ -88,11 +88,11 @@ import { projects } from '../data/projects';
     <!-- STATS ROW -->
     <div class="stats-row">
       <div class="stat-cell">
-        <span class="stat-number">11</span>
-        <span class="stat-desc">project branches</span>
+        <span class="stat-number">{projects.length}</span>
+        <span class="stat-desc">projects built</span>
       </div>
       <div class="stat-cell">
-        <span class="stat-number">4.1</span>
+        <span class="stat-number">4.0</span>
         <span class="stat-desc">CGPA / 4.3</span>
       </div>
       <div class="stat-cell">
@@ -119,7 +119,7 @@ import { projects } from '../data/projects';
       <div class="section-header">
         <span class="section-number">04</span>
         <h2 class="section-title">development_path</h2>
-        <span class="section-meta">// 14 milestones</span>
+        <span class="section-meta">// 19 milestones</span>
       </div>
       <Timeline />
     </section>
@@ -129,7 +129,7 @@ import { projects } from '../data/projects';
       <div class="section-header">
         <span class="section-number">05</span>
         <h2 class="section-title">projects_built</h2>
-        <span class="section-meta">// 11 branches</span>
+        <span class="section-meta">// {projects.length} projects</span>
       </div>
 
       <div class="projects-toolbar">
@@ -138,6 +138,13 @@ import { projects } from '../data/projects';
           <input type="text" class="search-input" id="projectSearch" placeholder="filter projects by name, tech, or tag..." />
           <span class="search-hint" aria-hidden="true">ESC to clear</span>
         </label>
+        <div class="severity-filters" id="severityFilters">
+          <button class="sev-filter active" data-sev="all" type="button">all</button>
+          <button class="sev-filter" data-sev="critical" type="button">critical</button>
+          <button class="sev-filter" data-sev="high" type="button">high</button>
+          <button class="sev-filter" data-sev="medium" type="button">medium</button>
+          <button class="sev-filter" data-sev="low" type="button">low</button>
+        </div>
         <span class="search-count" id="projectCount">{projects.length} of {projects.length}</span>
       </div>
 
@@ -211,29 +218,26 @@ import { projects } from '../data/projects';
           </div>
         </div>
 
-        <form class="message-form" id="contactForm" action="https://formsubmit.co/paulamagedcyber@gmail.com" method="POST">
+        <form class="message-form" id="contactForm" novalidate>
           <h3 class="form-title">&#x25B8; send_message</h3>
           <div class="form-row">
             <label class="form-field">
               <span class="form-label">name</span>
-              <input type="text" name="name" required class="form-input" placeholder="your name" />
+              <input type="text" id="formName" required class="form-input" placeholder="your name" />
             </label>
             <label class="form-field">
               <span class="form-label">email</span>
-              <input type="email" name="email" required class="form-input" placeholder="your email" />
+              <input type="email" id="formEmail" required class="form-input" placeholder="your email" />
             </label>
           </div>
           <label class="form-field">
             <span class="form-label">subject</span>
-            <input type="text" name="subject" class="form-input" placeholder="subject" />
+            <input type="text" id="formSubject" class="form-input" placeholder="subject" />
           </label>
           <label class="form-field">
             <span class="form-label">message</span>
-            <textarea name="message" required class="form-input form-textarea" placeholder="type your message..." rows="4"></textarea>
+            <textarea id="formMessage" required class="form-input form-textarea" placeholder="type your message..." rows="4"></textarea>
           </label>
-          <input type="hidden" name="_next" value="https://PM-CyberSec.github.io/portfolio-site/" />
-          <input type="hidden" name="_captcha" value="true" />
-          <input type="text" name="_honey" style="display:none" />
           <button type="submit" class="form-submit">
             <span aria-hidden="true">&#x25B8;</span> transmit
           </button>
@@ -266,20 +270,59 @@ import { projects } from '../data/projects';
   var search = document.getElementById('projectSearch');
   var grid = document.getElementById('projectGrid');
   var count = document.getElementById('projectCount');
+  var sevFilter = 'all';
   if (search && grid) {
     var cards = grid.querySelectorAll('.project-card');
-    search.addEventListener('input', function() {
+    function matches(card, q) {
+      if (q) {
+        var tags = (card.getAttribute('data-tags') || '').toLowerCase();
+        var stack = (card.getAttribute('data-stack') || '').toLowerCase();
+        var title = (card.getAttribute('data-title') || '').toLowerCase();
+        if (tags.indexOf(q) === -1 && stack.indexOf(q) === -1 && title.indexOf(q) === -1) return false;
+      }
+      if (sevFilter !== 'all') {
+        var cardSev = (card.getAttribute('data-severity') || '').toLowerCase();
+        if (cardSev !== sevFilter) return false;
+      }
+      return true;
+    }
+    function updateFilter() {
       var q = search.value.toLowerCase().trim();
       var visible = 0;
       cards.forEach(function(c) {
-        var match = !q || c.textContent.toLowerCase().indexOf(q) !== -1;
+        var match = matches(c, q);
         c.style.display = match ? '' : 'none';
         if (match) visible++;
       });
       if (count) count.textContent = visible + ' of ' + cards.length;
-    });
+    }
+    search.addEventListener('input', updateFilter);
     search.addEventListener('keydown', function(e) {
-      if (e.key === 'Escape') { search.value = ''; search.dispatchEvent(new Event('input')); search.blur(); }
+      if (e.key === 'Escape') { search.value = ''; updateFilter(); search.blur(); }
+    });
+
+    var sevBtns = document.querySelectorAll('.sev-filter');
+    sevBtns.forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        sevBtns.forEach(function(b) { b.classList.remove('active'); });
+        btn.classList.add('active');
+        sevFilter = btn.getAttribute('data-sev');
+        updateFilter();
+      });
+    });
+  }
+
+  var contactForm = document.getElementById('contactForm');
+  if (contactForm) {
+    contactForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      var name = document.getElementById('formName').value.trim();
+      var email = document.getElementById('formEmail').value.trim();
+      var subject = document.getElementById('formSubject').value.trim() || 'Message from portfolio';
+      var message = document.getElementById('formMessage').value.trim();
+      var body = 'From: ' + name + ' (' + email + ')\n\n' + message;
+      var mailto = 'mailto:paulamagedcyber@gmail.com?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
+      window.location.href = mailto;
     });
   }
 </script>
@@ -411,6 +454,21 @@ import { projects } from '../data/projects';
     letter-spacing: 0.5px;
   }
 
+  /* TIMELINE PARALLAX SECTION */
+  #timeline {
+    position: relative;
+    z-index: 2;
+  }
+
+  #timeline::before {
+    content: '';
+    position: absolute;
+    inset: -40px 0;
+    background: linear-gradient(180deg, transparent 0%, rgba(0, 255, 204, 0.02) 20%, rgba(0, 255, 204, 0.04) 50%, rgba(0, 255, 204, 0.02) 80%, transparent 100%);
+    pointer-events: none;
+    z-index: -1;
+  }
+
   /* BADGE STRIP */
   .badge-strip {
     display: flex;
@@ -509,6 +567,37 @@ import { projects } from '../data/projects';
     font-size: 0.6rem;
     white-space: nowrap;
     flex-shrink: 0;
+  }
+
+  .severity-filters {
+    display: flex;
+    gap: 4px;
+    flex-shrink: 0;
+  }
+
+  .sev-filter {
+    background: none;
+    border: 1px solid var(--color-border);
+    color: var(--color-text-muted);
+    font-family: inherit;
+    font-size: 0.6rem;
+    padding: 4px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .sev-filter:hover {
+    border-color: var(--color-accent-dim);
+    color: var(--color-text);
+  }
+
+  .sev-filter.active {
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+    box-shadow: 0 0 8px var(--color-glow);
   }
 
   /* PROJECTS GRID */
@@ -811,6 +900,7 @@ import { projects } from '../data/projects';
 
     .projects-toolbar { flex-direction: column; align-items: stretch; }
     .search-hint { display: none; }
+    .severity-filters { flex-wrap: wrap; }
   }
 
   @media (max-width: 768px) {

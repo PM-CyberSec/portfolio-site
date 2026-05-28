@@ -93,6 +93,41 @@ const entries: Entry[] = [
     type: 'project',
   },
   {
+    year: 'May 2026',
+    title: 'NeonNet · End-to-End Encrypted Messenger',
+    subtitle: 'Independent Project',
+    description: 'End-to-end encrypted messaging and file transfer over TCP relay. RSA-4096 + AES-256-GCM hybrid encryption with Bash TUI and Python AsyncIO relay.',
+    type: 'project',
+  },
+  {
+    year: 'May 2026',
+    title: 'DLDS · Digital Forensics & Detection System',
+    subtitle: 'Academic Project',
+    description: 'Agent-based digital forensics platform with real-time event monitoring, Zeek/Suricata telemetry correlation, and Laravel + React case management dashboard.',
+    type: 'project',
+  },
+  {
+    year: 'May 2026',
+    title: 'IoT Sensor Network · Secure Enterprise Topology',
+    subtitle: 'Academic Project',
+    description: 'Enterprise IoT network simulation with VLAN segmentation, inter-VLAN routing, and centralized monitoring on Cisco Packet Tracer.',
+    type: 'project',
+  },
+  {
+    year: 'May 2026',
+    title: 'Static Web UI · Web Programming Lab',
+    subtitle: 'Academic Project',
+    description: 'Collection of static web pages and PHP scripts demonstrating HTML/CSS frontend design and server-side form processing.',
+    type: 'project',
+  },
+  {
+    year: 'Active',
+    title: 'Inventory Vault · Product Management Security',
+    subtitle: 'Active Development',
+    description: 'Hardened asset management framework built with Laravel 11, integrating security controls into product lifecycle workflows.',
+    type: 'project',
+  },
+  {
     year: 'Active',
     title: 'TryHackMe — Cyber Security 101',
     subtitle: 'Continuous Learning',
@@ -110,10 +145,10 @@ const entries: Entry[] = [
 ---
 
 <div class="timeline">
-  <div class="timeline-track" aria-hidden="true"></div>
+  <div class="timeline-track" id="timelineTrack" aria-hidden="true"></div>
   {
     entries.map((entry, i) => (
-      <div class="timeline-entry" data-type={entry.type}>
+      <div class="timeline-entry reveal-entry" data-type={entry.type} data-index={i}>
         <div class="timeline-marker">
           <span class="marker-dot"></span>
           <span class="marker-line" aria-hidden="true"></span>
@@ -130,6 +165,72 @@ const entries: Entry[] = [
   }
 </div>
 
+<script>
+  (function() {
+    var entries = document.querySelectorAll('.reveal-entry');
+    var track = document.getElementById('timelineTrack');
+
+    function updateActive(index) {
+      entries.forEach(function(el, i) {
+        el.classList.toggle('active', i === index);
+      });
+      if (track) {
+        var pct = entries.length > 1 ? (index / (entries.length - 1)) * 100 : 0;
+        track.style.setProperty('--track-pct', pct + '%');
+      }
+    }
+
+    if ('IntersectionObserver' in window) {
+      var observer = new IntersectionObserver(function(entriesList) {
+        entriesList.forEach(function(e) {
+          if (e.isIntersecting) {
+            e.target.classList.add('visible');
+          }
+        });
+      }, { threshold: 0.15, rootMargin: '0px 0px -40px 0px' });
+
+      entries.forEach(function(el) {
+        observer.observe(el);
+      });
+    } else {
+      entries.forEach(function(el) { el.classList.add('visible'); });
+    }
+
+    var tlSection = document.getElementById('timeline');
+    if (tlSection) {
+      function updateOnScroll() {
+        var tlRect = tlSection.getBoundingClientRect();
+        var vh = window.innerHeight;
+        /* only track when timeline is in view */
+        if (tlRect.bottom < 0 || tlRect.top > vh) return;
+        var sectionCenter = tlRect.top + tlRect.height / 2;
+        var viewCenter = vh / 2;
+        var closest = -1;
+        var closestDist = Infinity;
+        entries.forEach(function(el, i) {
+          var rect = el.getBoundingClientRect();
+          var entryCenter = rect.top + rect.height / 2;
+          var dist = Math.abs(entryCenter - viewCenter);
+          if (dist < closestDist) {
+            closestDist = dist;
+            closest = i;
+          }
+        });
+        if (closest >= 0) updateActive(closest);
+      }
+
+      var tickingTl = false;
+      window.addEventListener('scroll', function() {
+        if (!tickingTl) {
+          requestAnimationFrame(function() { updateOnScroll(); tickingTl = false; });
+          tickingTl = true;
+        }
+      });
+      updateOnScroll();
+    }
+  })();
+</script>
+
 <style>
   .timeline {
     position: relative;
@@ -144,14 +245,59 @@ const entries: Entry[] = [
     top: 0;
     bottom: 0;
     width: 2px;
-    background: linear-gradient(180deg, var(--color-accent) 0%, var(--color-accent-dim) 50%, transparent 100%);
+    background: linear-gradient(180deg, var(--color-border) 0%, var(--color-border) 100%);
     opacity: 0.3;
+    transition: background 0.6s ease;
+  }
+
+  .timeline-track::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: var(--track-pct, 0%);
+    background: linear-gradient(180deg, var(--color-accent) 0%, var(--color-accent-dim) 100%);
+    transition: height 0.6s ease;
   }
 
   .timeline-entry {
     display: flex;
     gap: 20px;
     position: relative;
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+
+  .timeline-entry.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .timeline-entry[data-index="0"].visible { transition-delay: 0s; }
+  .timeline-entry[data-index="1"].visible { transition-delay: 0.05s; }
+  .timeline-entry[data-index="2"].visible { transition-delay: 0.1s; }
+  .timeline-entry[data-index="3"].visible { transition-delay: 0.15s; }
+  .timeline-entry[data-index="4"].visible { transition-delay: 0.2s; }
+  .timeline-entry[data-index="5"].visible { transition-delay: 0.25s; }
+  .timeline-entry[data-index="6"].visible { transition-delay: 0.3s; }
+  .timeline-entry[data-index="7"].visible { transition-delay: 0.35s; }
+  .timeline-entry[data-index="8"].visible { transition-delay: 0.4s; }
+  .timeline-entry[data-index="9"].visible { transition-delay: 0.45s; }
+  .timeline-entry[data-index="10"].visible { transition-delay: 0.5s; }
+  .timeline-entry[data-index="11"].visible { transition-delay: 0.55s; }
+  .timeline-entry[data-index="12"].visible { transition-delay: 0.6s; }
+  .timeline-entry[data-index="13"].visible { transition-delay: 0.65s; }
+
+  .timeline-entry.active .timeline-card {
+    border-color: var(--color-accent);
+    box-shadow: 0 0 20px var(--color-glow);
+  }
+
+  .timeline-entry.active .marker-dot {
+    box-shadow: 0 0 14px var(--color-glow);
+    transform: scale(1.3);
   }
 
   .timeline-marker {
@@ -170,7 +316,7 @@ const entries: Entry[] = [
     background: var(--color-bg);
     border: 2px solid var(--color-accent);
     z-index: 1;
-    transition: all 0.3s ease;
+    transition: all 0.4s ease;
     flex-shrink: 0;
   }
 
@@ -191,9 +337,14 @@ const entries: Entry[] = [
     border-radius: 8px;
     padding: 16px 20px;
     margin: 12px 0;
-    transition: all 0.3s ease;
+    transition: all 0.4s ease;
     position: relative;
     min-width: 0;
+  }
+
+  .timeline-entry.active .timeline-card {
+    border-color: var(--color-accent);
+    box-shadow: 0 0 20px var(--color-glow);
   }
 
   .timeline-card:hover {

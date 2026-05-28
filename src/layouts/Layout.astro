@@ -171,6 +171,36 @@ const canonical = 'https://PM-CyberSec.github.io/portfolio-site/';
       outline-offset: 2px;
     }
 
+    :root {
+      scrollbar-width: thin;
+      scrollbar-color: var(--color-accent) transparent;
+    }
+
+    :root::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+
+    :root::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    :root::-webkit-scrollbar-thumb {
+      background: var(--color-accent-dim);
+      border-radius: 3px;
+      border: 1px solid rgba(0, 255, 204, 0.05);
+      box-shadow: 0 0 8px var(--color-glow), 0 0 16px var(--color-accent-dim);
+    }
+
+    :root::-webkit-scrollbar-thumb:hover {
+      background: var(--color-accent);
+      box-shadow: 0 0 12px var(--color-glow), 0 0 24px var(--color-accent-dim);
+    }
+
+    :root::-webkit-scrollbar-corner {
+      background: transparent;
+    }
+
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after {
         animation-duration: 0.01ms !important;
@@ -365,9 +395,23 @@ const canonical = 'https://PM-CyberSec.github.io/portfolio-site/';
       document.addEventListener('mouseup', function() {
         var sel = window.getSelection();
         if (sel && sel.toString().trim().length > 0) {
+          var text = sel.toString();
+          try {
+            navigator.clipboard.writeText(text);
+          } catch(e) {
+            var ta = document.createElement('textarea');
+            ta.value = text;
+            ta.style.position = 'fixed';
+            ta.style.left = '-9999px';
+            document.body.appendChild(ta);
+            ta.select();
+            document.execCommand('copy');
+            document.body.removeChild(ta);
+          }
           showCopyToast();
         }
       });
+
     })();
   </script>
 </body>
