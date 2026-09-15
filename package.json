@@ -6,7 +6,7 @@
     "dev": "astro dev",
     "dev:admin": "node scripts/api-server.mjs & astro dev",
     "start": "astro dev",
-    "build": "node scripts/content-loader.mjs && node -e \"require('fs').renameSync('src/pages/admin','src/pages/_admin_bak')\" 2>/dev/null; astro build; node -e \"require('fs').renameSync('src/pages/_admin_bak','src/pages/admin')\" 2>/dev/null; true",
+    "build": "node -e \"try{require('fs').renameSync('src/pages/admin','src/pages/_admin_bak')}catch(e){}\" && node scripts/content-loader.mjs && astro build; CODE=$?; node -e \"try{require('fs').renameSync('src/pages/_admin_bak','src/pages/admin')}catch(e){}\" > /dev/null 2>&1; exit $CODE",
     "preview": "astro preview",
     "admin": "node scripts/api-server.mjs",
     "portfolio": "node scripts/portfolio-cli.mjs",
