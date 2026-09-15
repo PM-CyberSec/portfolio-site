@@ -1,0 +1,115 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Nav from '../../components/Nav.astro';
+import Footer from '../../components/Footer.astro';
+import projects from '../../data/projects.json';
+
+const base = import.meta.env.BASE_URL;
+---
+<Layout title="Projects · Paula Maged" description="Security projects — SOAR platforms, encrypted messengers, forensics pipelines, and network analysis tools.">
+  <Nav />
+
+  <section class="relative overflow-hidden min-h-[35vh] flex flex-col justify-end">
+    <img src={`${base}/images/new.jpeg`} alt="" class="absolute inset-0 w-full h-full object-cover" />
+    <div class="absolute inset-0 bg-[var(--bg)]/50" />
+    <div class="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[var(--bg)]" />
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-6 relative z-10 w-full">
+      <div class="flex items-center gap-2 text-xs text-[var(--text-dim)] mb-6">
+        <a href={base} class="hover:text-accent transition">Profile</a>
+        <span>/</span>
+        <span class="text-[var(--text-muted)]">Projects</span>
+      </div>
+      <h1 class="text-3xl font-bold text-[var(--text)] mb-3">Projects</h1>
+      <p class="text-[var(--text-muted)] text-sm max-w-2xl mb-8">Security-focused projects — from SOAR platforms to forensics pipelines.</p>
+
+      <div class="flex gap-2 mb-4 flex-wrap">
+        <button class="filter-btn text-xs px-3 py-1.5 border border-accent text-accent rounded-btn bg-accent-dim backdrop-blur-sm" data-filter="all">All</button>
+        <button class="filter-btn text-xs px-3 py-1.5 border border-[var(--border)] text-[var(--text-dim)] rounded-btn hover:border-[var(--border-strong)] hover:text-[var(--text-muted)] transition backdrop-blur-sm bg-[var(--bg)]/30" data-filter="active">Active</button>
+        <button class="filter-btn text-xs px-3 py-1.5 border border-[var(--border)] text-[var(--text-dim)] rounded-btn hover:border-[var(--border-strong)] hover:text-[var(--text-muted)] transition backdrop-blur-sm bg-[var(--bg)]/30" data-filter="completed">Completed</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Featured Project -->
+  {projects.filter(p => p.featured).length > 0 && (
+    <section class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mb-12">
+      <div class="bg-[var(--bg-card)] border border-[var(--border)] rounded-card p-6 sm:p-8">
+        <div class="flex items-center gap-2 mb-3">
+          <span class="text-[10px] px-2 py-0.5 bg-accent/20 text-accent border border-accent/30 rounded-badge uppercase tracking-wider">Featured</span>
+          {projects.filter(p => p.featured).slice(0,1).map(p => (
+            <span class:list={[
+              "text-[10px] px-2 py-0.5 border rounded-badge",
+              p.status === 'active' ? "bg-accent/20 text-accent border-accent/30" : "bg-[var(--bg-elevated)] text-[var(--text-dim)] border-[var(--border)]"
+            ]}>{p.status}</span>
+          ))}
+        </div>
+        {projects.filter(p => p.featured).slice(0,1).map(p => (
+          <a href={`${base}/projects/${p.slug}`}>
+            <h2 class="text-xl font-bold text-[var(--text)] mb-2 hover:text-accent transition">{p.title}</h2>
+          </a>
+        ))}
+        {projects.filter(p => p.featured).slice(0,1).map(p => (
+          <>
+            <p class="text-sm text-[var(--text-dim)] mb-3">{p.role} · {p.timeline}</p>
+            <p class="text-[var(--text-muted)] text-sm mb-4">{p.description}</p>
+            <p class="text-sm text-[var(--text-muted)] mb-4"><span class="text-accent font-semibold">Problem:</span> {p.problem}</p>
+            <div class="flex flex-wrap gap-1.5 mb-4">
+              {p.technologies.map(t => (
+                <span class="text-[10px] px-2 py-0.5 border border-[var(--border)] rounded-badge text-[var(--text-dim)] bg-[var(--bg-elevated)]">{t}</span>
+              ))}
+            </div>
+            <a href={`${base}/projects/${p.slug}`} class="text-sm text-accent hover:underline">View case study &rarr;</a>
+          </>
+        ))}
+      </div>
+    </section>
+  )}
+
+  <!-- All Projects Grid -->
+  <section class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pb-24">
+    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4" id="project-grid">
+      {projects.map(p => (
+        <a href={`${base}/projects/${p.slug}`} class:list={["group block bg-[var(--bg-card)] border border-[var(--border)] rounded-card p-5 hover:border-[var(--border-strong)] transition project-card", `status-${p.status}`]} data-status={p.status}>
+          <div class="flex items-center gap-2 mb-2">
+            <h3 class="text-[var(--text)] font-semibold text-sm group-hover:text-accent transition">{p.title}</h3>
+            <span class:list={[
+              "text-[10px] px-2 py-0.5 border rounded-badge ml-auto",
+              p.status === 'active' ? "bg-accent/20 text-accent border-accent/30" : "bg-[var(--bg-elevated)] text-[var(--text-dim)] border-[var(--border)]"
+            ]}>{p.status}</span>
+          </div>
+          {p.subtitle && <p class="text-xs text-accent mb-1">{p.subtitle}</p>}
+          <p class="text-xs text-[var(--text-dim)] mb-2">{p.role} · {p.timeline}</p>
+          <p class="text-sm text-[var(--text-muted)] mb-3 line-clamp-3">{p.description}</p>
+          <div class="flex flex-wrap gap-1.5">
+            {p.technologies.slice(0, 3).map(t => (
+              <span class="text-[10px] px-2 py-0.5 border border-[var(--border)] rounded-badge text-[var(--text-dim)] bg-[var(--bg-elevated)]">{t}</span>
+            ))}
+          </div>
+        </a>
+      ))}
+    </div>
+  </section>
+
+  <Footer />
+</Layout>
+
+<script is:inline>
+document.querySelectorAll('.filter-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.filter-btn').forEach(b => {
+      b.classList.remove('border-accent', 'text-accent', 'bg-accent-dim');
+      b.classList.add('border-[var(--border)]', 'text-[var(--text-dim)]');
+    });
+    btn.classList.add('border-accent', 'text-accent', 'bg-accent-dim');
+    btn.classList.remove('border-[var(--border)]', 'text-[var(--text-dim)]');
+    const filter = btn.dataset.filter;
+    document.querySelectorAll('.project-card').forEach(card => {
+      if (filter === 'all' || card.dataset.status === filter) {
+        card.style.display = '';
+      } else {
+        card.style.display = 'none';
+      }
+    });
+  });
+});
+</script>

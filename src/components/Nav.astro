@@ -1,0 +1,54 @@
+---
+import profile from '../data/profile.json';
+const base = import.meta.env.BASE_URL;
+const current = Astro.url.pathname;
+const navLinks = [
+  { href: '', label: 'Profile', match: '/' },
+  { href: 'projects', label: 'Projects', match: 'projects' },
+  { href: 'investigations', label: 'Investigations', match: 'investigations' },
+  { href: 'blog', label: 'Blog', match: 'blog' },
+];
+function isActive(match: string) {
+  return current === '/' + match || current === match || current.startsWith('/' + match);
+}
+---
+<nav class="sticky top-0 z-50 border-b border-[var(--border)] bg-[var(--bg-elevated)]/80 backdrop-blur-xl">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-14">
+    <a href={base} class="text-accent font-bold text-sm tracking-tight hover:opacity-80 transition">PM</a>
+    <div class="hidden sm:flex items-center gap-1">
+      {navLinks.map(link => (
+        <a
+          href={link.href === '' ? base : `${base}/${link.href}`}
+          class:list={[
+            "px-3 py-1.5 text-sm rounded-btn transition",
+            isActive(link.match)
+              ? "text-accent bg-accent-dim"
+              : "c-muted hover:text-accent hover:bg-accent-dim"
+          ]}
+        >{link.label}</a>
+      ))}
+    </div>
+    <div class="flex items-center gap-3">
+      {profile.links?.github && <a href={profile.links.github} target="_blank" rel="noopener noreferrer" class="c-dim hover:text-accent transition text-sm" aria-label="GitHub">&#x2387;</a>}
+      {profile.links?.linkedin && <a href={profile.links.linkedin} target="_blank" rel="noopener noreferrer" class="c-dim hover:text-accent transition text-sm" aria-label="LinkedIn">&#x25C8;</a>}
+      <button id="themeToggle" class="c-dim hover:text-accent transition text-xs px-2 py-1 border border-[var(--border)] rounded-btn" aria-label="Toggle theme">SOC</button>
+    </div>
+  </div>
+  <!-- mobile nav -->
+  <div class="sm:hidden flex justify-center gap-1 pb-2 px-4">
+    {navLinks.map(link => (
+      <a
+          href={link.href === '' ? base : `${base}/${link.href}`}
+        class:list={[
+          "px-3 py-1 text-xs rounded-btn transition",
+          isActive(link.match)
+            ? "text-accent bg-accent-dim"
+            : "c-muted"
+        ]}
+      >{link.label}</a>
+    ))}
+  </div>
+</nav>
+<script is:inline>
+(function(){var b=document.getElementById('themeToggle'),r=document.documentElement,l=localStorage;function s(t){t==='htb'?(r.setAttribute('data-theme','htb'),b.textContent='HTB'):(r.removeAttribute('data-theme'),b.textContent='SOC');try{l.setItem('p-theme',t)}catch(e){}}var v;try{v=l.getItem('p-theme')}catch(e){}if(v==='htb')s('htb');b&&b.addEventListener('click',function(){s(r.getAttribute('data-theme')==='htb'?'soc':'htb')})})();
+</script>

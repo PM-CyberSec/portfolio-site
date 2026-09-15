@@ -1,0 +1,255 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
+import profile from '../data/profile.json';
+import experience from '../data/experience.json';
+import skills from '../data/skills.json';
+import certifications from '../data/certifications.json';
+import projects from '../data/projects.json';
+import investigations from '../data/investigations.json';
+import blog from '../data/blog.json';
+import { Image } from 'astro:assets';
+
+const base = import.meta.env.BASE_URL;
+const featuredProjects = projects.filter(p => p.featured);
+const latestBlogs = blog.slice(0, 2);
+const latestInvestigations = investigations.slice(0, 2);
+---
+<Layout title="Paula Maged · Cybersecurity Student" description="Blue Team Operations, Incident Response & Security Monitoring — Cybersecurity Portfolio">
+  <Nav />
+
+  <!-- Hero -->
+  <section class="relative overflow-hidden">
+    <div class="absolute inset-0 bg-gradient-to-b from-accent-dim/20 via-transparent to-transparent pointer-events-none" />
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-16 relative">
+      <p class="text-accent text-sm font-mono tracking-widest uppercase mb-4">{profile.tagline}</p>
+      <h1 class="text-4xl sm:text-5xl font-bold text-[var(--text)] mb-4 tracking-tight">{profile.name}</h1>
+      <p class="text-lg text-[var(--text-accent)] font-medium mb-3">{profile.title}</p>
+      <p class="text-lg text-[var(--text-muted)] max-w-2xl mb-8">{profile.bio}</p>
+      <div class="flex flex-wrap gap-3 mb-10">
+        {(profile.focus||[]).map(f => (
+          <span class="text-xs px-3 py-1 border border-[var(--border)] rounded-badge text-[var(--text-muted)] bg-[var(--bg-elevated)]">{f}</span>
+        ))}
+      </div>
+      <div class="flex flex-wrap gap-4">
+        <a href={`${base}/projects`} class="inline-flex items-center gap-2 px-5 py-2.5 bg-accent text-bg font-semibold text-sm rounded-btn hover:opacity-90 transition">
+          View Projects
+          <span class="text-xs opacity-70">&rarr;</span>
+        </a>
+        {profile.links?.linkedin && <a href={profile.links.linkedin} target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 px-5 py-2.5 border border-[var(--border-strong)] text-[var(--text-muted)] text-sm rounded-btn hover:border-accent hover:text-accent transition">LinkedIn</a>}
+        {profile.links?.github && <a href={profile.links.github} target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 px-5 py-2.5 border border-[var(--border-strong)] text-[var(--text-muted)] text-sm rounded-btn hover:border-accent hover:text-accent transition">GitHub</a>}
+        {profile.links?.resume && <a href={profile.links.resume} target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 px-5 py-2.5 border border-[var(--border-strong)] text-[var(--text-muted)] text-sm rounded-btn hover:border-accent hover:text-accent transition">Resume</a>}
+        {profile.links?.email && <a href={`mailto:${profile.links.email}`} class="inline-flex items-center gap-2 px-5 py-2.5 border border-[var(--border-strong)] text-[var(--text-muted)] text-sm rounded-btn hover:border-accent hover:text-accent transition">Email</a>}
+      </div>
+    </div>
+  </section>
+
+  <!-- How I Think -->
+  <section class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16 border-t border-[var(--border)]">
+    <p class="text-accent text-xs font-mono tracking-widest uppercase mb-3">APPROACH</p>
+    <h2 class="text-2xl font-semibold text-[var(--text)] mb-8">How I Approach Security</h2>
+    <div class="flex flex-wrap items-center gap-3">
+      {profile.approach.split('→').map((step, i) => (
+        <>
+          <div class="bg-[var(--bg-card)] border border-[var(--border)] rounded-card px-5 py-3 text-sm text-[var(--text)] font-medium">{step.trim()}</div>
+          {i < profile.approach.split('→').length - 1 && <span class="text-accent text-lg">&rarr;</span>}
+        </>
+      ))}
+    </div>
+  </section>
+
+  <!-- Security Profile -->
+  <section class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16 border-t border-[var(--border)]">
+    <p class="text-accent text-xs font-mono tracking-widest uppercase mb-3">PROFILE</p>
+    <h2 class="text-2xl font-semibold text-[var(--text)] mb-8">Security Profile</h2>
+    <div class="bg-[var(--bg-card)] border border-[var(--border)] rounded-card p-6">
+      <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {profile.degree && <div>
+          <p class="text-xs text-[var(--text-dim)] uppercase tracking-wider mb-1">Degree</p>
+          <p class="text-sm text-[var(--text)]">{profile.degree}</p>
+        </div>}
+        {profile.education && <div>
+          <p class="text-xs text-[var(--text-dim)] uppercase tracking-wider mb-1">Education</p>
+          <p class="text-sm text-[var(--text)]">{profile.education}</p>
+        </div>}
+        {profile.gpa && <div>
+          <p class="text-xs text-[var(--text-dim)] uppercase tracking-wider mb-1">GPA</p>
+          <p class="text-sm text-[var(--text)]">{profile.gpa}</p>
+        </div>}
+        {profile.graduationYear && <div>
+          <p class="text-xs text-[var(--text-dim)] uppercase tracking-wider mb-1">Graduation</p>
+          <p class="text-sm text-[var(--text)]">{profile.graduationYear}</p>
+        </div>}
+        {profile.location && <div>
+          <p class="text-xs text-[var(--text-dim)] uppercase tracking-wider mb-1">Location</p>
+          <p class="text-sm text-[var(--text)]">{profile.location}</p>
+        </div>}
+        {profile.availability && <div>
+          <p class="text-xs text-[var(--text-dim)] uppercase tracking-wider mb-1">Availability</p>
+          <p class="text-sm text-[var(--text)]">{profile.availability}</p>
+        </div>}
+        {profile.languages?.length > 0 && <div>
+          <p class="text-xs text-[var(--text-dim)] uppercase tracking-wider mb-1">Languages</p>
+          <p class="text-sm text-[var(--text)]">{profile.languages.join(' · ')}</p>
+        </div>}
+      </div>
+    </div>
+  </section>
+
+  <!-- Technical Stack -->
+  <section class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16 border-t border-[var(--border)]">
+    <p class="text-accent text-xs font-mono tracking-widest uppercase mb-3">TOOLKIT</p>
+    <h2 class="text-2xl font-semibold text-[var(--text)] mb-8">Technical Stack</h2>
+    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      {skills.groups.map(group => (
+        <div class="bg-[var(--bg-card)] border border-[var(--border)] rounded-card p-5">
+          <h3 class="text-sm font-semibold text-[var(--text)] mb-3">{group.category}</h3>
+          <div class="flex flex-wrap gap-2">
+            {group.tools.map(tool => (
+              <span class="text-xs px-2.5 py-1 border border-[var(--border)] rounded-badge text-[var(--text-muted)] bg-[var(--bg-elevated)]">{tool}</span>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <!-- Experience -->
+  <section class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16 border-t border-[var(--border)]">
+    <p class="text-accent text-xs font-mono tracking-widest uppercase mb-3">EXPERIENCE</p>
+    <h2 class="text-2xl font-semibold text-[var(--text)] mb-8">Work & Education</h2>
+    <div class="space-y-4">
+      {experience.map(exp => (
+        <div class="bg-[var(--bg-card)] border border-[var(--border)] rounded-card p-5 flex flex-col sm:flex-row sm:items-start gap-4">
+          {exp.pic && <a href={exp.pic} target="_blank" rel="noopener noreferrer" class="flex-shrink-0"><img src={exp.pic} alt={exp.company} class="w-14 h-14 object-contain rounded-badge hover:opacity-80 transition" /></a>}
+          <div class="flex-1">
+            <div class="flex items-center gap-2 mb-1">
+              <h3 class="text-[var(--text)] font-semibold text-sm">{exp.title}</h3>
+              {exp.current && <span class="text-[10px] px-2 py-0.5 bg-success/20 text-success border border-success/30 rounded-badge">Current</span>}
+            </div>
+            <p class="text-xs text-[var(--text-dim)] mb-2">{exp.company} · {exp.timeline} · {exp.location}</p>
+            <ul class="space-y-1">
+              {exp.highlights.map(h => (
+                <li class="text-sm text-[var(--text-muted)] flex gap-2">
+                  <span class="text-accent mt-1.5 flex-shrink-0">&#x25B8;</span>
+                  <span>{h}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <!-- Certifications -->
+  <section class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16 border-t border-[var(--border)]">
+    <p class="text-accent text-xs font-mono tracking-widest uppercase mb-3">CERTIFICATIONS</p>
+    <h2 class="text-2xl font-semibold text-[var(--text)] mb-8">Certifications & Learning</h2>
+    <div class="grid sm:grid-cols-2 gap-4">
+      {certifications.map(cert => (
+        <div class="bg-[var(--bg-card)] border border-[var(--border)] rounded-card p-5 flex items-center gap-4">
+          {cert.pic && <a href={cert.pic} target="_blank" rel="noopener noreferrer" class="flex-shrink-0"><img src={cert.pic} alt={cert.name} class="w-14 h-14 object-contain rounded-badge hover:opacity-80 transition" /></a>}
+          <div class="flex-1 min-w-0">
+            <h3 class="text-sm font-semibold text-[var(--text)]">{cert.name}</h3>
+            <p class="text-xs text-[var(--text-dim)]">{cert.issuer} · {cert.date}</p>
+          </div>
+          <span class:list={[
+            "text-[10px] px-2 py-0.5 border rounded-badge flex-shrink-0",
+            cert.status === 'completed' ? "bg-success/20 text-success border-success/30" : "bg-warning/20 text-warning border-warning/30"
+          ]}>
+            {cert.status === 'completed' ? 'Completed' : 'In Progress'}
+          </span>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <!-- Featured Projects Preview -->
+  <section class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16 border-t border-[var(--border)]">
+    <div class="flex items-center justify-between mb-8">
+      <div>
+        <p class="text-accent text-xs font-mono tracking-widest uppercase mb-3">PROJECTS</p>
+        <h2 class="text-2xl font-semibold text-[var(--text)]">Featured Projects</h2>
+      </div>
+      <a href={`${base}/projects`} class="text-sm text-[var(--text-muted)] hover:text-accent transition">View all &rarr;</a>
+    </div>
+    <div class="grid sm:grid-cols-2 gap-4">
+      {featuredProjects.map(p => (
+        <a href={`${base}/projects/${p.slug}`} class="group block bg-[var(--bg-card)] border border-[var(--border)] rounded-card p-5 hover:border-[var(--border-strong)] transition">
+          <div class="flex items-center gap-2 mb-2">
+            <h3 class="text-[var(--text)] font-semibold text-sm group-hover:text-accent transition">{p.title}</h3>
+            <span class:list={[
+              "text-[10px] px-2 py-0.5 border rounded-badge",
+              p.status === 'active' ? "bg-accent/20 text-accent border-accent/30" : "bg-[var(--bg-elevated)] text-[var(--text-dim)] border-[var(--border)]"
+            ]}>{p.status}</span>
+          </div>
+          <p class="text-xs text-[var(--text-dim)] mb-2">{p.role} · {p.timeline}</p>
+          <p class="text-sm text-[var(--text-muted)] mb-3 line-clamp-2">{p.description}</p>
+          <div class="flex flex-wrap gap-1.5">
+            {p.technologies.slice(0, 4).map(t => (
+              <span class="text-[10px] px-2 py-0.5 border border-[var(--border)] rounded-badge text-[var(--text-dim)] bg-[var(--bg-elevated)]">{t}</span>
+            ))}
+          </div>
+        </a>
+      ))}
+    </div>
+  </section>
+
+  <!-- Recent Investigations Preview -->
+  <section class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16 border-t border-[var(--border)]">
+    <div class="flex items-center justify-between mb-8">
+      <div>
+        <p class="text-accent text-xs font-mono tracking-widest uppercase mb-3">INVESTIGATIONS</p>
+        <h2 class="text-2xl font-semibold text-[var(--text)]">Recent Investigations</h2>
+      </div>
+      <a href={`${base}/investigations`} class="text-sm text-[var(--text-muted)] hover:text-accent transition">View all &rarr;</a>
+    </div>
+    <div class="grid sm:grid-cols-2 gap-4">
+      {latestInvestigations.map(inv => (
+        <a href={`${base}/investigations/${inv.slug}`} class="group block bg-[var(--bg-card)] border border-[var(--border)] rounded-card overflow-hidden hover:border-[var(--border-strong)] transition">
+          {inv.pic && <img src={inv.pic} alt={inv.title} class="w-full h-36 object-cover" />}
+          <div class="p-5">
+          <div class="flex items-center gap-2 mb-2">
+            <span class="text-[10px] px-2 py-0.5 bg-accent/20 text-accent border border-accent/30 rounded-badge">{inv.category}</span>
+            <span class="text-[10px] text-[var(--text-dim)]">{inv.date}</span>
+          </div>
+          <h3 class="text-[var(--text)] font-semibold text-sm mb-2 group-hover:text-accent transition">{inv.title}</h3>
+          <p class="text-sm text-[var(--text-muted)] line-clamp-2">{inv.summary}</p>
+          </div>
+        </a>
+      ))}
+    </div>
+  </section>
+
+  <!-- Recent Blog Preview -->
+  <section class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16 border-t border-[var(--border)]">
+    <div class="flex items-center justify-between mb-8">
+      <div>
+        <p class="text-accent text-xs font-mono tracking-widest uppercase mb-3">BLOG</p>
+        <h2 class="text-2xl font-semibold text-[var(--text)]">Latest Articles</h2>
+      </div>
+      <a href={`${base}/blog`} class="text-sm text-[var(--text-muted)] hover:text-accent transition">View all &rarr;</a>
+    </div>
+    <div class="grid sm:grid-cols-2 gap-4">
+      {latestBlogs.length > 0 ? latestBlogs.map(post => (
+        <a href={`${base}/blog/${post.slug}`} class="group block bg-[var(--bg-card)] border border-[var(--border)] rounded-card overflow-hidden hover:border-[var(--border-strong)] transition">
+          {post.pic && <img src={post.pic} alt={post.title} class="w-full h-36 object-cover" />}
+          <div class="p-5">
+          <div class="flex items-center gap-2 mb-2">
+            <span class="text-[10px] px-2 py-0.5 bg-accent/20 text-accent border border-accent/30 rounded-badge">{post.category}</span>
+            <span class="text-[10px] text-[var(--text-dim)]">{post.readingTime} min read</span>
+          </div>
+          <h3 class="text-[var(--text)] font-semibold text-sm mb-2 group-hover:text-accent transition">{post.title}</h3>
+          <p class="text-sm text-[var(--text-muted)] line-clamp-2">{post.description}</p>
+          </div>
+        </a>
+      )) : (
+        <p class="text-sm text-[var(--text-dim)] col-span-2">Articles coming soon.</p>
+      )}
+    </div>
+  </section>
+
+  <Footer />
+</Layout>

@@ -1,0 +1,36 @@
+{
+  "title": "PowerShell Defense Evasion Techniques",
+  "slug": "powershell-defense-evasion",
+  "category": "Windows",
+  "date": "2026-09-14",
+  "context": "Personal Security Lab",
+  "summary": "Investigated how threat actors use PowerShell obfuscation and AMSI bypass to evade detection, with detection strategies using Sysmon and Event Viewer.",
+  "scenario": "Attackers increasingly use PowerShell as their primary execution framework due to its deep integration with Windows and ability to bypass application whitelisting.",
+  "objective": "Map common PowerShell evasion techniques to MITRE ATT&CK and develop detection rules.",
+  "environment": [
+    "Windows 10",
+    "Sysmon",
+    "Event Viewer",
+    "PowerShell"
+  ],
+  "keyFindings": [
+    "AMSI bypass attempts leave detectable event traces",
+    "Script block logging (Event ID 4104) is the most reliable detection source",
+    "Encoded commands have predictable entropy patterns"
+  ],
+  "mitreTechniques": [
+    "T1059.001",
+    "T1562.001"
+  ],
+  "tools": [
+    "Sysmon",
+    "PowerShell",
+    "MITRE ATT&CK"
+  ],
+  "outcome": "Created detection playbook for PowerShell-based attacks with Sysmon configuration and Splunk queries.",
+  "reportFile": "report.md",
+  "relatedProjects": [
+    "cybernest-soar"
+  ],
+  "relatedBlogs": []
+}

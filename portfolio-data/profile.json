@@ -1,0 +1,30 @@
+{
+  "name": "Paula Maged",
+  "title": "CYBERSECURITY STUDENT",
+  "tagline": "Blue Team · SOC · IR",
+  "bio": "Building practical security systems, investigating threats, and automating defensive operations.",
+  "focus": [
+    "Blue Team Operations",
+    "Incident Response",
+    "Detection Engineering",
+    "Security Automation"
+  ],
+  "approach": "Observe → Investigate → Correlate → Map → Respond → Document → Improve",
+  "degree": "B.Tech. Networking & Cybersecurity",
+  "education": "El Sewedy University of Technology (SUTech)",
+  "gpa": "4.1 / 4.3",
+  "graduationYear": "2028",
+  "languages": [
+    "Arabic (Native)",
+    "English (Technical)",
+    "French (DELF B2)"
+  ],
+  "location": "Egypt",
+  "availability": "Open to SOC / Blue Team / Security Engineering roles",
+  "links": {
+    "github": "https://github.com/PM-CyberSec",
+    "linkedin": "https://linkedin.com/in/paulamaged",
+    "email": "paulamagedcyber@gmail.com",
+    "resume": ""
+  }
+}

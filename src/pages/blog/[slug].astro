@@ -1,0 +1,167 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Nav from '../../components/Nav.astro';
+import Footer from '../../components/Footer.astro';
+import blog from '../../data/blog.json';
+import projects from '../../data/projects.json';
+import investigations from '../../data/investigations.json';
+import { marked } from 'marked';
+
+export function getStaticPaths() {
+  return blog.map(b => ({ params: { slug: b.slug } }));
+}
+
+const base = import.meta.env.BASE_URL;
+const { slug } = Astro.params;
+const post = blog.find(b => b.slug === slug);
+
+if (!post) {
+  return Astro.redirect(`${base}/blog`);
+}
+
+// Build lookup for [[slug]] internal links
+const allItems = [
+  ...blog.map(b => ({ ...b, _type: 'blog', _url: `${base}/blog/${b.slug}` })),
+  ...projects.map(p => ({ ...p, _type: 'project', _url: `${base}/projects/${p.slug}` })),
+  ...investigations.map(i => ({ ...i, _type: 'investigation', _url: `${base}/investigations/${i.slug}` })),
+];
+
+function processInternalLinks(md) {
+  return md.replace(/\[\[([^\]]+)\]\]/g, (match, ref) => {
+    const item = allItems.find(i => i.slug === ref || i.title === ref);
+    if (item) return `[${item.title}](${item._url})`;
+    return `[${ref}](${base})`;
+  });
+}
+
+// Strip YAML frontmatter if present
+let content = post.content || '';
+if (content.startsWith('---')) {
+  const end = content.indexOf('---', 3);
+  if (end !== -1) content = content.substring(end + 3).trim();
+}
+
+const htmlContent = marked.parse(processInternalLinks(content));
+
+const relatedInvestigations = post.relatedInvestigations?.length
+  ? investigations.filter(i => post.relatedInvestigations.includes(i.slug))
+  : [];
+const relatedProjects = post.relatedProjects?.length
+  ? projects.filter(p => post.relatedProjects.includes(p.slug))
+  : [];
+const relatedPosts = blog.filter(b => b.slug !== slug && (b.tags||[]).some(t => (post.tags||[]).includes(t))).slice(0, 2);
+---
+<Layout title={`${post.title} · Blog`} description={post.description}>
+  <Nav />
+
+  <article class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-24">
+    <div class="flex items-center gap-2 text-xs text-[var(--text-dim)] mb-6">
+      <a href={base} class="hover:text-accent transition">Profile</a>
+      <span>/</span>
+      <a href={`${base}/blog`} class="hover:text-accent transition">Blog</a>
+      <span>/</span>
+      <span class="text-[var(--text-muted)]">{post.title}</span>
+    </div>
+
+    <div class="flex items-center gap-2 mb-4">
+      <span class="text-[10px] px-2 py-0.5 bg-accent/20 text-accent border border-accent/30 rounded-badge">{post.category}</span>
+      <span class="text-[10px] text-[var(--text-dim)]">{post.date}</span>
+      <span class="text-[10px] text-[var(--text-dim)]">{post.readingTime} min read</span>
+    </div>
+
+    <h1 class="text-3xl font-bold text-[var(--text)] mb-6">{post.title}</h1>
+
+    {post.pdf && (
+      <div class="mb-6 bg-[var(--bg-card)] border border-[var(--border)] rounded-card overflow-hidden">
+        <iframe src={post.pdf} class="w-full" style="height:80vh" title="PDF Article"></iframe>
+      </div>
+      <p class="text-xs text-[var(--text-dim)] mb-8 text-center">
+        <a href={post.pdf} target="_blank" rel="noopener noreferrer" class="hover:text-accent transition">Open PDF in new tab &rarr;</a>
+      </p>
+    )}
+
+    {content.trim() ? (
+      <div class="prose" set:html={htmlContent} />
+    ) : (
+      !post.pdf && <p class="text-sm text-[var(--text-dim)]">No content yet.</p>
+    )}
+
+    <div class="mt-8 pt-6 border-t border-[var(--border)]">
+      <div class="flex flex-wrap gap-2">
+        {(post.tags||[]).map(t => (
+          <span class="text-xs px-2.5 py-1 border border-[var(--border)] rounded-badge text-[var(--text-dim)] bg-[var(--bg-elevated)]">{t}</span>
+        ))}
+      </div>
+    </div>
+
+    {(relatedInvestigations.length > 0 || relatedProjects.length > 0 || relatedPosts.length > 0) && (
+      <div class="mt-12 border-t border-[var(--border)] pt-8">
+        {relatedInvestigations.length > 0 && (
+          <div class="mb-6">
+            <h3 class="text-sm font-semibold text-[var(--text)] mb-3">Related Investigations</h3>
+            <div class="grid sm:grid-cols-2 gap-3">
+              {relatedInvestigations.map(inv => (
+                <a href={`${base}/investigations/${inv.slug}`} class="group block bg-[var(--bg-card)] border border-[var(--border)] rounded-card p-4 hover:border-[var(--border-strong)] transition">
+                  <h4 class="text-sm font-semibold text-[var(--text)] group-hover:text-accent transition">{inv.title}</h4>
+                  <p class="text-xs text-[var(--text-dim)]">{inv.category} · {inv.date}</p>
+                </a>
+              ))}
+            </div>
+          </div>
+        )}
+        {relatedProjects.length > 0 && (
+          <div class="mb-6">
+            <h3 class="text-sm font-semibold text-[var(--text)] mb-3">Related Projects</h3>
+            <div class="grid sm:grid-cols-2 gap-3">
+              {relatedProjects.map(p => (
+                <a href={`${base}/projects/${p.slug}`} class="group block bg-[var(--bg-card)] border border-[var(--border)] rounded-card p-4 hover:border-[var(--border-strong)] transition">
+                  <h4 class="text-sm font-semibold text-[var(--text)] group-hover:text-accent transition">{p.title}</h4>
+                  <p class="text-xs text-[var(--text-dim)]">{p.role} · {p.timeline}</p>
+                </a>
+              ))}
+            </div>
+          </div>
+        )}
+        {relatedPosts.length > 0 && (
+          <div>
+            <h3 class="text-sm font-semibold text-[var(--text)] mb-3">Related Articles</h3>
+            <div class="grid sm:grid-cols-2 gap-3">
+              {relatedPosts.map(rp => (
+                <a href={`${base}/blog/${rp.slug}`} class="group block bg-[var(--bg-card)] border border-[var(--border)] rounded-card p-4 hover:border-[var(--border-strong)] transition">
+                  <h4 class="text-sm font-semibold text-[var(--text)] group-hover:text-accent transition">{rp.title}</h4>
+                  <p class="text-xs text-[var(--text-dim)]">{rp.readingTime} min · {rp.category}</p>
+                </a>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    )}
+  </article>
+
+  <Footer />
+</Layout>
+
+<style is:global>
+.prose { color: var(--text-muted); line-height: 1.75; }
+.prose h1 { font-size: 1.75rem; font-weight: 700; color: var(--text); margin: 1.5rem 0 0.75rem; }
+.prose h2 { font-size: 1.5rem; font-weight: 700; color: var(--text); margin: 1.5rem 0 0.75rem; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; }
+.prose h3 { font-size: 1.25rem; font-weight: 600; color: var(--text); margin: 1.25rem 0 0.5rem; }
+.prose h4 { font-size: 1.1rem; font-weight: 600; color: var(--text); margin: 1rem 0 0.5rem; }
+.prose p { margin: 0.75rem 0; }
+.prose a { color: var(--accent); text-decoration: underline; text-underline-offset: 2px; }
+.prose a:hover { opacity: 0.8; }
+.prose ul, .prose ol { margin: 0.75rem 0; padding-left: 1.5rem; }
+.prose li { margin: 0.25rem 0; }
+.prose li::marker { color: var(--accent); }
+.prose pre { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 1rem; overflow-x: auto; margin: 1rem 0; }
+.prose code { font-family: 'JetBrains Mono', monospace; font-size: 0.85em; background: var(--bg); padding: 0.15em 0.4em; border-radius: 4px; border: 1px solid var(--border); }
+.prose pre code { background: none; border: none; padding: 0; }
+.prose blockquote { border-left: 3px solid var(--accent); padding-left: 1rem; margin: 1rem 0; color: var(--text-dim); font-style: italic; }
+.prose table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+.prose th, .prose td { border: 1px solid var(--border); padding: 0.5rem 0.75rem; text-align: left; }
+.prose th { background: var(--bg-elevated); font-weight: 600; color: var(--text); }
+.prose hr { border: none; border-top: 1px solid var(--border); margin: 1.5rem 0; }
+.prose img { max-width: 100%; height: auto; border-radius: 8px; margin: 1rem 0; border: 1px solid var(--border); }
+</style>
+</Layout>

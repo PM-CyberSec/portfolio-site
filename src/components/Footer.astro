@@ -1,0 +1,25 @@
+---
+import profile from '../data/profile.json';
+const base = import.meta.env.BASE_URL;
+---
+<footer class="border-t border-[var(--border)] mt-24">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="text-center mb-8">
+      <p class="text-[var(--text-dim)] text-sm tracking-widest uppercase mb-4">Let's connect</p>
+      <p class="text-[var(--text)] font-semibold text-lg mb-1">{profile.name}</p>
+      <p class="text-[var(--text-muted)] text-sm">{profile.title} · {(profile.focus||[]).join(' · ')}</p>
+    </div>
+    <div class="flex justify-center gap-6 mb-8">
+      {profile.links?.email && <a href={`mailto:${profile.links.email}`} class="text-[var(--text-muted)] hover:text-accent text-sm transition">Email</a>}
+      {profile.links?.github && <a href={profile.links.github} target="_blank" rel="noopener noreferrer" class="text-[var(--text-muted)] hover:text-accent text-sm transition">GitHub</a>}
+      {profile.links?.linkedin && <a href={profile.links.linkedin} target="_blank" rel="noopener noreferrer" class="text-[var(--text-muted)] hover:text-accent text-sm transition">LinkedIn</a>}
+    </div>
+    <div class="flex justify-center gap-4 text-xs text-[var(--text-dim)]">
+      <a href={base} class="hover:text-accent transition">Profile</a>
+      <a href={`${base}/projects`} class="hover:text-accent transition">Projects</a>
+      <a href={`${base}/investigations`} class="hover:text-accent transition">Investigations</a>
+      <a href={`${base}/blog`} class="hover:text-accent transition">Blog</a>
+    </div>
+    <p class="text-center text-[var(--text-dim)] text-xs mt-6">&copy; {new Date().getFullYear()} {profile.name}</p>
+  </div>
+</footer>

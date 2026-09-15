@@ -1,0 +1,161 @@
+[
+  {
+    "title": "AutoConfigLab",
+    "slug": "autoconfiglab",
+    "subtitle": "Network Automation Configuration Platform",
+    "description": "Laravel + Ansible platform for guided Cisco IOS configuration with IP conflict detection, VLAN validation, rollback capabilities, and audit logging.",
+    "role": "Developer",
+    "timeline": "2025",
+    "status": "completed",
+    "featured": false,
+    "problem": "Manual network device configuration is error-prone and lacks validation. Need automated workflows with pre-deployment checks and rollback capabilities.",
+    "approach": "Built a wizard-driven platform using Laravel 13 and Ansible that validates configurations before deployment, detects IP conflicts and VLAN duplication, and provides one-click rollback.",
+    "results": "Working platform with async job execution, deployment history auditing, RBAC enforcement, and a visual topology dashboard for Cisco IOS devices.",
+    "technologies": [
+      "Laravel",
+      "PHP",
+      "Ansible",
+      "MySQL",
+      "Cisco IOS",
+      "SNMP"
+    ],
+    "categories": [
+      "Network Automation",
+      "Security",
+      "Infrastructure"
+    ],
+    "github": "https://github.com/PM-CyberSec/SUTech-courses-labs/tree/NetworkOperations",
+    "screenshots": [],
+    "team": [],
+    "relatedInvestigations": [],
+    "relatedBlogs": []
+  },
+  {
+    "title": "CyberNest SOAR",
+    "slug": "cybernest-soar",
+    "subtitle": "AI-Enhanced Security Orchestration Platform",
+    "description": "Open-source SOAR platform integrating SIEM, EDR, and NDR telemetry with automated incident response workflows. Built as a team project with containerized microservices architecture.",
+    "role": "Cybersecurity Team Lead · SOAR Architect",
+    "timeline": "Sep 2025 — Present",
+    "status": "active",
+    "featured": true,
+    "problem": "SOC teams face alert fatigue from high-volume, low-context alerts across disconnected security tools. Manual triage and response workflows slow down incident handling.",
+    "approach": "Designed a modular SOAR architecture that orchestrates security tools through a centralized event-driven backend, with automated enrichment and response playbooks.",
+    "results": "Core SOAR integration milestone completed with working Docker deployment of Wazuh, TheHive, Cortex, Suricata, Zeek, and Velociraptor. Backend API with 140+ endpoints across 25 categories for orchestration and enrichment.",
+    "technologies": [
+      "Python",
+      "FastAPI",
+      "Docker",
+      "Wazuh",
+      "TheHive",
+      "Cortex",
+      "MISP",
+      "Suricata",
+      "Zeek",
+      "Velociraptor"
+    ],
+    "categories": [
+      "SOAR",
+      "SIEM",
+      "Security Automation"
+    ],
+    "metrics": [],
+    "github": "https://github.com/CyberNest-SOAR/CyberNest-Soar",
+    "screenshots": [],
+    "team": [],
+    "relatedInvestigations": [],
+    "relatedBlogs": []
+  },
+  {
+    "slug": "dlds-digital-forensics",
+    "title": "AI-Assisted Network Forensics",
+    "subtitle": "ML-Based Anomaly Detection on Network Traffic",
+    "description": "Academic project building a machine learning pipeline for detecting C2 communication and data exfiltration in PCAP data.",
+    "role": "Forensics Analyst",
+    "timeline": "2025",
+    "status": "completed",
+    "featured": true,
+    "problem": "Signature-based IDS struggles to detect C2 channels hidden in encrypted or low-and-slow traffic. Need anomaly detection approaches for zero-day threats.",
+    "approach": "Built an ML pipeline using Scikit-learn to analyze PCAP data with custom features based on flow duration, packet entropy, and protocol behavior. Integrated with Zeek and Suricata for multi-layered validation.",
+    "results": "Anomaly detection pipeline capable of identifying suspicious network patterns. Multi-layered validation approach combining ML classification with traditional IDS signatures.",
+    "technologies": [
+      "Python",
+      "Scikit-learn",
+      "Pandas",
+      "Suricata",
+      "Zeek",
+      "Wireshark"
+    ],
+    "categories": [
+      "Digital Forensics",
+      "Machine Learning",
+      "Network Security"
+    ],
+    "github": "https://github.com/PM-CyberSec/SUTech-courses-labs/tree/DigitalForensics",
+    "screenshots": [],
+    "team": [],
+    "relatedInvestigations": [],
+    "relatedBlogs": []
+  },
+  {
+    "title": "Inventory Vault",
+    "slug": "inventory-vault",
+    "subtitle": "Secure Asset Management System",
+    "description": "Laravel 11 inventory management application with CSRF protection, SQL injection prevention via Eloquent ORM, XSS escaping, and Bcrypt password hashing.",
+    "role": "Developer",
+    "timeline": "2025",
+    "status": "completed",
+    "featured": false,
+    "problem": "Web applications need security built in, not bolted on. Every input must be validated, every session protected, every query parameterized.",
+    "approach": "Built a full-stack inventory system using Laravel 11 with security-first design: CSRF tokens on all forms, Eloquent ORM for SQL injection prevention, XSS escaping, Bcrypt password hashing, and secure session management.",
+    "results": "Functional inventory management system with CRUD operations, multi-tagging system, dynamic filtering, and comprehensive security controls against OWASP Top 10 vulnerabilities.",
+    "technologies": [
+      "Laravel",
+      "PHP",
+      "MySQL",
+      "Bootstrap",
+      "JavaScript"
+    ],
+    "categories": [
+      "Web Security",
+      "Full-Stack",
+      "Application Security"
+    ],
+    "github": "https://github.com/PM-CyberSec/SUTech-courses-labs/tree/WebSecurity",
+    "screenshots": [],
+    "team": [],
+    "relatedInvestigations": [],
+    "relatedBlogs": []
+  },
+  {
+    "title": "NeonNet CyberDeck",
+    "slug": "neonnet-cyberdeck",
+    "subtitle": "End-to-End Encrypted Messenger",
+    "description": "Zero-knowledge encrypted messaging system with RSA-4096/AES-256-GCM hybrid encryption, TCP relay server, and a curses-based TUI interface.",
+    "role": "Developer",
+    "timeline": "2025",
+    "status": "completed",
+    "featured": false,
+    "problem": "Secure communication requires end-to-end encryption where the server never sees plaintext. Need proper cryptographic primitives — not just encryption as a feature, but as the foundation.",
+    "approach": "Implemented hybrid encryption (RSA-4096 OAEP for key exchange, AES-256-GCM for messages) with RSA-PSS digital signatures. Built a TCP relay server using Python AsyncIO that forwards only ciphertext.",
+    "results": "Functional encrypted messenger with key exchange, real-time messaging, file transfer (25MB limit), digital signatures, and a curses-based TUI (CyberDeck). Server operates with zero knowledge of plaintext.",
+    "technologies": [
+      "Bash",
+      "Python",
+      "OpenSSL",
+      "RSA-4096",
+      "AES-256-GCM",
+      "TCP/AsyncIO"
+    ],
+    "categories": [
+      "Cryptography",
+      "Networking",
+      "Security"
+    ],
+    "github": "https://github.com/PM-CyberSec/SUTech-courses-labs/tree/Linux%26Shell",
+    "screenshots": [],
+    "team": [],
+    "relatedInvestigations": [],
+    "relatedBlogs": []
+  }
+]

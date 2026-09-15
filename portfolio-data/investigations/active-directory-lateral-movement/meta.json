@@ -1,0 +1,37 @@
+{
+  "title": "Active Directory Lateral Movement",
+  "slug": "active-directory-lateral-movement",
+  "category": "Windows",
+  "date": "2026-09-10",
+  "context": "Personal Security Lab",
+  "summary": "Mapped lateral movement paths through an AD environment using Pass-the-Hash and Kerberoasting techniques, building detection coverage for common attack patterns.",
+  "scenario": "Once an attacker compromises a single machine in an AD environment, they pivot laterally to reach high-value targets like domain controllers. Understanding these paths is essential for building detection rules.",
+  "objective": "Identify and document lateral movement techniques in a lab AD environment to build detection coverage and monitoring checklists.",
+  "environment": [
+    "Windows Server 2019",
+    "Active Directory",
+    "Wireshark",
+    "BloodHound"
+  ],
+  "keyFindings": [
+    "Kerberoasting tickets have detectable TGS request patterns in DC logs",
+    "Pass-the-Hash leaves NTLM authentication anomalies that can be correlated",
+    "BloodHound graph analysis reveals shortest attack paths for privilege escalation",
+    "Detection rules should focus on abnormal TGS request volumes and NTLM logon patterns"
+  ],
+  "mitreTechniques": [
+    "T1550.002",
+    "T1558",
+    "T1021.002"
+  ],
+  "tools": [
+    "BloodHound",
+    "Wireshark",
+    "Impacket",
+    "Rubeus"
+  ],
+  "outcome": "Built AD security monitoring checklist and detection rules for lateral movement indicators, covering Kerberoasting, Pass-the-Hash, and privilege escalation patterns.",
+  "reportFile": "report.md",
+  "relatedProjects": [],
+  "relatedBlogs": []
+}

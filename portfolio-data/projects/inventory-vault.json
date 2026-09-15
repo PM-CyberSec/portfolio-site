@@ -1,0 +1,30 @@
+{
+  "title": "Inventory Vault",
+  "slug": "inventory-vault",
+  "subtitle": "Secure Asset Management System",
+  "description": "Laravel 11 inventory management application with CSRF protection, SQL injection prevention via Eloquent ORM, XSS escaping, and Bcrypt password hashing.",
+  "role": "Developer",
+  "timeline": "2025",
+  "status": "completed",
+  "featured": false,
+  "problem": "Web applications need security built in, not bolted on. Every input must be validated, every session protected, every query parameterized.",
+  "approach": "Built a full-stack inventory system using Laravel 11 with security-first design: CSRF tokens on all forms, Eloquent ORM for SQL injection prevention, XSS escaping, Bcrypt password hashing, and secure session management.",
+  "results": "Functional inventory management system with CRUD operations, multi-tagging system, dynamic filtering, and comprehensive security controls against OWASP Top 10 vulnerabilities.",
+  "technologies": [
+    "Laravel",
+    "PHP",
+    "MySQL",
+    "Bootstrap",
+    "JavaScript"
+  ],
+  "categories": [
+    "Web Security",
+    "Full-Stack",
+    "Application Security"
+  ],
+  "github": "https://github.com/PM-CyberSec/SUTech-courses-labs/tree/WebSecurity",
+  "screenshots": [],
+  "team": [],
+  "relatedInvestigations": [],
+  "relatedBlogs": []
+}

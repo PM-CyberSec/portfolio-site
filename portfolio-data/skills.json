@@ -1,0 +1,68 @@
+{
+  "groups": [
+    {
+      "category": "Security Monitoring & SIEM",
+      "tools": [
+        "Wazuh",
+        "Splunk",
+        "Suricata",
+        "Wireshark",
+        "Arkime"
+      ]
+    },
+    {
+      "category": "Endpoint Detection & Response",
+      "tools": [
+        "Velociraptor",
+        "Sysmon",
+        "Volatility"
+      ]
+    },
+    {
+      "category": "Incident Response & Case Management",
+      "tools": [
+        "TheHive",
+        "Cortex",
+        "MISP"
+      ]
+    },
+    {
+      "category": "Programming & Scripting",
+      "tools": [
+        "Python",
+        "SQL",
+        "Bash",
+        "Java",
+        "C++",
+        "JavaScript",
+        "PHP"
+      ]
+    },
+    {
+      "category": "Infrastructure & Automation",
+      "tools": [
+        "Docker",
+        "Ansible",
+        "Linux",
+        "Active Directory"
+      ]
+    },
+    {
+      "category": "Frameworks & Standards",
+      "tools": [
+        "MITRE ATT&CK",
+        "NIST IR",
+        "Cyber Kill Chain"
+      ]
+    },
+    {
+      "category": "AI & Analytics",
+      "tools": [
+        "Scikit-learn",
+        "Pandas",
+        "LLMs",
+        "ML Pipelines"
+      ]
+    }
+  ]
+}

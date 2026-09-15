@@ -1,0 +1,36 @@
+{
+  "title": "CyberNest SOAR",
+  "slug": "cybernest-soar",
+  "subtitle": "AI-Enhanced Security Orchestration Platform",
+  "description": "Open-source SOAR platform integrating SIEM, EDR, and NDR telemetry with automated incident response workflows. Built as a team project with containerized microservices architecture.",
+  "role": "Cybersecurity Team Lead · SOAR Architect",
+  "timeline": "Sep 2025 — Present",
+  "status": "active",
+  "featured": true,
+  "problem": "SOC teams face alert fatigue from high-volume, low-context alerts across disconnected security tools. Manual triage and response workflows slow down incident handling.",
+  "approach": "Designed a modular SOAR architecture that orchestrates security tools through a centralized event-driven backend, with automated enrichment and response playbooks.",
+  "results": "Core SOAR integration milestone completed with working Docker deployment of Wazuh, TheHive, Cortex, Suricata, Zeek, and Velociraptor. Backend API with 140+ endpoints across 25 categories for orchestration and enrichment.",
+  "technologies": [
+    "Python",
+    "FastAPI",
+    "Docker",
+    "Wazuh",
+    "TheHive",
+    "Cortex",
+    "MISP",
+    "Suricata",
+    "Zeek",
+    "Velociraptor"
+  ],
+  "categories": [
+    "SOAR",
+    "SIEM",
+    "Security Automation"
+  ],
+  "metrics": [],
+  "github": "https://github.com/CyberNest-SOAR/CyberNest-Soar",
+  "screenshots": [],
+  "team": [],
+  "relatedInvestigations": [],
+  "relatedBlogs": []
+}

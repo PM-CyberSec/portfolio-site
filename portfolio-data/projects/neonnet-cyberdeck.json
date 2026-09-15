@@ -1,0 +1,31 @@
+{
+  "title": "NeonNet CyberDeck",
+  "slug": "neonnet-cyberdeck",
+  "subtitle": "End-to-End Encrypted Messenger",
+  "description": "Zero-knowledge encrypted messaging system with RSA-4096/AES-256-GCM hybrid encryption, TCP relay server, and a curses-based TUI interface.",
+  "role": "Developer",
+  "timeline": "2025",
+  "status": "completed",
+  "featured": false,
+  "problem": "Secure communication requires end-to-end encryption where the server never sees plaintext. Need proper cryptographic primitives — not just encryption as a feature, but as the foundation.",
+  "approach": "Implemented hybrid encryption (RSA-4096 OAEP for key exchange, AES-256-GCM for messages) with RSA-PSS digital signatures. Built a TCP relay server using Python AsyncIO that forwards only ciphertext.",
+  "results": "Functional encrypted messenger with key exchange, real-time messaging, file transfer (25MB limit), digital signatures, and a curses-based TUI (CyberDeck). Server operates with zero knowledge of plaintext.",
+  "technologies": [
+    "Bash",
+    "Python",
+    "OpenSSL",
+    "RSA-4096",
+    "AES-256-GCM",
+    "TCP/AsyncIO"
+  ],
+  "categories": [
+    "Cryptography",
+    "Networking",
+    "Security"
+  ],
+  "github": "https://github.com/PM-CyberSec/SUTech-courses-labs/tree/Linux%26Shell",
+  "screenshots": [],
+  "team": [],
+  "relatedInvestigations": [],
+  "relatedBlogs": []
+}

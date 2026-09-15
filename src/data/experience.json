@@ -1,0 +1,74 @@
+[
+  {
+    "title": "IT Intern — Security & Network Infrastructure",
+    "company": "AlDahra",
+    "type": "Internship",
+    "timeline": "Aug 2025 — Sep 2025",
+    "location": "Heliopolis — Cairo, Egypt",
+    "current": false,
+    "highlights": [
+      "Administered network security controls, monitoring firewall rules and managing Active Directory Group Policy Objects and permissions",
+      "Engineered a REST API for real-time data ingestion and visualization, demonstrating backend development and integration skills",
+      "Provided Tier 1 technical support and network troubleshooting, resolving server infrastructure issues for enterprise operations"
+    ],
+    "pic": "/portfolio-site/certs/ElDahra_internship.jpeg"
+  },
+  {
+    "title": "SOC Intern",
+    "company": "TriosCyber × Ernith",
+    "type": "Internship",
+    "timeline": "Sep 2026 — Oct 2026",
+    "location": "Remote",
+    "current": false,
+    "highlights": [
+      "Deployed and configured a multi-node Wazuh SIEM lab environment on Ubuntu Server with custom correlation rules and real-time alert monitoring",
+      "Analyzed enterprise network traffic and system logs using Wireshark, Suricata, and Zeek to identify indicators of compromise",
+      "Investigated endpoint telemetry and Windows/Linux system logs during simulated security incidents, performing alert triage and root-cause analysis",
+      "Automated threat detection workflows by integrating SIEM alerts with external intelligence sources using Python scripts and REST APIs"
+    ],
+    "pic": ""
+  },
+  {
+    "title": "SOC Intern",
+    "company": "Archon Vanguard",
+    "type": "Internship",
+    "timeline": "Sep 2026 — Oct 2026",
+    "location": "Remote",
+    "current": false,
+    "highlights": [
+      "Analyzed network traffic and protocols using Wireshark to investigate OSI model attacks, intrusion detection systems, and firewall controls",
+      "Performed deep log analysis using Windows Event Viewer, Sysmon, and system logs to identify suspicious behavior and Living off the Land techniques",
+      "Investigated phishing attempts, web security anomalies, and initial access/persistence vectors across Windows and Linux environments",
+      "Applied Cyber Kill Chain and MITRE ATT&CK frameworks to structure threat detection, alert triage, and incident response lifecycles"
+    ],
+    "pic": ""
+  },
+  {
+    "title": "FortiGate Security Intern",
+    "company": "NTI-ITIDA",
+    "type": "Intern",
+    "timeline": "Sep 2026 - Oct 2026",
+    "location": "Remote",
+    "current": true,
+    "highlights": [
+      "Configured and managed FortiGate security policies, firewall rules, and administrative settings through the FortiOS 7.6 Administrator training environment",
+      "Applied FortiGate networking and security concepts including interfaces, routing, NAT, firewall policies, and traffic control",
+      "Analyzed security and network traffic behavior using FortiGate monitoring, logging, and diagnostic capabilities",
+      "Practiced enterprise firewall administration and troubleshooting workflows using FortiOS 7.6"
+    ],
+    "pic": ""
+  },
+  {
+    "title": "B.Tech. Networking & Cybersecurity",
+    "company": "El Sewedy University of Technology (SUTech)",
+    "type": "Education",
+    "timeline": "2024 — 2028",
+    "location": "Egypt",
+    "current": true,
+    "highlights": [
+      "CGPA: 4.1 / 4.3",
+      "Focus: Blue Team Operations, Incident Response, Defensive Security",
+      "IEEE Student Branch — Tech & R&D"
+    ]
+  }
+]

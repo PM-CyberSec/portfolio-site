@@ -1,0 +1,397 @@
+---
+// Portfolio Admin UI — dev only
+---
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Portfolio Admin</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+<div class="w">
+  <div class="hd"><div class="hd-l"><div class="logo">PM</div><h1>Portfolio <span>Admin</span></h1></div><div class="env">Local Dev</div></div>
+  <div class="wb"><h2>Welcome back, Paula</h2><p>Click any item to edit it. Run <code>npm run build</code> after changes.</p></div>
+  <div class="sts" id="sts"></div>
+  <div class="tabs" id="tabs"></div>
+  <div id="view"></div>
+</div>
+<div class="tt2" id="toast"></div>
+<style is:global>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0F172A;--card:#1E293B;--elev:#334155;--acc:#00FFCC;--acc-d:rgba(0,255,204,.08);--acc-h:rgba(0,255,204,.18);--tx:#F1F5F9;--tx2:#94A3B8;--tx3:#64748B;--brd:rgba(148,163,184,.15);--brd2:rgba(0,255,204,.3);--red:#F87171;--red-d:rgba(248,113,113,.1);--grn:#34D399;--r:12px;--rs:8px}
+html,body{background:var(--bg);color:var(--tx);font-family:'Inter',system-ui,sans-serif;min-height:100vh}
+input:-webkit-autofill{-webkit-box-shadow:0 0 0 1000px #0B1426 inset!important;-webkit-text-fill-color:#F1F5F9!important}
+.w{max-width:800px;margin:0 auto;padding:32px 24px 64px}
+.hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:40px}
+.hd-l{display:flex;align-items:center;gap:12px}
+.logo{width:40px;height:40px;background:var(--acc);border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;color:var(--bg)}
+.hd h1{font-size:22px;font-weight:700}.hd h1 span{color:var(--acc)}
+.env{font-size:11px;padding:4px 10px;border-radius:20px;background:rgba(52,211,153,.1);color:var(--grn);border:1px solid rgba(52,211,153,.2);font-weight:500;display:flex;align-items:center;gap:5px}
+.env::before{content:'';width:6px;height:6px;background:var(--grn);border-radius:50%;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.wb{background:linear-gradient(135deg,var(--card),var(--elev));border:1px solid var(--brd);border-radius:var(--r);padding:20px 24px;margin-bottom:32px}
+.wb h2{font-size:16px;font-weight:600;margin-bottom:4px}.wb p{font-size:13px;color:var(--tx2)}
+.wb code{font-family:'JetBrains Mono',monospace;font-size:12px;background:var(--acc-d);color:var(--acc);padding:2px 6px;border-radius:4px}
+.sts{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:32px}
+.st{background:var(--card);border:1px solid var(--brd);border-radius:var(--r);padding:16px;text-align:center}
+.st .i{font-size:20px;margin-bottom:6px}.st .n{font-size:24px;font-weight:700;color:var(--acc);font-family:'JetBrains Mono',monospace}.st .l{font-size:11px;color:var(--tx3);margin-top:2px;text-transform:uppercase;letter-spacing:.5px}
+.tabs{display:flex;gap:4px;margin-bottom:20px;background:var(--card);border-radius:var(--rs);padding:4px;border:1px solid var(--brd)}
+.tab{flex:1;padding:8px 12px;font-size:13px;color:var(--tx3);cursor:pointer;border:none;background:none;border-radius:6px;transition:all .15s;font-family:inherit;font-weight:500;text-align:center}
+.tab:hover{color:var(--tx2);background:var(--acc-d)}.tab.on{color:var(--acc);background:var(--acc-d)}
+.b{padding:8px 16px;font-size:13px;border-radius:var(--rs);border:1px solid var(--brd);background:transparent;color:var(--tx3);cursor:pointer;transition:all .15s;font-family:inherit;font-weight:500;display:inline-flex;align-items:center;gap:6px}
+.b:hover{border-color:var(--brd2);color:var(--tx2);background:var(--acc-d)}
+.b.p{background:var(--acc);color:var(--bg);border-color:var(--acc);font-weight:600}.b.p:hover{opacity:.9}
+.b.sm{padding:5px 10px;font-size:12px}
+.b.e{color:var(--acc);border-color:rgba(0,255,204,.3);background:var(--acc-d)}.b.e:hover{background:var(--acc-h);border-color:var(--acc)}
+.b.x{color:var(--red);border-color:rgba(248,113,113,.3);background:var(--red-d)}.b.x:hover{background:rgba(248,113,113,.18);border-color:var(--red)}
+.b.mv{color:var(--tx3);border-color:var(--brd)}.b.mv:hover{color:var(--acc);border-color:var(--brd2);background:var(--acc-d)}
+.sh{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.sh-t{font-size:15px;font-weight:600}
+.ls{display:flex;flex-direction:column;gap:8px}
+.li{background:var(--card);border:1px solid var(--brd);border-radius:var(--r);padding:14px 16px;display:flex;align-items:center;justify-content:space-between;transition:all .15s;cursor:pointer}
+.li:hover{border-color:var(--brd2);transform:translateX(2px)}
+.li .nf{flex:1;min-width:0}.li .tt{font-size:14px;font-weight:600;margin-bottom:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.li .mt{font-size:12px;color:var(--tx3);display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.li .tg{font-size:10px;padding:1px 6px;border-radius:4px;background:var(--acc-d);color:var(--acc);font-weight:500}
+.li .ac{display:flex;gap:6px;margin-left:12px;flex-shrink:0}
+.ed{background:var(--card);border:1px solid var(--brd2);border-radius:var(--r);padding:24px}
+.ed-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--brd)}
+.ed-h h2{font-size:18px;font-weight:700}
+.ed-a{display:flex;gap:8px}
+.f{margin-bottom:16px}.f label{display:block;font-size:12px;color:var(--tx2);margin-bottom:5px;font-weight:500}
+.f input,.f textarea,.f select{width:100%;padding:9px 12px;font-size:14px;background:#0B1426!important;color:var(--tx)!important;border:1px solid var(--brd);border-radius:var(--rs);font-family:inherit;outline:none;transition:all .15s;-webkit-appearance:none;appearance:none}
+.f input:focus,.f textarea:focus,.f select:focus{border-color:var(--acc);box-shadow:0 0 0 3px var(--acc-d)}
+.f textarea{min-height:80px;resize:vertical}.f .h{display:block;font-size:11px;color:var(--tx3);margin-top:4px}
+.fr{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.sb{display:flex;justify-content:flex-end;gap:8px;margin-top:20px;padding-top:16px;border-top:1px solid var(--brd)}
+.ps{background:var(--card);border:1px solid var(--brd);border-radius:var(--r);margin-bottom:12px;overflow:hidden}
+.ps-h{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--brd);cursor:pointer;transition:background .15s}
+.ps-h:hover{background:var(--acc-d)}
+.ps-h h3{font-size:14px;font-weight:600;display:flex;align-items:center;gap:8px}
+.ps-h .c{font-size:11px;color:var(--tx3);font-weight:400}
+.ps-b{padding:16px}
+.pi{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border:1px solid var(--brd);border-radius:var(--rs);margin-bottom:8px;transition:border-color .15s}
+.pi:hover{border-color:var(--brd2)}
+.pi .pf{flex:1}.pi .pt{font-size:13px;font-weight:600}.pi .pm{font-size:12px;color:var(--tx3)}
+.pi .pa{display:flex;gap:6px}
+.emp{text-align:center;padding:48px 24px;color:var(--tx3);background:var(--card);border:1px dashed var(--brd);border-radius:var(--r)}
+.emp .ei{font-size:36px;margin-bottom:12px;opacity:.5}.emp p{margin-bottom:8px;font-size:14px}
+.tt2{position:fixed;bottom:24px;right:24px;padding:12px 20px;border-radius:var(--rs);font-size:13px;font-weight:500;z-index:200;opacity:0;transform:translateY(8px);transition:all .3s}
+.tt2.show{opacity:1;transform:translateY(0)}.tt2.ok{background:var(--card);border:1px solid var(--grn);color:var(--grn)}.tt2.er{background:var(--card);border:1px solid var(--red);color:var(--red)}
+@media(max-width:640px){.sts{grid-template-columns:repeat(2,1fr)}.fr{grid-template-columns:1fr}.w{padding:16px 16px 48px}}
+</style>
+<script>
+var API='http://localhost:4323/api',curTab='profile',editSlug=null,expandedSections={};
+// Restore state across Vite HMR reloads
+try{var saved=JSON.parse(localStorage.getItem('admin-state'));if(saved&&saved.tab)curTab=saved.tab;if(saved&&saved.sections)expandedSections=saved.sections;}catch(e){}
+function saveState(){try{localStorage.setItem('admin-state',JSON.stringify({tab:curTab,sections:expandedSections}));}catch(e){}}
+function $(id){return document.getElementById(id)}
+function val(id){var el=$(id);return el?el.value:''}
+function csv(s){return s.split(',').map(function(x){return x.trim()}).filter(Boolean)}
+function sl(s){return s.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')}
+function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+function toast(m,t){var e=$('toast');e.textContent=m;e.className='tt2 '+(t||'ok');e.classList.add('show');setTimeout(function(){e.classList.remove('show')},2500)}
+
+function initTabs(){
+  var tabs=['profile','projects','investigations','blogs'];
+  var labels=['Profile','Projects','Investigations','Blog'];
+  var h='';
+  for(var i=0;i<tabs.length;i++){
+    h+='<button class="tab" data-t="'+tabs[i]+'">'+labels[i]+'</button>';
+  }
+  $('tabs').innerHTML=h;
+  $('tabs').onclick=function(e){
+    var t=e.target;if(!t.dataset.t)return;
+    curTab=t.dataset.t;saveState();highlightTab();showList();
+  };
+}
+
+function highlightTab(){
+  document.querySelectorAll('.tab').forEach(function(x){
+    x.classList.toggle('on',x.dataset.t===curTab);
+  });
+}
+
+function showList(){
+  highlightTab();
+  if(curTab==='profile'){showProfile();return;}
+  fetch(API+'/list/'+curTab).then(function(r){return r.json()}).then(function(items){
+    var lbl=curTab==='projects'?'Projects':curTab==='investigations'?'Investigations':'Blog Posts';
+    var nlbl=curTab==='projects'?'Project':curTab==='investigations'?'Investigation':'Blog Post';
+    var html='<div class="sh"><span class="sh-t">'+lbl+' ('+items.length+')</span><button class="b p" id="newBtn">+ New '+nlbl+'</button></div>';
+    if(!items.length){html+='<div class="emp"><div class="ei">&#x2795;</div><p><strong>No '+curTab+' yet</strong></p><p>Click "+ New" to create one.</p></div>';}
+    else{
+      html+='<div class="ls">';
+      for(var i=0;i<items.length;i++){
+        var it=items[i];
+        var mt='';
+        if(it.category)mt+='<span class="tg">'+esc(it.category)+'</span>';
+        if(it.role)mt+='<span class="tg">'+esc(it.role)+'</span>';
+        if(it.date)mt+='<span>'+esc(it.date)+'</span>';
+        if(it.timeline)mt+='<span>'+esc(it.timeline)+'</span>';
+        if(it.featured)mt+='<span>&#9733; Featured</span>';
+        html+='<div class="li" data-slug="'+esc(it.slug)+'">';
+        html+='<div class="nf"><div class="tt">'+esc(it.title)+'</div><div class="mt">'+mt+'</div></div>';
+        html+='<div class="ac">';
+        html+='<button class="b sm e" data-action="edit" data-slug="'+esc(it.slug)+'">Edit</button>';
+        html+='<button class="b sm x" data-action="del" data-slug="'+esc(it.slug)+'">Delete</button>';
+        html+='</div></div>';
+      }
+      html+='</div>';
+    }
+    $('view').innerHTML=html;
+    $('newBtn').onclick=function(){showNew()};
+    var lis=$('view').querySelectorAll('.li');
+    for(var j=0;j<lis.length;j++){lis[j].onclick=function(){showEdit(this.dataset.slug)}}
+    var btns=$('view').querySelectorAll('[data-action]');
+    for(var k=0;k<btns.length;k++){
+      btns[k].onclick=function(e){
+        e.stopPropagation();
+        if(this.dataset.action==='edit')showEdit(this.dataset.slug);
+        else delItem(this.dataset.slug);
+      };
+    }
+  }).catch(function(){$('view').innerHTML='<div class="emp"><div class="ei">&#x26A0;</div><p><strong>API not running</strong></p><p><code>node scripts/api-server.mjs</code></p></div>'});
+}
+
+function showNew(){
+  editSlug=null;
+  var lbl=curTab==='projects'?'Project':curTab==='investigations'?'Investigation':'Blog Post';
+  $('view').innerHTML=buildForm(curTab,null);
+  var fi=$('f-title');if(fi)fi.focus();
+}
+
+function showEdit(slug){
+  Promise.all([
+    fetch(API+'/'+curTab+'/'+slug).then(function(r){return r.json()}),
+    (curTab==='blogs'||curTab==='investigations')?fetch(API+'/'+curTab+'/'+slug+'/content').then(function(r){return r.json()}):Promise.resolve({content:''})
+  ]).then(function(res){
+    var item=res[0];item._content=res[1].content||'';
+    editSlug=item.slug;
+    $('view').innerHTML=buildForm(curTab,item);
+  }).catch(function(e){toast('Error loading','er')});
+}
+
+function buildForm(type,it){
+  var isE=!!it,lbl=type==='projects'?'Project':type==='investigations'?'Investigation':'Blog Post';
+  var d=it||{};
+  var f='';
+  if(type==='projects'){
+    f=inp('Title','f-title',d.title)
+     +inp('Subtitle','f-sub',d.subtitle)
+     +ta('Description','f-desc',d.description)
+     +row(inp('Role','f-role',d.role)+inp('Timeline','f-tl',d.timeline))
+     +row(sel('Status','f-st',d.status,[['active','Active'],['completed','Completed']])+sel('Featured','f-ft',d.featured?'true':'false',[['false','No'],['true','Yes']]))
+     +ta('Problem','f-pr',d.problem)
+     +ta('Approach','f-ap',d.approach)
+     +ta('Results','f-re',d.results)
+     +inp('Technologies','f-tc',arr(d.technologies),'Python, Docker','Comma-separated')
+     +inp('Categories','f-ca',arr(d.categories),'SOAR, SIEM','Comma-separated')
+     +inp('Metrics','f-mt',arr(d.metrics),'10k events/day, 99.9% uptime','Comma-separated')
+     +inp('GitHub URL','f-gh',d.github);
+  }else if(type==='investigations'){
+    f=inp('Title','f-title',d.title)
+     +row(sel('Category','f-ca',d.category,[['Windows','Windows'],['Linux','Linux'],['Network','Network'],['Threat Hunting','Threat Hunting']])+inp('Date','f-da',d.date,'','date'))
+     +inp('Card Image URL','f-pic',d.pic,'','Optional image for listing card')
+     +ta('Summary','f-su',d.summary)
+     +ta('Scenario','f-sc',d.scenario)
+     +ta('Objective','f-ob',d.objective)
+     +inp('Environment','f-ev',arr(d.environment),'Windows 10, Sysmon','Comma-separated')
+     +inp('Key Findings','f-fi',arr(d.keyFindings),'Finding 1','Comma-separated')
+     +inp('MITRE Techniques','f-mi',arr(d.mitreTechniques),'T1059.001','Comma-separated')
+     +inp('Tools','f-to',arr(d.tools),'Sysmon','Comma-separated')
+     +ta('Outcome','f-ou',d.outcome)
+     +inp('Related Projects','f-rp',arr(d.relatedProjects),'slug-of-project','Comma-separated slugs')
+     +inp('Related Blogs','f-rb',arr(d.relatedBlogs),'slug-of-blog','Comma-separated slugs')
+     +inp('PDF URL','f-pdf',d.pdf,'','Optional PDF report URL')
+     +ta('Full Report (Markdown)','f-md',d._content||'','Write report in Markdown. Use ![alt](url) for images...');
+  }else{
+    f=inp('Title','f-title',d.title)
+     +ta('Description','f-desc',d.description)
+     +row(sel('Category','f-ca',d.category,[['SOC','SOC'],['Detection','Detection'],['Networking','Networking'],['IR','IR'],['Security Engineering','Security Engineering'],['Labs','Labs']])+inp('Date','f-da',d.date,'','date'))
+     +inp('Card Image URL','f-pic',d.pic,'','Optional image for listing card')
+     +inp('Tags','f-ta',arr(d.tags),'Windows, Detection','Comma-separated')
+     +inp('Reading Time (min)','f-rt',d.readingTime,'5')
+     +inp('Related Investigations','f-ri',arr(d.relatedInvestigations),'slug-of-investigation','Comma-separated slugs')
+     +inp('Related Projects','f-rp',arr(d.relatedProjects),'slug-of-project','Comma-separated slugs')
+     +inp('PDF URL','f-pdf',d.pdf,'','Optional PDF article URL')
+     +ta('Article Content (Markdown)','f-md',d._content||'','Write article in Markdown. Use ![alt](url) for images...');
+  }
+  return '<div class="ed"><div class="ed-h"><h2>'+(isE?'Edit':'New')+' '+lbl+'</h2><div class="ed-a"><button class="b" data-act="backBtn">Back</button><button class="b p" data-act="saveBtn2">Save</button></div></div>'+f+'<div class="sb"><button class="b" data-act="cancelBtn">Cancel</button><button class="b p" data-act="saveBtn">Save '+lbl+'</button></div></div>';
+}
+
+function inp(label,id,val,ph,hint){
+  var v=val!=null?val:'';
+  var h='<div class="f"><label>'+label+'</label><input id="'+id+'" value="'+esc(v)+'" placeholder="'+(ph||'')+'">';
+  if(hint)h+='<span class="h">'+hint+'</span>';
+  return h+'</div>';
+}
+function ta(label,id,val){
+  return '<div class="f"><label>'+label+'</label><textarea id="'+id+'">'+esc(val||'')+'</textarea></div>';
+}
+function row(inner){return '<div class="fr">'+inner+'</div>';}
+function sel(label,id,val,opts){
+  var h='<div class="f"><label>'+label+'</label><select id="'+id+'">';
+  for(var i=0;i<opts.length;i++){
+    h+='<option value="'+opts[i][0]+'"'+(val==opts[i][0]?' selected':'')+'>'+opts[i][1]+'</option>';
+  }
+  return h+'</select></div>';
+}
+function arr(a){return Array.isArray(a)?a.join(', '):(a||'');}
+
+function saveItem(editSlug){
+  var isE=!!editSlug,d={},type=curTab;
+  if(type==='projects'){
+    d.title=val('f-title');d.slug=editSlug||sl(d.title);d.subtitle=val('f-sub');d.description=val('f-desc');d.role=val('f-role');d.timeline=val('f-tl');d.status=val('f-st');d.featured=val('f-ft')==='true';d.problem=val('f-pr');d.approach=val('f-ap');d.results=val('f-re');d.technologies=csv(val('f-tc'));d.categories=csv(val('f-ca'));d.metrics=csv(val('f-mt'));d.github=val('f-gh');d.screenshots=[];d.team=[];d.relatedInvestigations=[];d.relatedBlogs=[];
+  }else if(type==='investigations'){
+    d.title=val('f-title');d.slug=editSlug||sl(d.title);d.category=val('f-ca');d.date=val('f-da');d.pic=val('f-pic');d.summary=val('f-su');d.scenario=val('f-sc');d.objective=val('f-ob');d.environment=csv(val('f-ev'));d.keyFindings=csv(val('f-fi'));d.mitreTechniques=csv(val('f-mi'));d.tools=csv(val('f-to'));d.outcome=val('f-ou');d.reportFile='report.md';d.pdf=val('f-pdf');d.relatedProjects=csv(val('f-rp'));d.relatedBlogs=csv(val('f-rb'));
+  }else{
+    d.title=val('f-title');d.slug=editSlug||sl(d.title);d.description=val('f-desc');d.date=val('f-da');d.category=val('f-ca');d.pic=val('f-pic');d.tags=csv(val('f-ta'));d.readingTime=parseInt(val('f-rt'))||5;d.pdf=val('f-pdf');d.relatedInvestigations=csv(val('f-ri'));d.relatedProjects=csv(val('f-rp'));
+  }
+  var mdContent=val('f-md');
+  fetch(API+'/'+type,{method:isE?'PUT':'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(d)}).then(function(r){
+    if(r.ok){
+      var afterSave=function(){toast(isE?'Updated':'Created');};
+      if(mdContent&&(type==='blogs'||type==='investigations')){
+        fetch(API+'/'+type+'/'+d.slug+'/content',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({content:mdContent})}).then(afterSave).catch(afterSave);
+      }else{afterSave();}
+      // Re-fetch item and re-render form (stays in place)
+      Promise.all([
+        fetch(API+'/'+type+'/'+d.slug).then(function(r){return r.json()}),
+        (type==='blogs'||type==='investigations')?fetch(API+'/'+type+'/'+d.slug+'/content').then(function(r){return r.json()}):Promise.resolve({content:''})
+      ]).then(function(res){
+        var item=res[0];item._content=res[1].content||'';
+        editSlug=item.slug;
+        $('view').innerHTML=buildForm(type,item);
+      }).catch(function(){});
+    }else toast('Error','er');
+  }).catch(function(e){toast(e.message,'er')});
+}
+
+function delItem(slug){
+  if(!confirm('Delete this item?'))return;
+  fetch(API+'/'+curTab+'/'+slug,{method:'DELETE'}).then(function(){toast('Deleted');showList()}).catch(function(e){toast(e.message,'er')});
+}
+
+function tSec(el){var b=el.nextElementSibling;b.style.display=b.style.display==='none'?'':'none';}
+
+function showProfile(){
+  highlightTab();
+  Promise.all([
+    fetch(API+'/profile').then(function(r){return r.json()}),
+    fetch(API+'/profile/experience').then(function(r){return r.json()}),
+    fetch(API+'/profile/skills').then(function(r){return r.json()}),
+    fetch(API+'/profile/certifications').then(function(r){return r.json()})
+  ]).then(function(res){
+    var p=res[0],exp=res[1],sk=res[2],ce=res[3];
+    var h='';
+    h+='<div class="ps"><div class="ps-h" data-act="toggle"><h3>&#x1F464; Personal Info</h3></div><div class="ps-b">';
+    h+=row(inp('Name','p-name',p.name)+inp('Title','p-title',p.title));
+    h+=inp('Tagline','p-tag',p.tagline);
+    h+=ta('Bio','p-bio',p.bio);
+    h+=inp('Focus Areas','p-foc',arr(p.focus),'Blue Team, IR','Comma-separated');
+    h+=inp('Approach','p-app',p.approach);
+    h+=row(inp('Degree','p-deg',p.degree)+inp('Education','p-edu',p.education));
+    h+=row(inp('GPA','p-gpa',p.gpa)+inp('Graduation Year','p-grd',p.graduationYear));
+    h+=inp('Languages','p-lang',arr(p.languages),'Arabic, English','Comma-separated');
+    h+=row(inp('Location','p-loc',p.location)+inp('Availability','p-avl',p.availability));
+    h+=row(inp('GitHub','p-gh',p.links?p.links.github:'')+inp('LinkedIn','p-li',p.links?p.links.linkedin:''));
+    h+=row(inp('Email','p-em',p.links?p.links.email:'')+inp('Resume URL','p-rs',p.links?p.links.resume:''));
+    h+='<div class="sb"><button class="b p" data-act="saveProf">Save Profile</button></div></div></div>';
+
+    h+='<div class="ps"><div class="ps-h" data-act="toggle"><h3>&#x1F4BC; Experience <span class="c">'+exp.length+' items</span></h3></div><div class="ps-b" id="ex">';
+    for(var i=0;i<exp.length;i++){
+      h+='<div class="pi"><div class="pf"><div class="pt">'+esc(exp[i].title)+'</div><div class="pm">'+esc(exp[i].company)+' · '+esc(exp[i].timeline)+(exp[i].current?' · &#x25CF; Current':'')+'</div></div><div class="pa">';
+      if(i>0)h+='<button class="b sm" data-act="mvExp" data-i="'+i+'" data-d="-1">&#x25B2;</button>';
+      if(i<exp.length-1)h+='<button class="b sm" data-act="mvExp" data-i="'+i+'" data-d="1">&#x25BC;</button>';
+      h+='<button class="b sm e" data-act="edExp" data-i="'+i+'">Edit</button><button class="b sm x" data-act="dlExp" data-i="'+i+'">Del</button></div></div>';
+    }
+    h+='<button class="b" data-act="adExp" style="margin-top:8px">+ Add Experience</button></div></div>';
+
+    h+='<div class="ps"><div class="ps-h" data-act="toggle"><h3>&#x1F6E0; Skills <span class="c">'+(sk.groups||[]).length+' groups</span></h3></div><div class="ps-b" id="sk">';
+    var gs=sk.groups||[];
+    for(var j=0;j<gs.length;j++){
+      h+='<div class="pi"><div class="pf"><div class="pt">'+esc(gs[j].category)+'</div><div class="pm">'+esc(gs[j].tools.join(', '))+'</div></div><div class="pa"><button class="b sm e" data-act="edSk" data-i="'+j+'">Edit</button><button class="b sm x" data-act="dlSk" data-i="'+j+'">Del</button></div></div>';
+    }
+    h+='<button class="b" data-act="adSk" style="margin-top:8px">+ Add Skill Group</button></div></div>';
+
+    h+='<div class="ps"><div class="ps-h" data-act="toggle"><h3>&#x1F4DC; Certifications <span class="c">'+ce.length+' items</span></h3></div><div class="ps-b" id="ct">';
+    for(var k=0;k<ce.length;k++){
+      h+='<div class="pi"><div class="pf"><div class="pt">'+esc(ce[k].name)+'</div><div class="pm">'+esc(ce[k].issuer)+' · '+esc(ce[k].date)+'</div></div><div class="pa"><button class="b sm e" data-act="edCt" data-i="'+k+'">Edit</button><button class="b sm x" data-act="dlCt" data-i="'+k+'">Del</button></div></div>';
+    }
+    h+='<button class="b" data-act="adCt" style="margin-top:8px">+ Add Certification</button></div></div>';
+
+    $('view').innerHTML=h;
+    // Restore expanded state
+    document.querySelectorAll('.ps-h').forEach(function(el){
+      var key=el.textContent.trim();
+      if(expandedSections[key]===false){el.nextElementSibling.style.display='none';}
+      else if(expandedSections[key]===true){el.nextElementSibling.style.display='';}
+    });
+  }).catch(function(e){$('view').innerHTML='<div class="emp"><div class="ei">&#x26A0;</div><p><strong>API not running</strong></p></div>'});
+}
+
+function saveProf(){
+  var d={name:val('p-name'),title:val('p-title'),tagline:val('p-tag'),bio:val('p-bio'),focus:csv(val('p-foc')),approach:val('p-app'),degree:val('p-deg'),education:val('p-edu'),gpa:val('p-gpa'),graduationYear:val('p-grd'),languages:csv(val('p-lang')),location:val('p-loc'),availability:val('p-avl'),links:{github:val('p-gh'),linkedin:val('p-li'),email:val('p-em'),resume:val('p-rs')}};
+  fetch(API+'/profile',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(d)}).then(function(){toast('Profile saved')}).catch(function(e){toast(e.message,'er')});
+}
+
+function adExp(){var d={title:'New Position',company:'Company',type:'Work',timeline:'2025',location:'Egypt',current:false,highlights:[],pic:''};fetch(API+'/profile/experience',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(d)}).then(function(){toast('Added');renderExpSection()})}
+function mvExp(i,dir){fetch(API+'/profile/experience').then(function(r){return r.json()}).then(function(items){var j=i+parseInt(dir);if(j<0||j>=items.length)return;var tmp=items[i];items[i]=items[j];items[j]=tmp;fetch(API+'/profile/experience',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(items)}).then(function(){toast('Moved');renderExpSection()})})}
+function edExp(i){fetch(API+'/profile/experience').then(function(r){return r.json()}).then(function(items){var e=items[i];$('ex').innerHTML=inp('Title','e-ti',e.title)+row(inp('Company','e-co',e.company)+inp('Type','e-ty',e.type))+row(inp('Timeline','e-tl',e.timeline)+inp('Location','e-lo',e.location))+sel('Current','e-cu',e.current?'true':'false',[['false','No'],['true','Yes']])+inp('Picture URL','e-pic',e.pic,'','Optional')+ta('Highlights','e-hi',(e.highlights||[]).join('\n'))+'<div class="sb"><button class="b" data-act="cancelProf">Cancel</button><button class="b p" data-act="svExp" data-i="'+i+'">Save</button></div>'})}
+function svExp(i){fetch(API+'/profile/experience').then(function(r){return r.json()}).then(function(items){items[i]={title:val('e-ti'),company:val('e-co'),type:val('e-ty'),timeline:val('e-tl'),location:val('e-lo'),current:val('e-cu')==='true',highlights:val('e-hi').split('\n').map(function(s){return s.trim()}).filter(Boolean),pic:val('e-pic')};fetch(API+'/profile/experience',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(items)}).then(function(){toast('Saved');renderExpSection()})})}
+function renderExpSection(){fetch(API+'/profile/experience').then(function(r){return r.json()}).then(function(exp){var h='';for(var i=0;i<exp.length;i++){h+='<div class="pi"><div class="pf"><div class="pt">'+esc(exp[i].title)+'</div><div class="pm">'+esc(exp[i].company)+' · '+esc(exp[i].timeline)+(exp[i].current?' · &#x25CF; Current':'')+'</div></div><div class="pa">';if(i>0)h+='<button class="b sm" data-act="mvExp" data-i="'+i+'" data-d="-1">&#x25B2;</button>';if(i<exp.length-1)h+='<button class="b sm" data-act="mvExp" data-i="'+i+'" data-d="1">&#x25BC;</button>';h+='<button class="b sm e" data-act="edExp" data-i="'+i+'">Edit</button><button class="b sm x" data-act="dlExp" data-i="'+i+'">Del</button></div></div>';}h+='<button class="b" data-act="adExp" style="margin-top:8px">+ Add Experience</button>';$('ex').innerHTML=h;})}
+function dlExp(i){if(!confirm('Delete?'))return;fetch(API+'/profile/experience').then(function(r){return r.json()}).then(function(items){items.splice(i,1);fetch(API+'/profile/experience',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(items)}).then(function(){toast('Deleted');renderExpSection()})})}
+
+function adSk(){fetch(API+'/profile/skills').then(function(r){return r.json()}).then(function(d){d.groups=d.groups||[];d.groups.push({category:'New Category',tools:[]});fetch(API+'/profile/skills',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(d)}).then(function(){toast('Added');renderSkSection()})})}
+function edSk(i){fetch(API+'/profile/skills').then(function(r){return r.json()}).then(function(d){var g=d.groups[i];$('sk').innerHTML=inp('Category','s-ca',g.category)+inp('Tools','s-to',arr(g.tools),'Wazuh, Splunk','Comma-separated')+'<div class="sb"><button class="b" data-act="cancelProf">Cancel</button><button class="b p" data-act="svSk" data-i="'+i+'">Save</button></div>'})}
+function svSk(i){fetch(API+'/profile/skills').then(function(r){return r.json()}).then(function(d){d.groups[i]={category:val('s-ca'),tools:csv(val('s-to'))};fetch(API+'/profile/skills',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(d)}).then(function(){toast('Saved');renderSkSection()})})}
+function dlSk(i){if(!confirm('Delete?'))return;fetch(API+'/profile/skills').then(function(r){return r.json()}).then(function(d){d.groups.splice(i,1);fetch(API+'/profile/skills',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(d)}).then(function(){toast('Deleted');renderSkSection()})})}
+function renderSkSection(){fetch(API+'/profile/skills').then(function(r){return r.json()}).then(function(sk){var h='';var gs=sk.groups||[];for(var j=0;j<gs.length;j++){h+='<div class="pi"><div class="pf"><div class="pt">'+esc(gs[j].category)+'</div><div class="pm">'+esc(gs[j].tools.join(', '))+'</div></div><div class="pa"><button class="b sm e" data-act="edSk" data-i="'+j+'">Edit</button><button class="b sm x" data-act="dlSk" data-i="'+j+'">Del</button></div></div>';}h+='<button class="b" data-act="adSk" style="margin-top:8px">+ Add Skill Group</button>';$('sk').innerHTML=h;})}
+
+function adCt(){var d={name:'New Certification',issuer:'Issuer',date:'2025',status:'in-progress',link:'',pic:''};fetch(API+'/profile/certifications',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(d)}).then(function(){toast('Added');renderCtSection()})}
+function edCt(i){fetch(API+'/profile/certifications').then(function(r){return r.json()}).then(function(items){var c=items[i];$('ct').innerHTML=inp('Name','c-na',c.name)+row(inp('Issuer','c-is',c.issuer)+inp('Date','c-da',c.date))+sel('Status','c-st',c.status,[['completed','Completed'],['in-progress','In Progress']])+inp('Link URL','c-ln',c.link,'','Optional credential URL')+inp('Picture URL','c-pic',c.pic,'','Optional badge image')+'<div class="sb"><button class="b" data-act="cancelProf">Cancel</button><button class="b p" data-act="svCt" data-i="'+i+'">Save</button></div>'})}
+function svCt(i){fetch(API+'/profile/certifications').then(function(r){return r.json()}).then(function(items){items[i]={name:val('c-na'),issuer:val('c-is'),date:val('c-da'),status:val('c-st'),link:val('c-ln'),pic:val('c-pic')};fetch(API+'/profile/certifications',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(items)}).then(function(){toast('Saved');renderCtSection()})})}
+function dlCt(i){if(!confirm('Delete?'))return;fetch(API+'/profile/certifications').then(function(r){return r.json()}).then(function(items){items.splice(i,1);fetch(API+'/profile/certifications',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(items)}).then(function(){toast('Deleted');renderCtSection()})})}
+function renderCtSection(){fetch(API+'/profile/certifications').then(function(r){return r.json()}).then(function(ce){var h='';for(var k=0;k<ce.length;k++){h+='<div class="pi"><div class="pf"><div class="pt">'+esc(ce[k].name)+'</div><div class="pm">'+esc(ce[k].issuer)+' · '+esc(ce[k].date)+'</div></div><div class="pa"><button class="b sm e" data-act="edCt" data-i="'+k+'">Edit</button><button class="b sm x" data-act="dlCt" data-i="'+k+'">Del</button></div></div>';}h+='<button class="b" data-act="adCt" style="margin-top:8px">+ Add Certification</button>';$('ct').innerHTML=h;})}
+
+// Wire up all buttons via event delegation
+document.addEventListener('click',function(e){
+  var t=e.target;if(!t.dataset||!t.dataset.act)return;
+  var a=t.dataset.act,i=parseInt(t.dataset.i);
+  if(a==='toggle'){
+    var b=t.nextElementSibling;var key=t.textContent.trim();
+    var isOpen=b.style.display!=='none';
+    b.style.display=isOpen?'none':'';
+    expandedSections[key]=!isOpen;
+    saveState();
+    return;
+  }
+  if(a==='backBtn'||a==='cancelBtn'||a==='cancelProf')showList();
+  if(a==='saveBtn'||a==='saveBtn2')saveItem(editSlug);
+  if(a==='saveProf')saveProf();
+  if(a==='adExp')adExp();
+  if(a==='mvExp')mvExp(i,t.dataset.d);
+  if(a==='edExp')edExp(i);
+  if(a==='svExp')svExp(i);
+  if(a==='dlExp')dlExp(i);
+  if(a==='adSk')adSk();
+  if(a==='edSk')edSk(i);
+  if(a==='svSk')svSk(i);
+  if(a==='dlSk')dlSk(i);
+  if(a==='adCt')adCt();
+  if(a==='edCt')edCt(i);
+  if(a==='svCt')svCt(i);
+  if(a==='dlCt')dlCt(i);
+});
+
+initTabs();showList();
+// Save scroll position before Vite HMR reload
+window.addEventListener('beforeunload',function(){try{localStorage.setItem('admin-scroll',String(window.scrollY));}catch(e){}});
+// Restore scroll after reload
+try{var sy=parseInt(localStorage.getItem('admin-scroll'));if(sy>0)setTimeout(function(){window.scrollTo(0,sy);},100);}catch(e){}
+</script>
+</body>
+</html>

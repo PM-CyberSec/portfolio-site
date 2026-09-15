@@ -1,0 +1,82 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Nav from '../../components/Nav.astro';
+import Footer from '../../components/Footer.astro';
+import blog from '../../data/blog.json';
+
+const base = import.meta.env.BASE_URL;
+const categories = [...new Set(blog.map(b => b.category))];
+---
+<Layout title="Blog · Paula Maged" description="Articles on SOC operations, detection engineering, incident response, and security tooling.">
+  <Nav />
+
+  <section class="relative overflow-hidden min-h-[35vh] flex flex-col justify-end">
+    <img src={`${base}/images/4-improved.jpeg`} alt="" class="absolute inset-0 w-full h-full object-cover" />
+    <div class="absolute inset-0 bg-[var(--bg)]/50" />
+    <div class="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[var(--bg)]" />
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-6 relative z-10 w-full">
+      <div class="flex items-center gap-2 text-xs text-[var(--text-dim)] mb-6">
+        <a href={base} class="hover:text-accent transition">Profile</a>
+        <span>/</span>
+        <span class="text-[var(--text-muted)]">Blog</span>
+      </div>
+      <h1 class="text-3xl font-bold text-[var(--text)] mb-3">Blog</h1>
+      <p class="text-[var(--text-muted)] text-sm max-w-2xl mb-8">Thoughts on detection engineering, SOC operations, and building security tooling.</p>
+
+      <div class="flex gap-2 mb-4 flex-wrap">
+        <button class="filter-btn text-xs px-3 py-1.5 border border-accent text-accent rounded-btn bg-accent-dim backdrop-blur-sm" data-filter="all">All</button>
+        {categories.map(cat => (
+          <button class="filter-btn text-xs px-3 py-1.5 border border-[var(--border)] text-[var(--text-dim)] rounded-btn hover:border-[var(--border-strong)] hover:text-[var(--text-muted)] transition backdrop-blur-sm bg-[var(--bg)]/30" data-filter={cat}>{cat}</button>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pb-24">
+    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4" id="blog-grid">
+      {blog.length > 0 ? blog.map(post => (
+        <a href={`${base}/blog/${post.slug}`} class:list={["group block bg-[var(--bg-card)] border border-[var(--border)] rounded-card overflow-hidden hover:border-[var(--border-strong)] transition blog-card"]} data-category={post.category}>
+          {post.pic && <img src={post.pic} alt={post.title} class="w-full h-40 object-cover" />}
+          <div class="p-5">
+          <div class="flex items-center gap-2 mb-2">
+            <span class="text-[10px] px-2 py-0.5 bg-accent/20 text-accent border border-accent/30 rounded-badge">{post.category}</span>
+            <span class="text-[10px] text-[var(--text-dim)]">{post.readingTime} min</span>
+          </div>
+          <h3 class="text-[var(--text)] font-semibold text-sm mb-2 group-hover:text-accent transition">{post.title}</h3>
+          <p class="text-sm text-[var(--text-muted)] mb-3 line-clamp-2">{post.description}</p>
+          <div class="flex flex-wrap gap-1.5">
+            {(post.tags||[]).slice(0, 3).map(t => (
+              <span class="text-[10px] px-2 py-0.5 border border-[var(--border)] rounded-badge text-[var(--text-dim)] bg-[var(--bg-elevated)]">{t}</span>
+            ))}
+          </div>
+          </div>
+        </a>
+      )) : (
+        <p class="text-sm text-[var(--text-dim)] col-span-3 text-center py-12">Articles coming soon.</p>
+      )}
+    </div>
+  </section>
+
+  <Footer />
+</Layout>
+
+<script is:inline>
+document.querySelectorAll('.filter-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.filter-btn').forEach(b => {
+      b.classList.remove('border-accent', 'text-accent', 'bg-accent-dim');
+      b.classList.add('border-[var(--border)]', 'text-[var(--text-dim)]');
+    });
+    btn.classList.add('border-accent', 'text-accent', 'bg-accent-dim');
+    btn.classList.remove('border-[var(--border)]', 'text-[var(--text-dim)]');
+    const filter = btn.dataset.filter;
+    document.querySelectorAll('.blog-card').forEach(card => {
+      if (filter === 'all' || card.dataset.category === filter) {
+        card.style.display = '';
+      } else {
+        card.style.display = 'none';
+      }
+    });
+  });
+});
+</script>

@@ -1,0 +1,31 @@
+{
+  "title": "AutoConfigLab",
+  "slug": "autoconfiglab",
+  "subtitle": "Network Automation Configuration Platform",
+  "description": "Laravel + Ansible platform for guided Cisco IOS configuration with IP conflict detection, VLAN validation, rollback capabilities, and audit logging.",
+  "role": "Developer",
+  "timeline": "2025",
+  "status": "completed",
+  "featured": false,
+  "problem": "Manual network device configuration is error-prone and lacks validation. Need automated workflows with pre-deployment checks and rollback capabilities.",
+  "approach": "Built a wizard-driven platform using Laravel 13 and Ansible that validates configurations before deployment, detects IP conflicts and VLAN duplication, and provides one-click rollback.",
+  "results": "Working platform with async job execution, deployment history auditing, RBAC enforcement, and a visual topology dashboard for Cisco IOS devices.",
+  "technologies": [
+    "Laravel",
+    "PHP",
+    "Ansible",
+    "MySQL",
+    "Cisco IOS",
+    "SNMP"
+  ],
+  "categories": [
+    "Network Automation",
+    "Security",
+    "Infrastructure"
+  ],
+  "github": "https://github.com/PM-CyberSec/SUTech-courses-labs/tree/NetworkOperations",
+  "screenshots": [],
+  "team": [],
+  "relatedInvestigations": [],
+  "relatedBlogs": []
+}

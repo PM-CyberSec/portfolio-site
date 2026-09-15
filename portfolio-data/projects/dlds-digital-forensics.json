@@ -1,0 +1,31 @@
+{
+  "slug": "dlds-digital-forensics",
+  "title": "AI-Assisted Network Forensics",
+  "subtitle": "ML-Based Anomaly Detection on Network Traffic",
+  "description": "Academic project building a machine learning pipeline for detecting C2 communication and data exfiltration in PCAP data.",
+  "role": "Forensics Analyst",
+  "timeline": "2025",
+  "status": "completed",
+  "featured": true,
+  "problem": "Signature-based IDS struggles to detect C2 channels hidden in encrypted or low-and-slow traffic. Need anomaly detection approaches for zero-day threats.",
+  "approach": "Built an ML pipeline using Scikit-learn to analyze PCAP data with custom features based on flow duration, packet entropy, and protocol behavior. Integrated with Zeek and Suricata for multi-layered validation.",
+  "results": "Anomaly detection pipeline capable of identifying suspicious network patterns. Multi-layered validation approach combining ML classification with traditional IDS signatures.",
+  "technologies": [
+    "Python",
+    "Scikit-learn",
+    "Pandas",
+    "Suricata",
+    "Zeek",
+    "Wireshark"
+  ],
+  "categories": [
+    "Digital Forensics",
+    "Machine Learning",
+    "Network Security"
+  ],
+  "github": "https://github.com/PM-CyberSec/SUTech-courses-labs/tree/DigitalForensics",
+  "screenshots": [],
+  "team": [],
+  "relatedInvestigations": [],
+  "relatedBlogs": []
+}

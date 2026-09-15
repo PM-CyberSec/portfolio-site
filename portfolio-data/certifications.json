@@ -1,0 +1,18 @@
+[
+  {
+    "name": "Cyber Threat Management",
+    "issuer": "Cisco",
+    "date": "2025",
+    "status": "completed",
+    "link": "",
+    "pic": "/portfolio-site/certs/CyberThreatManagement.png-1.png"
+  },
+  {
+    "name": "Networking Basics",
+    "issuer": "Cisco",
+    "date": "2025",
+    "status": "completed",
+    "link": "",
+    "pic": "/portfolio-site/certs/NetworkingBasics.png-1.png"
+  }
+]

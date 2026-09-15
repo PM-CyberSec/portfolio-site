@@ -1,0 +1,77 @@
+[
+  {
+    "title": "Active Directory Lateral Movement",
+    "slug": "active-directory-lateral-movement",
+    "category": "Windows",
+    "date": "2026-09-10",
+    "context": "Personal Security Lab",
+    "summary": "Mapped lateral movement paths through an AD environment using Pass-the-Hash and Kerberoasting techniques, building detection coverage for common attack patterns.",
+    "scenario": "Once an attacker compromises a single machine in an AD environment, they pivot laterally to reach high-value targets like domain controllers. Understanding these paths is essential for building detection rules.",
+    "objective": "Identify and document lateral movement techniques in a lab AD environment to build detection coverage and monitoring checklists.",
+    "environment": [
+      "Windows Server 2019",
+      "Active Directory",
+      "Wireshark",
+      "BloodHound"
+    ],
+    "keyFindings": [
+      "Kerberoasting tickets have detectable TGS request patterns in DC logs",
+      "Pass-the-Hash leaves NTLM authentication anomalies that can be correlated",
+      "BloodHound graph analysis reveals shortest attack paths for privilege escalation",
+      "Detection rules should focus on abnormal TGS request volumes and NTLM logon patterns"
+    ],
+    "mitreTechniques": [
+      "T1550.002",
+      "T1558",
+      "T1021.002"
+    ],
+    "tools": [
+      "BloodHound",
+      "Wireshark",
+      "Impacket",
+      "Rubeus"
+    ],
+    "outcome": "Built AD security monitoring checklist and detection rules for lateral movement indicators, covering Kerberoasting, Pass-the-Hash, and privilege escalation patterns.",
+    "reportFile": "report.md",
+    "relatedProjects": [],
+    "relatedBlogs": [],
+    "reportContent": "# Active Directory Lateral Movement Investigation\n\n## Executive Summary\n\nMapped lateral movement paths through an AD environment using common techniques like Pass-the-Hash and Kerberoasting, then developed detection rules for each technique.\n\n## Investigation Objective\n\nIdentify and document lateral movement techniques in a lab AD environment to build detection coverage.\n\n## Environment\n\n- Windows Server 2019\n- Active Directory Domain Services\n- Wireshark for traffic capture\n- BloodHound for attack path visualization\n\n## Investigation Approach\n\n1. Established baseline AD environment with standard user and admin accounts\n2. Used BloodHound to enumerate AD objects and identify attack paths\n3. Executed Kerberoasting attacks and captured TGS request patterns\n4. Performed Pass-the-Hash attacks and analyzed NTLM authentication logs\n5. Documented detection opportunities for each technique\n\n## Key Findings\n\n### Kerberoasting (T1558)\n- SPN accounts with weak passwords are vulnerable to offline cracking\n- TGS requests generate identifiable patterns in DC event logs\n- Detection: Monitor for unusual volumes of TGS-4624 events from single sources\n\n### Pass-the-Hash (T1550.002)\n- NTLM authentication anomalies appear in DC logs when hashes are replayed\n- Lateral movement via SMB creates detectable network patterns\n- Detection: Correlate NTLM logon events with source/destination anomalies\n\n### Privilege Escalation Paths\n- BloodHound graph analysis reveals shortest paths to Domain Admin\n- Common paths: User → SPN → Kerberoast → cracked hash → admin\n\n## MITRE ATT&CK Mapping\n\n| Technique | ID | Description |\n|---|---|---|\n| Pass the Hash | T1550.002 | Use captured NTLM hashes for authentication |\n| Kerberoasting | T1558 | Request TGS tickets for offline cracking |\n| Remote Services | T1021.002 | Lateral movement via SMB/WinRM |\n\n## Tools Used\n\n- **BloodHound**: AD enumeration and attack path visualization\n- **Wireshark**: Network traffic capture and analysis\n- **Impacket**: Kerberoasting and Pass-the-Hash execution\n- **Rubeus**: Kerberos interaction and ticket manipulation\n\n## Outcome\n\nBuilt AD security monitoring checklist covering:\n- Detection rules for lateral movement indicators\n- Log sources to monitor for each technique\n- Alert thresholds for abnormal authentication patterns\n- Recommended SIEM queries for Wazuh/Splunk\n"
+  },
+  {
+    "title": "PowerShell Defense Evasion Techniques",
+    "slug": "powershell-defense-evasion",
+    "category": "Windows",
+    "date": "2026-09-14",
+    "context": "Personal Security Lab",
+    "summary": "Investigated how threat actors use PowerShell obfuscation and AMSI bypass to evade detection, with detection strategies using Sysmon and Event Viewer.",
+    "scenario": "Attackers increasingly use PowerShell as their primary execution framework due to its deep integration with Windows and ability to bypass application whitelisting.",
+    "objective": "Map common PowerShell evasion techniques to MITRE ATT&CK and develop detection rules.",
+    "environment": [
+      "Windows 10",
+      "Sysmon",
+      "Event Viewer",
+      "PowerShell"
+    ],
+    "keyFindings": [
+      "AMSI bypass attempts leave detectable event traces",
+      "Script block logging (Event ID 4104) is the most reliable detection source",
+      "Encoded commands have predictable entropy patterns"
+    ],
+    "mitreTechniques": [
+      "T1059.001",
+      "T1562.001"
+    ],
+    "tools": [
+      "Sysmon",
+      "PowerShell",
+      "MITRE ATT&CK"
+    ],
+    "outcome": "Created detection playbook for PowerShell-based attacks with Sysmon configuration and Splunk queries.",
+    "reportFile": "report.md",
+    "relatedProjects": [
+      "cybernest-soar"
+    ],
+    "relatedBlogs": [],
+    "reportContent": "# PowerShell Defense Evasion Investigation\n\n## Executive Summary\n\nInvestigated how threat actors use PowerShell obfuscation and AMSI bypass to evade detection, then developed detection strategies using Sysmon and Event Viewer.\n\n## Investigation Objective\n\nMap common PowerShell evasion techniques to MITRE ATT&CK and develop detection rules.\n\n## Environment\n\n- Windows 10\n- Sysmon for enhanced logging\n- Windows Event Viewer\n- PowerShell 5.1+\n\n## Investigation Approach\n\n1. Documented common PowerShell evasion techniques from MITRE ATT&CK\n2. Executed obfuscation methods in controlled lab environment\n3. Analyzed resulting logs from Sysmon and Windows Event Viewer\n4. Identified reliable detection sources for each technique\n5. Developed detection rules and Sysmon configuration\n\n## Key Findings\n\n### AMSI Bypass (T1562.001)\n- AMSI bypass attempts modify Windows Defender settings\n- These modifications leave detectable event traces\n- Detection: Monitor for AMSI-related registry changes and defender status modifications\n\n### Obfuscated Commands (T1059.001)\n- Script block logging (Event ID 4104) captures deobfuscated command content\n- This is the most reliable source for detecting obfuscated PowerShell\n- Encoded commands show predictable entropy patterns in base64 strings\n\n### Detection Recommendations\n\n1. Enable PowerShell Script Block Logging (Event ID 4104)\n2. Enable PowerShell Module Logging (Event ID 4103)\n3. Deploy Sysmon with PowerShell-focused configuration\n4. Monitor for encoded command patterns with high entropy\n\n## MITRE ATT&CK Mapping\n\n| Technique | ID | Description |\n|---|---|---|\n| PowerShell | T1059.001 | Command and scripting interpreter |\n| Impair Defenses | T1562.001 | Disable or modify tools |\n\n## Outcome\n\nCreated detection playbook including:\n- Sysmon configuration for PowerShell monitoring\n- Detection queries for Wazuh/Splunk\n- Alert thresholds for suspicious PowerShell activity\n- Documentation of each evasion technique and its detection method\n"
+  }
+]
