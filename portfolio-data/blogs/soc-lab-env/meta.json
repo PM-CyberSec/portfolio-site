@@ -1,0 +1,17 @@
+{
+  "title": "SOC Lab Env",
+  "slug": "soc-lab-env",
+  "description": "Designing a realistic security operations environment while keeping attack simulations isolated, observable, and manageable.",
+  "date": "1-10-2026",
+  "category": "SOC",
+  "pic": "/portfolio-site/images/rickomender-deskroom.png",
+  "tags": [
+    "Virtual",
+    "Lab Environment",
+    "Network Management"
+  ],
+  "readingTime": 15,
+  "pdf": "",
+  "relatedInvestigations": [],
+  "relatedProjects": []
+}

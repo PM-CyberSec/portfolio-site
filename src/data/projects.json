@@ -59,7 +59,11 @@
       "SIEM",
       "Security Automation"
     ],
-    "metrics": [],
+    "metrics": [
+      "219K events analyszed",
+      "350 alerts generated",
+      "90% accuracy"
+    ],
     "github": "https://github.com/CyberNest-SOAR/CyberNest-Soar",
     "screenshots": [],
     "team": [],

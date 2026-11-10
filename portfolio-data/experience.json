@@ -15,21 +15,6 @@
   },
   {
     "title": "SOC Intern",
-    "company": "TriosCyber × Ernith",
-    "type": "Internship",
-    "timeline": "Sep 2026 — Oct 2026",
-    "location": "Remote",
-    "current": false,
-    "highlights": [
-      "Deployed and configured a multi-node Wazuh SIEM lab environment on Ubuntu Server with custom correlation rules and real-time alert monitoring",
-      "Analyzed enterprise network traffic and system logs using Wireshark, Suricata, and Zeek to identify indicators of compromise",
-      "Investigated endpoint telemetry and Windows/Linux system logs during simulated security incidents, performing alert triage and root-cause analysis",
-      "Automated threat detection workflows by integrating SIEM alerts with external intelligence sources using Python scripts and REST APIs"
-    ],
-    "pic": ""
-  },
-  {
-    "title": "SOC Intern",
     "company": "Archon Vanguard",
     "type": "Internship",
     "timeline": "Sep 2026 — Oct 2026",
@@ -41,7 +26,7 @@
       "Investigated phishing attempts, web security anomalies, and initial access/persistence vectors across Windows and Linux environments",
       "Applied Cyber Kill Chain and MITRE ATT&CK frameworks to structure threat detection, alert triage, and incident response lifecycles"
     ],
-    "pic": ""
+    "pic": "/portfolio-site/certs/ArchonVanguard-intern-cert.png"
   },
   {
     "title": "FortiGate Security Intern",
@@ -49,7 +34,7 @@
     "type": "Intern",
     "timeline": "Sep 2026 - Oct 2026",
     "location": "Remote",
-    "current": true,
+    "current": false,
     "highlights": [
       "Configured and managed FortiGate security policies, firewall rules, and administrative settings through the FortiOS 7.6 Administrator training environment",
       "Applied FortiGate networking and security concepts including interfaces, routing, NAT, firewall policies, and traffic control",

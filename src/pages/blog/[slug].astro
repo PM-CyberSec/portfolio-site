@@ -50,52 +50,90 @@ const relatedProjects = post.relatedProjects?.length
   ? projects.filter(p => post.relatedProjects.includes(p.slug))
   : [];
 const relatedPosts = blog.filter(b => b.slug !== slug && (b.tags||[]).some(t => (post.tags||[]).includes(t))).slice(0, 2);
+
+// Resolve cover image: meta pic may already include base (/portfolio-site/...) or be relative
+const picUrl = post.pic
+  ? (post.pic.startsWith('http') || post.pic.startsWith('/') ? post.pic : `${base}/${post.pic}`)
+  : null;
 ---
 <Layout title={`${post.title} · Blog`} description={post.description}>
   <Nav />
 
-  <article class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-24">
-    <div class="flex items-center gap-2 text-xs text-[var(--text-dim)] mb-6">
-      <a href={base} class="hover:text-accent transition">Profile</a>
-      <span>/</span>
-      <a href={`${base}/blog`} class="hover:text-accent transition">Blog</a>
-      <span>/</span>
-      <span class="text-[var(--text-muted)]">{post.title}</span>
-    </div>
-
-    <div class="flex items-center gap-2 mb-4">
-      <span class="text-[10px] px-2 py-0.5 bg-accent/20 text-accent border border-accent/30 rounded-badge">{post.category}</span>
-      <span class="text-[10px] text-[var(--text-dim)]">{post.date}</span>
-      <span class="text-[10px] text-[var(--text-dim)]">{post.readingTime} min read</span>
-    </div>
-
-    <h1 class="text-3xl font-bold text-[var(--text)] mb-6">{post.title}</h1>
-
-    {post.pdf && (
-      <div class="mb-6 bg-[var(--bg-card)] border border-[var(--border)] rounded-card overflow-hidden">
-        <iframe src={post.pdf} class="w-full" style="height:80vh" title="PDF Article"></iframe>
+  <article class="pb-24">
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-4 no-print">
+      <div class="flex items-center gap-2 text-xs text-[var(--text-dim)]">
+        <a href={base} class="hover:text-accent transition">Profile</a>
+        <span>/</span>
+        <a href={`${base}/blog`} class="hover:text-accent transition">Blog</a>
+        <span>/</span>
+        <span class="text-[var(--text-muted)]">{post.title}</span>
       </div>
-      <p class="text-xs text-[var(--text-dim)] mb-8 text-center">
-        <a href={post.pdf} target="_blank" rel="noopener noreferrer" class="hover:text-accent transition">Open PDF in new tab &rarr;</a>
-      </p>
-    )}
+    </div>
 
-    {content.trim() ? (
-      <div class="prose" set:html={htmlContent} />
-    ) : (
-      !post.pdf && <p class="text-sm text-[var(--text-dim)]">No content yet.</p>
-    )}
+    <div id="blog-print-area">
+      <div class="print-only">
+        <div class="print-only-title">{post.title}</div>
+        <div class="print-only-meta">{post.category} · {post.date} · {post.readingTime} min read</div>
+      </div>
 
-    <div class="mt-8 pt-6 border-t border-[var(--border)]">
-      <div class="flex flex-wrap gap-2">
-        {(post.tags||[]).map(t => (
-          <span class="text-xs px-2.5 py-1 border border-[var(--border)] rounded-badge text-[var(--text-dim)] bg-[var(--bg-elevated)]">{t}</span>
-        ))}
+      <header class="blog-hero">
+        {picUrl ? (
+          <img id="blog-hero-img" src={picUrl} alt="" aria-hidden="true" loading="eager" />
+        ) : (
+          <div class="blog-hero-fallback" aria-hidden="true"></div>
+        )}
+        <div class="blog-hero-overlay" aria-hidden="true"></div>
+        <div class="blog-hero-fade" aria-hidden="true"></div>
+        <div class="blog-hero-content">
+          <div class="blog-hero-badges">
+            <span class="blog-hero-category">{post.category}</span>
+          </div>
+          <h1 class="blog-hero-title">{post.title}</h1>
+          <div class="blog-hero-rule" aria-hidden="true"></div>
+          <div class="blog-hero-meta">
+            <span>{post.date}</span>
+            <span class="blog-hero-dot" aria-hidden="true">·</span>
+            <span>{post.readingTime} min read</span>
+          </div>
+        </div>
+      </header>
+
+      <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+
+      <div class="flex flex-wrap items-center gap-3 mb-8 no-print">
+        <button id="exportPdfBtn" type="button" class="text-xs px-3 py-1.5 border border-accent text-accent rounded-btn bg-accent-dim hover:opacity-80 transition">
+          &#x2B07; Export article as PDF
+        </button>
+        <span class="text-[11px] text-[var(--text-dim)]">Saves the article below (with cover) via print &rarr; Save as PDF</span>
+      </div>
+
+      {post.pdf && (
+        <div class="mb-6 bg-[var(--bg-card)] border border-[var(--border)] rounded-card overflow-hidden no-print">
+          <iframe src={post.pdf} class="w-full" style="height:80vh" title="PDF Article" loading="lazy"></iframe>
+        </div>
+        <p class="text-xs text-[var(--text-dim)] mb-8 text-center no-print">
+          <a href={post.pdf} target="_blank" rel="noopener noreferrer" class="hover:text-accent transition">Open attached PDF in new tab &rarr;</a>
+        </p>
+      )}
+
+      {content.trim() ? (
+        <div class="prose" set:html={htmlContent} />
+      ) : (
+        !post.pdf && <p class="text-sm text-[var(--text-dim)]">No content yet.</p>
+      )}
+
+      <div class="mt-8 pt-6 border-t border-[var(--border)]">
+        <div class="flex flex-wrap gap-2">
+          {(post.tags||[]).map(t => (
+            <span class="text-xs px-2.5 py-1 border border-[var(--border)] rounded-badge text-[var(--text-dim)] bg-[var(--bg-elevated)]">{t}</span>
+          ))}
+        </div>
+      </div>
       </div>
     </div>
 
     {(relatedInvestigations.length > 0 || relatedProjects.length > 0 || relatedPosts.length > 0) && (
-      <div class="mt-12 border-t border-[var(--border)] pt-8">
+      <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 mt-12 border-t border-[var(--border)] pt-8 no-print">
         {relatedInvestigations.length > 0 && (
           <div class="mb-6">
             <h3 class="text-sm font-semibold text-[var(--text)] mb-3">Related Investigations</h3>
@@ -142,6 +180,13 @@ const relatedPosts = blog.filter(b => b.slug !== slug && (b.tags||[]).some(t => 
   <Footer />
 </Layout>
 
+<script is:inline>
+  (function () {
+    var btn = document.getElementById('exportPdfBtn');
+    if (btn) btn.addEventListener('click', function () { window.print(); });
+  })();
+</script>
+
 <style is:global>
 .prose { color: var(--text-muted); line-height: 1.75; }
 .prose h1 { font-size: 1.75rem; font-weight: 700; color: var(--text); margin: 1.5rem 0 0.75rem; }
@@ -163,5 +208,119 @@ const relatedPosts = blog.filter(b => b.slug !== slug && (b.tags||[]).some(t => 
 .prose th { background: var(--bg-elevated); font-weight: 600; color: var(--text); }
 .prose hr { border: none; border-top: 1px solid var(--border); margin: 1.5rem 0; }
 .prose img { max-width: 100%; height: auto; border-radius: 8px; margin: 1rem 0; border: 1px solid var(--border); }
+.blog-hero {
+  position: relative;
+  width: 100%;
+  min-height: 340px;
+  height: 44vh;
+  max-height: 540px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: #000;
+  margin: 0 0 2.5rem;
+}
+.blog-hero img,
+.blog-hero-fallback {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.blog-hero img { object-fit: cover; }
+.blog-hero-fallback { background: radial-gradient(ellipse at 50% 30%, #1F2937 0%, #000 70%); }
+.blog-hero-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: radial-gradient(ellipse at center, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.55) 100%);
+}
+.blog-hero-fade {
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 40%;
+  z-index: 1;
+  background: linear-gradient(to bottom, transparent 0%, var(--bg) 100%);
+}
+.blog-hero-content {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  padding: 3rem 1.5rem 3.5rem;
+  max-width: 920px;
+  width: 100%;
+}
+.blog-hero-badges { margin-bottom: 1rem; }
+.blog-hero-category {
+  display: inline-block;
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: #fff;
+  border: 1px solid rgba(255,255,255,0.5);
+  background: rgba(255,255,255,0.12);
+  backdrop-filter: blur(4px);
+  padding: 4px 12px;
+  border-radius: 999px;
+}
+.blog-hero-title {
+  color: #fff !important;
+  font-size: clamp(1.75rem, 4vw, 2.75rem);
+  font-weight: 600;
+  line-height: 1.2;
+  margin: 0;
+  text-shadow: 0 2px 24px rgba(0,0,0,0.7);
+}
+.blog-hero-rule {
+  width: 88px;
+  height: 5px;
+  background: #fff;
+  margin: 1.1rem auto 1.4rem;
+  box-shadow: 0 1px 8px rgba(0,0,0,0.6);
+}
+.blog-hero-meta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.9rem;
+  color: #fff;
+  font-size: 0.9rem;
+  text-shadow: 0 1px 12px rgba(0,0,0,0.8);
+}
+.blog-hero-dot { opacity: 0.7; }
+@media (max-width: 640px) {
+  .blog-hero { min-height: 280px; height: 38vh; }
+  .blog-hero-content { padding: 2rem 1rem 2.5rem; }
+}
+.print-only { display: none; }
+@page { margin: 14mm; }
+@media print {
+  nav, footer, .no-print, #exportPdfBtn { display: none !important; }
+  html, body { background: #fff !important; }
+  article { max-width: 100% !important; padding: 0 !important; margin: 0 !important; }
+  #blog-print-area { display: block !important; }
+  #blog-print-area h1 { color: #000 !important; font-size: 22pt !important; margin: 0 0 10pt !important; }
+  .print-only { display: block !important; margin-bottom: 10pt; border-bottom: 2px solid #000; padding-bottom: 8pt; }
+  .print-only-title { font-size: 22pt; font-weight: 700; color: #000 !important; }
+  .print-only-meta { font-size: 9pt; color: #444 !important; margin-top: 4pt; }
+  .prose, .prose p, .prose li, .prose ul, .prose ol { color: #111 !important; }
+  .prose h1, .prose h2, .prose h3, .prose h4, .prose th { color: #000 !important; }
+  .prose a { color: #000 !important; text-decoration: underline; }
+  .prose pre { background: #f5f5f5 !important; border: 1px solid #ccc !important; white-space: pre-wrap; word-break: break-word; }
+  .prose code { background: #f0f0f0 !important; border-color: #ccc !important; color: #000 !important; }
+  .prose blockquote { color: #333 !important; border-left-color: #000 !important; }
+  .prose table, .prose th, .prose td { border-color: #999 !important; }
+  .blog-hero { display: block !important; width: 100% !important; height: auto !important; min-height: 0 !important; max-height: none !important; background: #fff !important; margin: 0 0 10pt !important; }
+  .blog-hero img { position: static !important; height: auto !important; max-height: 90mm; object-fit: cover; width: 100%; break-inside: avoid; }
+  .blog-hero-fallback { display: none !important; }
+  .blog-hero-overlay, .blog-hero-fade { display: none !important; }
+  .blog-hero-content { padding: 0 !important; }
+  .blog-hero-badges { display: none !important; }
+  .blog-hero-title { color: #000 !important; text-shadow: none !important; }
+  .blog-hero-rule { background: #000 !important; box-shadow: none !important; }
+  .blog-hero-meta { color: #333 !important; text-shadow: none !important; }
+  #blog-hero-img { break-inside: avoid; max-height: 90mm; object-fit: cover; width: 100%; }
+  figure { break-inside: avoid; }
+}
 </style>
-</Layout>
