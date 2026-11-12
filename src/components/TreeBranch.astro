@@ -1,0 +1,80 @@
+---
+interface TreeNode {
+  name: string;
+  path: string;
+  type: 'dir' | 'file';
+  children: TreeNode[];
+  note?: string;
+  href?: string;
+}
+
+interface Props {
+  nodes?: TreeNode[];
+  depth?: number;
+}
+
+const { nodes = [], depth = 0 } = Astro.props;
+---
+
+{nodes.map(node => (
+  node.type === 'dir' ? (
+    <li data-path={node.path} data-dir="true">
+      <details
+        class="tree-details group"
+        open={depth < 1}
+        data-depth={depth}
+        data-open-default={depth < 1 ? 'true' : 'false'}
+      >
+        <summary class="flex items-center gap-1.5 rounded px-1.5 py-1 cursor-pointer select-none hover:bg-[var(--bg-elevated)] transition">
+          <svg class="tree-chevron w-3 h-3 text-[var(--text-dim)] shrink-0" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+            <path d="M4 2l4 4-4 4" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+          <svg class="w-3.5 h-3.5 text-accent/80 shrink-0" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3" aria-hidden="true">
+            <path d="M1.5 4.5A1.5 1.5 0 0 1 3 3h3l1.5 1.5H13A1.5 1.5 0 0 1 14.5 6v6A1.5 1.5 0 0 1 13 13.5H3A1.5 1.5 0 0 1 1.5 12V4.5Z" stroke-linejoin="round" />
+          </svg>
+          <span class="font-mono text-xs text-[var(--text)] truncate">{node.name}/</span>
+          {node.note && (
+            <span class="hidden sm:inline font-mono text-[10px] text-[var(--text-dim)] truncate">{node.note}</span>
+          )}
+          <span class="ml-auto font-mono text-[9px] text-[var(--text-dim)] tabular-nums shrink-0">{node.children.length}</span>
+        </summary>
+        <ul class="ml-3 border-l border-[var(--border)] pl-2 list-none p-0 m-0">
+          <Astro.self nodes={node.children} depth={depth + 1} />
+        </ul>
+      </details>
+    </li>
+  ) : (
+    <li data-path={node.path} data-dir="false" class="flex items-center gap-1.5 rounded px-1.5 py-1 hover:bg-[var(--bg-elevated)] transition" title={node.path}>
+      <span class="w-3 shrink-0" aria-hidden="true"></span>
+      <svg class="w-3.5 h-3.5 text-[var(--text-dim)] shrink-0" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3" aria-hidden="true">
+        <path d="M4 1.5h5l3 3v10H4V1.5Z" stroke-linejoin="round" />
+        <path d="M9 1.5v3h3" stroke-linejoin="round" />
+      </svg>
+      {node.href ? (
+        <a href={node.href} target="_blank" rel="noopener noreferrer" class="font-mono text-xs text-[var(--text-muted)] hover:text-accent transition truncate">
+          {node.name}
+        </a>
+      ) : (
+        <span class="font-mono text-xs text-[var(--text-muted)] truncate">{node.name}</span>
+      )}
+      {node.note && (
+        <span class="hidden sm:inline font-mono text-[10px] text-[var(--text-dim)] truncate">{node.note}</span>
+      )}
+    </li>
+  )
+))}
+
+<style>
+  .tree-details > summary::-webkit-details-marker {
+    display: none;
+  }
+  .tree-details > summary {
+    list-style: none;
+  }
+  .tree-chevron {
+    transition: transform 0.15s ease;
+  }
+  .tree-details[open] > summary .tree-chevron {
+    transform: rotate(90deg);
+  }
+</style>

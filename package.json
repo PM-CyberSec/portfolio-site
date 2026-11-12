@@ -11,7 +11,8 @@
     "admin": "node scripts/api-server.mjs",
     "portfolio": "node scripts/portfolio-cli.mjs",
     "seed": "node scripts/seed-content.mjs",
-    "sync": "node scripts/content-loader.mjs"
+    "sync": "node scripts/content-loader.mjs",
+    "sync:architecture": "node scripts/sync-architecture.mjs"
   },
   "dependencies": {
     "astro": "7.3.2",

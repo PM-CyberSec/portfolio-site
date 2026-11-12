@@ -11,14 +11,38 @@ function syncToSrc() {
   const srcData = path.join(ROOT, 'src', 'data');
   fs.mkdirSync(srcData, { recursive: true });
 
+  // Load optional architecture data keyed by project slug
+  const archDir = path.join(DATA_DIR, 'architecture');
+  const architecture = {};
+  if (fs.existsSync(archDir)) {
+    fs.readdirSync(archDir)
+      .filter(f => f.endsWith('.json'))
+      .forEach(f => {
+        try {
+          const data = JSON.parse(fs.readFileSync(path.join(archDir, f), 'utf8'));
+          const slug = data.slug || f.replace(/\.json$/, '');
+          architecture[slug] = data;
+        } catch (err) {
+          console.warn(`Skipping invalid architecture file ${f}: ${err.message}`);
+        }
+      });
+  }
+
   // Load all project JSONs
   const projectDir = path.join(DATA_DIR, 'projects');
   if (fs.existsSync(projectDir)) {
     const projects = fs.readdirSync(projectDir)
       .filter(f => f.endsWith('.json'))
-      .map(f => JSON.parse(fs.readFileSync(path.join(projectDir, f), 'utf8')));
+      .map(f => {
+        const project = JSON.parse(fs.readFileSync(path.join(projectDir, f), 'utf8'));
+        if (architecture[project.slug]) project.architecture = architecture[project.slug];
+        return project;
+      });
     fs.writeFileSync(path.join(srcData, 'projects.json'), JSON.stringify(projects, null, 2));
     console.log(`Synced ${projects.length} projects to src/data/projects.json`);
+    if (Object.keys(architecture).length) {
+      console.log(`Attached architecture data for ${Object.keys(architecture).length} project(s)`);
+    }
   }
 
   // Load all investigation metas + report content

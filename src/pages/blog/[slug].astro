@@ -5,6 +5,7 @@ import Footer from '../../components/Footer.astro';
 import blog from '../../data/blog.json';
 import projects from '../../data/projects.json';
 import investigations from '../../data/investigations.json';
+import { getBlogTheme } from '../../lib/blog-theme';
 import { marked } from 'marked';
 
 export function getStaticPaths() {
@@ -43,6 +44,52 @@ if (content.startsWith('---')) {
 
 const htmlContent = marked.parse(processInternalLinks(content));
 
+function slugifyHeading(text: string) {
+  const base = text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+  return base || `section-${Math.random().toString(36).slice(2, 7)}`;
+}
+
+function decodeEntities(value: string) {
+  return value
+    .replace(/&#x([0-9a-f]+);/gi, (_, hex: string) => String.fromCodePoint(parseInt(hex, 16)))
+    .replace(/&#(\d+);/g, (_, dec: string) => String.fromCodePoint(parseInt(dec, 10)))
+    .replace(/&quot;/g, '"')
+    .replace(/&apos;/g, "'")
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&amp;/g, '&');
+}
+
+const headingRegex = /<h([1-6])([^>]*)>([\s\S]*?)<\/h\1>/g;
+const headings: { id: string; text: string; depth: number }[] = [];
+let contentWithHeadings = htmlContent.replace(headingRegex, (match: string, levelStr: string, attrs: string, inner: string) => {
+  const level = parseInt(levelStr, 10);
+  const existingIdMatch = attrs.match(/id="([^"]*)"/);
+  const id = existingIdMatch?.[1] || slugifyHeading(inner.replace(/<[^>]+>/g, '').trim());
+  const text = decodeEntities(inner.replace(/<[^>]+>/g, '').trim());
+  headings.push({ id, text, depth: level });
+  const anchor = `<a class="heading-anchor" href="#${id}" aria-label="Link to section">\u2192</a>`;
+  const withId = attrs ? attrs.replace(/id="[^"]*"/, `id="${id}"`) : ` id="${id}"`;
+  const openTag = `<h${level}${withId}>`;
+  const closeTag = `</h${level}>`;
+  return `${openTag}${inner}${anchor}${closeTag}`;
+});
+
+const numberedHeading = /^\d+[.)]\s/;
+type TocChild = { id: string; text: string; depth: number };
+type TocGroup = TocChild & { children: TocChild[] };
+const tocGroups: TocGroup[] = [];
+let currentGroup: TocGroup | null = null;
+for (const heading of headings) {
+  if (numberedHeading.test(heading.text)) {
+    currentGroup = { ...heading, children: [] };
+    tocGroups.push(currentGroup);
+  } else if (currentGroup) {
+    currentGroup.children.push(heading);
+  }
+}
+
 const relatedInvestigations = post.relatedInvestigations?.length
   ? investigations.filter(i => post.relatedInvestigations.includes(i.slug))
   : [];
@@ -55,11 +102,27 @@ const relatedPosts = blog.filter(b => b.slug !== slug && (b.tags||[]).some(t => 
 const picUrl = post.pic
   ? (post.pic.startsWith('http') || post.pic.startsWith('/') ? post.pic : `${base}/${post.pic}`)
   : null;
+
+const theme = getBlogTheme(post.category);
+const articleThemeStyle = [
+  `--blog-accent:${theme.accent}`,
+  `--blog-accent-soft:${theme.soft}`,
+  `--blog-accent-faint:${theme.faint}`,
+  `--blog-accent-line:${theme.line}`,
+  `--blog-accent-border:${theme.border}`,
+  `--blog-accent-glow:${theme.glow}`,
+  `--accent:${theme.accent}`,
+  `--accent-dim:${theme.soft}`,
+  `--border:${theme.line}`,
+  `--border-strong:${theme.border}`,
+].join(';');
 ---
 <Layout title={`${post.title} · Blog`} description={post.description}>
   <Nav />
 
-  <article class="pb-24">
+  <article class="pb-24 blog-article" data-category={post.category} style={articleThemeStyle}>
+    <div id="readingProgress" class="blog-progress no-print" aria-hidden="true"></div>
+
     <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-4 no-print">
       <div class="flex items-center gap-2 text-xs text-[var(--text-dim)]">
         <a href={base} class="hover:text-accent transition">Profile</a>
@@ -98,8 +161,10 @@ const picUrl = post.pic
         </div>
       </header>
 
-      <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-
+      <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="blog-layout">
+      <div class="blog-reading">
+      <div class="blog-article-content min-w-0 flex-1">
       <div class="flex flex-wrap items-center gap-3 mb-8 no-print">
         <button id="exportPdfBtn" type="button" class="text-xs px-3 py-1.5 border border-accent text-accent rounded-btn bg-accent-dim hover:opacity-80 transition">
           &#x2B07; Export article as PDF
@@ -117,7 +182,7 @@ const picUrl = post.pic
       )}
 
       {content.trim() ? (
-        <div class="prose" set:html={htmlContent} />
+        <div class="prose" set:html={contentWithHeadings} />
       ) : (
         !post.pdf && <p class="text-sm text-[var(--text-dim)]">No content yet.</p>
       )}
@@ -128,6 +193,41 @@ const picUrl = post.pic
             <span class="text-xs px-2.5 py-1 border border-[var(--border)] rounded-badge text-[var(--text-dim)] bg-[var(--bg-elevated)]">{t}</span>
           ))}
         </div>
+      </div>
+      </div>
+      </div>
+
+      <aside id="blog-toc-panel" class="blog-toc no-print" aria-label="Table of contents">
+        <button id="toc-panel-toggle" type="button" class="blog-toc-toggle" aria-expanded="true" aria-controls="blog-toc-body" title="Toggle table of contents">
+          <span class="blog-toc-toggle-label">Contents</span>
+          <span class="blog-toc-toggle-icon" aria-hidden="true">&rsaquo;</span>
+        </button>
+        <div id="blog-toc-body" class="blog-toc-body">
+          {tocGroups.length > 0 && (
+          <ul class="blog-toc-groups">
+            {tocGroups.map((group) => (
+              <li class="blog-toc-group">
+                <div class="blog-toc-group-head">
+                  <a href={`#${group.id}`} data-heading={group.id}>{group.text}</a>
+                  {group.children.length > 0 && (
+                    <button type="button" class="blog-toc-expand" aria-expanded="false" aria-controls={`toc-sub-${group.id}`} aria-label={`Toggle section: ${group.text}`}>
+                      <span aria-hidden="true">&rsaquo;</span>
+                    </button>
+                  )}
+                </div>
+                {group.children.length > 0 && (
+                  <ul id={`toc-sub-${group.id}`} class="blog-toc-children" hidden>
+                    {group.children.map((child) => (
+                      <li><a href={`#${child.id}`} data-heading={child.id}>{child.text}</a></li>
+                    ))}
+                  </ul>
+                )}
+              </li>
+            ))}
+          </ul>
+          )}
+        </div>
+      </aside>
       </div>
       </div>
     </div>
@@ -184,6 +284,105 @@ const picUrl = post.pic
   (function () {
     var btn = document.getElementById('exportPdfBtn');
     if (btn) btn.addEventListener('click', function () { window.print(); });
+
+    var progress = document.getElementById('readingProgress');
+    var article = document.getElementById('blog-print-area');
+    if (progress && article) {
+      var ticking = false;
+      function update() {
+        var rect = article.getBoundingClientRect();
+        var start = window.scrollY + rect.top;
+        var distance = Math.max(1, article.offsetHeight - window.innerHeight);
+        var value = Math.min(1, Math.max(0, (window.scrollY - start) / distance));
+        progress.style.transform = 'scaleX(' + value + ')';
+        ticking = false;
+      }
+      function requestUpdate() {
+        if (!ticking) {
+          ticking = true;
+          window.requestAnimationFrame(update);
+        }
+      }
+      window.addEventListener('scroll', requestUpdate, { passive: true });
+      window.addEventListener('resize', requestUpdate);
+      update();
+    }
+
+    var prose = document.querySelector('.blog-reading .prose');
+    if (prose) {
+      var paragraphs = prose.querySelectorAll('p');
+      for (var i = 0; i < paragraphs.length; i++) {
+        var p = paragraphs[i];
+        if (!p.closest('blockquote')) {
+          p.classList.add('blog-dropcap');
+          break;
+        }
+      }
+    }
+
+    var tocPanel = document.getElementById('blog-toc-panel');
+    var tocToggle = document.getElementById('toc-panel-toggle');
+    var tocBody = document.getElementById('blog-toc-body');
+    if (tocPanel && tocToggle && tocBody) {
+      var storageKey = 'blog:toc-collapsed';
+      function applyPanelState(collapsed) {
+        tocPanel.classList.toggle('is-collapsed', collapsed);
+        tocToggle.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+      }
+      var storedCollapsed = false;
+      try { storedCollapsed = window.localStorage.getItem(storageKey) === '1'; } catch (e) { storedCollapsed = false; }
+      applyPanelState(storedCollapsed);
+      tocToggle.addEventListener('click', function () {
+        var nextCollapsed = !tocPanel.classList.contains('is-collapsed');
+        applyPanelState(nextCollapsed);
+        try { window.localStorage.setItem(storageKey, nextCollapsed ? '1' : '0'); } catch (e) {}
+      });
+
+      var expandButtons = tocPanel.querySelectorAll('.blog-toc-expand');
+      expandButtons.forEach(function (expandBtn) {
+        expandBtn.addEventListener('click', function () {
+          var list = document.getElementById(expandBtn.getAttribute('aria-controls'));
+          if (!list) return;
+          var isExpanded = expandBtn.getAttribute('aria-expanded') === 'true';
+          expandBtn.setAttribute('aria-expanded', isExpanded ? 'false' : 'true');
+          if (isExpanded) { list.setAttribute('hidden', ''); }
+          else { list.removeAttribute('hidden'); }
+        });
+      });
+
+      var tocIds = {};
+      tocPanel.querySelectorAll('a[data-heading]').forEach(function (link) {
+        tocIds[link.getAttribute('data-heading')] = true;
+      });
+      var sections = Array.from(document.querySelectorAll('#blog-print-area h1[id], #blog-print-area h2[id], #blog-print-area h3[id]')).filter(function (el) { return tocIds[el.id]; });
+      if (sections.length) {
+        var currentLink = null;
+        function setActive(id) {
+          var link = tocPanel.querySelector('a[data-heading="' + id + '"]');
+          if (!link || link === currentLink) return;
+          if (currentLink) currentLink.classList.remove('is-active');
+          link.classList.add('is-active');
+          currentLink = link;
+          var group = link.closest('.blog-toc-group');
+          if (group) {
+            var childList = group.querySelector('.blog-toc-children');
+            if (childList) {
+              var groupBtn = tocPanel.querySelector('.blog-toc-expand[aria-controls="' + childList.id + '"]');
+              if (groupBtn && groupBtn.getAttribute('aria-expanded') !== 'true') {
+                groupBtn.setAttribute('aria-expanded', 'true');
+                childList.removeAttribute('hidden');
+              }
+            }
+          }
+        }
+        var observer = new IntersectionObserver(function (entries) {
+          entries.forEach(function (entry) {
+            if (entry.isIntersecting) setActive(entry.target.id);
+          });
+        }, { rootMargin: '-20% 0px -70% 0px', threshold: 0 });
+        sections.forEach(function (section) { observer.observe(section); });
+      }
+    }
   })();
 </script>
 
@@ -208,6 +407,276 @@ const picUrl = post.pic
 .prose th { background: var(--bg-elevated); font-weight: 600; color: var(--text); }
 .prose hr { border: none; border-top: 1px solid var(--border); margin: 1.5rem 0; }
 .prose img { max-width: 100%; height: auto; border-radius: 8px; margin: 1rem 0; border: 1px solid var(--border); }
+
+/* Let the article text use the full content column (sidebar collapse/expand) */
+.blog-article .prose { max-width: none; }
+
+/* Category-scoped reading theme */
+.blog-article .text-accent { color: var(--blog-accent); }
+.blog-article .border-accent { border-color: var(--blog-accent-border); }
+.blog-article .bg-accent-dim { background: var(--blog-accent-soft); }
+.blog-article .hover\:text-accent:hover { color: var(--blog-accent); }
+.blog-article .group:hover .group-hover\:text-accent { color: var(--blog-accent); }
+
+.blog-progress {
+  position: fixed;
+  inset: 0 0 auto 0;
+  height: 3px;
+  z-index: 60;
+  background: var(--blog-accent);
+  box-shadow: 0 0 16px var(--blog-accent-glow);
+  transform: scaleX(0);
+  transform-origin: 0 50%;
+  will-change: transform;
+  pointer-events: none;
+}
+
+.blog-reading {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--blog-accent-border);
+  border-radius: 18px;
+  padding: 1rem;
+  background:
+    linear-gradient(180deg, var(--blog-accent-faint) 0%, transparent 22%),
+    var(--bg-card);
+  box-shadow:
+    0 28px 80px -58px var(--blog-accent-glow),
+    inset 0 1px 0 rgba(255, 255, 255, 0.035);
+}
+.blog-reading::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--blog-accent), transparent);
+  opacity: 0.65;
+  pointer-events: none;
+}
+@media (min-width: 640px) {
+  .blog-reading { padding: 1.75rem; }
+}
+.blog-article .blog-hero-rule {
+  background: var(--blog-accent);
+  box-shadow: 0 1px 18px var(--blog-accent-glow);
+}
+.blog-article .blog-hero-category {
+  border-color: var(--blog-accent-border);
+  box-shadow: 0 0 24px var(--blog-accent-glow);
+}
+.blog-article .blog-hero-fallback {
+  background: radial-gradient(ellipse at 50% 30%, var(--blog-accent-faint) 0%, #000 70%);
+}
+@media print {
+  .blog-progress { display: none !important; }
+  .blog-layout { display: block !important; }
+  .blog-toc { position: static !important; max-height: none !important; overflow: visible !important; }
+  .blog-reading {
+    border: none !important;
+    border-radius: 0 !important;
+    padding: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    overflow: visible !important;
+  }
+  .blog-reading::before { display: none !important; }
+}
+
+/* Phase 2: heading-based reading aids and prose polish */
+.blog-toc {
+  flex: 0 0 auto;
+  width: 240px;
+  padding: 0.5rem;
+  border: 1px solid var(--blog-accent-line);
+  border-radius: 12px;
+  background: linear-gradient(180deg, var(--blog-accent-faint), var(--bg-card));
+  transition: width 0.2s ease, padding 0.2s ease;
+}
+@media (min-width: 901px) {
+  .blog-toc {
+    position: sticky;
+    top: 4.5rem;
+    max-height: calc(100vh - 5.5rem);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+}
+.blog-toc-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  width: 100%;
+  padding: 6px 8px;
+  background: transparent;
+  border: 0;
+  border-radius: 6px;
+  color: var(--text-dim);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: color 0.15s ease, background 0.15s ease;
+}
+.blog-toc-toggle:hover {
+  color: var(--blog-accent);
+  background: var(--blog-accent-faint);
+}
+.blog-toc-toggle-icon {
+  display: inline-block;
+  font-size: 16px;
+  line-height: 1;
+  color: var(--blog-accent);
+  transform: rotate(90deg);
+  transition: transform 0.2s ease;
+}
+.blog-toc-body { padding: 4px; }
+.blog-toc-groups {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 2px;
+}
+.blog-toc-group-head {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+.blog-toc-group-head > a { flex: 1; min-width: 0; }
+.blog-toc-groups a {
+  display: block;
+  padding: 6px 8px;
+  border-left: 2px solid transparent;
+  border-radius: 6px;
+  color: var(--text-muted);
+  text-decoration: none;
+  font-size: 13px;
+  line-height: 1.4;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+.blog-toc-groups a:hover {
+  color: var(--text);
+  background: var(--bg-elevated);
+}
+.blog-toc-groups a.is-active {
+  color: var(--blog-accent);
+  border-left-color: var(--blog-accent);
+  background: var(--blog-accent-faint);
+}
+.blog-toc-expand {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  border-radius: 5px;
+  color: var(--text-dim);
+  cursor: pointer;
+  transition: color 0.15s ease, background 0.15s ease;
+}
+.blog-toc-expand span {
+  display: inline-block;
+  font-size: 15px;
+  line-height: 1;
+  transition: transform 0.18s ease;
+}
+.blog-toc-expand:hover {
+  color: var(--blog-accent);
+  background: var(--blog-accent-faint);
+}
+.blog-toc-expand[aria-expanded="true"] { color: var(--blog-accent); }
+.blog-toc-expand[aria-expanded="true"] span { transform: rotate(90deg); }
+.blog-toc-children {
+  list-style: none;
+  margin: 2px 0 4px;
+  padding: 0 0 0 10px;
+  display: grid;
+  gap: 1px;
+}
+.blog-toc-children[hidden] { display: none; }
+.blog-toc-children a {
+  padding: 5px 8px;
+  font-size: 12px;
+  color: var(--text-dim);
+}
+/* Collapsed panel: slim vertical tab */
+.blog-toc.is-collapsed {
+  width: 46px;
+  padding: 6px 4px;
+}
+.blog-toc.is-collapsed .blog-toc-body { display: none; }
+.blog-toc.is-collapsed .blog-toc-toggle {
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: 8px;
+  padding: 8px 2px;
+}
+.blog-toc.is-collapsed .blog-toc-toggle-label {
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+}
+.blog-toc.is-collapsed .blog-toc-toggle-icon { transform: rotate(0deg); }
+/* Sidebar layout: article content + separate TOC panel */
+.blog-layout {
+  display: flex;
+  gap: 2rem;
+  align-items: flex-start;
+}
+.blog-layout > .blog-reading {
+  flex: 1;
+  min-width: 0;
+}
+.blog-article-content { min-width: 0; }
+@media (max-width: 900px) {
+  .blog-layout { flex-direction: column; }
+  .blog-toc,
+  .blog-toc.is-collapsed { width: 100%; }
+  .blog-toc.is-collapsed .blog-toc-toggle {
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 6px 8px;
+  }
+  .blog-toc.is-collapsed .blog-toc-toggle-label { writing-mode: horizontal-tb; }
+}
+.blog-article .prose blockquote {
+  border-left: 3px solid var(--blog-accent);
+  padding: 0.75rem 0 0.75rem 1rem;
+  background: linear-gradient(90deg, var(--blog-accent-faint), transparent 70%);
+  border-radius: 0 8px 8px 0;
+  font-size: 1.12rem;
+  font-style: italic;
+}
+.blog-dropcap {
+  float: left;
+  font-size: 3.25rem;
+  line-height: 0.85;
+  padding-right: 0.6rem;
+  padding-top: 0.12em;
+  color: var(--blog-accent);
+  font-weight: 700;
+}
+.blog-article .prose h1[id],
+.blog-article .prose h2[id],
+.blog-article .prose h3[id] {
+  scroll-margin-top: 96px;
+}
+.blog-article .prose .heading-anchor {
+  color: var(--blog-accent);
+  text-decoration: none;
+  opacity: 0.55;
+  font-weight: 400;
+  transition: opacity 0.15s ease;
+}
+.blog-article .prose .heading-anchor:hover {
+  opacity: 1;
+}
+
 .blog-hero {
   position: relative;
   width: 100%;
@@ -309,7 +778,8 @@ const picUrl = post.pic
   .prose a { color: #000 !important; text-decoration: underline; }
   .prose pre { background: #f5f5f5 !important; border: 1px solid #ccc !important; white-space: pre-wrap; word-break: break-word; }
   .prose code { background: #f0f0f0 !important; border-color: #ccc !important; color: #000 !important; }
-  .prose blockquote { color: #333 !important; border-left-color: #000 !important; }
+  .prose blockquote { color: #333 !important; border-left-color: #000 !important; background: none !important; }
+  .blog-dropcap { float: none !important; font-size: inherit !important; padding: 0 !important; color: #111 !important; }
   .prose table, .prose th, .prose td { border-color: #999 !important; }
   .blog-hero { display: block !important; width: 100% !important; height: auto !important; min-height: 0 !important; max-height: none !important; background: #fff !important; margin: 0 0 10pt !important; }
   .blog-hero img { position: static !important; height: auto !important; max-height: 90mm; object-fit: cover; width: 100%; break-inside: avoid; }

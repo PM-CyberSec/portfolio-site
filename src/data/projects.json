@@ -68,7 +68,493 @@
     "screenshots": [],
     "team": [],
     "relatedInvestigations": [],
-    "relatedBlogs": []
+    "relatedBlogs": [],
+    "architecture": {
+      "summary": "Event-driven SOAR pipeline: sensors feed Wazuh/OpenSearch, FastAPI collectors normalize and enrich alerts in parallel, XGBoost scores risk, playbooks drive automated response, and a React SPA provides analyst workflows.",
+      "layers": [
+        {
+          "id": "sources",
+          "label": "Telemetry Sources",
+          "description": "Network, endpoint, and email signals",
+          "items": [
+            {
+              "name": "Suricata",
+              "role": "IDS",
+              "note": "eve.json → Filebeat"
+            },
+            {
+              "name": "Zeek",
+              "role": "NDR",
+              "note": "logs → Filebeat"
+            },
+            {
+              "name": "Velociraptor",
+              "role": "EDR",
+              "note": "endpoint data → Wazuh Agent"
+            },
+            {
+              "name": "Wazuh Agent",
+              "role": "HOST",
+              "note": "file integrity + telemetry"
+            },
+            {
+              "name": "Email / Phishing",
+              "role": "EMAIL",
+              "note": "samples and reports"
+            }
+          ]
+        },
+        {
+          "id": "ingest",
+          "label": "Collection & Indexing",
+          "description": "Normalize and store raw telemetry",
+          "items": [
+            {
+              "name": "Filebeat",
+              "role": "SHIPPER",
+              "note": "forwards Suricata + Zeek logs"
+            },
+            {
+              "name": "Wazuh Manager",
+              "role": "MANAGER",
+              "note": "agent + active response"
+            },
+            {
+              "name": "Wazuh Indexer",
+              "role": "OPENSEARCH",
+              "note": "wazuh-alerts-* indices"
+            }
+          ]
+        },
+        {
+          "id": "backend",
+          "label": "FastAPI Core",
+          "description": "Normalize, query, and orchestrate",
+          "items": [
+            {
+              "name": "FastAPI",
+              "role": "API",
+              "note": "python 3.11 · :8000"
+            },
+            {
+              "name": "22 Routers",
+              "role": "HTTP",
+              "note": "alerts, intel, playbooks, reports"
+            },
+            {
+              "name": "10 Collectors",
+              "role": "INGEST",
+              "note": "OpenSearch alert query"
+            },
+            {
+              "name": "Normalizer",
+              "role": "MODEL",
+              "note": "UnifiedAlert schema"
+            },
+            {
+              "name": "Auth Middleware",
+              "role": "JWT",
+              "note": "RBAC + route protection"
+            },
+            {
+              "name": "Audit Middleware",
+              "role": "LOG",
+              "note": "request history"
+            }
+          ]
+        },
+        {
+          "id": "enrich",
+          "label": "Enrichment & AI",
+          "description": "Parallel, fail-soft context gathering",
+          "items": [
+            {
+              "name": "VirusTotal",
+              "role": "INTEL",
+              "note": "malware reputation"
+            },
+            {
+              "name": "AbuseIPDB",
+              "role": "INTEL",
+              "note": "IP abuse score"
+            },
+            {
+              "name": "MISP",
+              "role": "INTEL",
+              "note": "IOC matching"
+            },
+            {
+              "name": "NVD / EPSS",
+              "role": "INTEL",
+              "note": "CVSS + exploitation probability"
+            },
+            {
+              "name": "XGBoost Noise Filter",
+              "role": "ML",
+              "note": "suppress low-value alerts"
+            },
+            {
+              "name": "Risk Scorer",
+              "role": "ML",
+              "note": "19 features · 0–100"
+            },
+            {
+              "name": "K-Means Clustering",
+              "role": "ML",
+              "note": "group related alerts"
+            },
+            {
+              "name": "Ollama + Qdrant",
+              "role": "RAG",
+              "note": "case context retrieval"
+            }
+          ]
+        },
+        {
+          "id": "automate",
+          "label": "Playbook & Response",
+          "description": "Risk-driven automated actions",
+          "items": [
+            {
+              "name": "Playbook Engine",
+              "role": "DECISION",
+              "note": "risk + severity matrix"
+            },
+            {
+              "name": "block_ip",
+              "role": "ACTION",
+              "note": "iptables → ufw → hosts.deny"
+            },
+            {
+              "name": "isolate_host",
+              "role": "ACTION",
+              "note": "Velociraptor / Wazuh"
+            },
+            {
+              "name": "create_case",
+              "role": "ACTION",
+              "note": "TheHive with observables"
+            },
+            {
+              "name": "TheHive / Cortex",
+              "role": "CASE MGMT",
+              "note": "investigation + analyzers"
+            }
+          ]
+        },
+        {
+          "id": "data",
+          "label": "Persistence",
+          "description": "Cases, evidence, telemetry, and cache",
+          "items": [
+            {
+              "name": "PostgreSQL",
+              "role": "DB",
+              "note": "soar_db"
+            },
+            {
+              "name": "OpenSearch",
+              "role": "SEARCH",
+              "note": "alert indices"
+            },
+            {
+              "name": "Cassandra",
+              "role": "DB",
+              "note": "TheHive cases"
+            },
+            {
+              "name": "Elasticsearch",
+              "role": "SEARCH",
+              "note": "Cortex / TheHive"
+            },
+            {
+              "name": "MariaDB",
+              "role": "DB",
+              "note": "MISP"
+            },
+            {
+              "name": "Redis",
+              "role": "CACHE",
+              "note": "sessions + MISP cache"
+            },
+            {
+              "name": "MinIO",
+              "role": "OBJECT",
+              "note": "case attachments"
+            }
+          ]
+        },
+        {
+          "id": "experience",
+          "label": "Analyst Experience",
+          "description": "React SPA over the FastAPI surface",
+          "items": [
+            {
+              "name": "React SPA",
+              "role": "UI",
+              "note": "Vite · 33 pages"
+            },
+            {
+              "name": "SOC Dashboards",
+              "role": "VIEW",
+              "note": "command center, alerts, risk"
+            },
+            {
+              "name": "SOC Chat",
+              "role": "VIEW",
+              "note": "RAG-assisted investigation"
+            },
+            {
+              "name": "Reports",
+              "role": "VIEW",
+              "note": "incident + export workflows"
+            },
+            {
+              "name": "Supabase Auth",
+              "role": "AUTH",
+              "note": "session + identity"
+            }
+          ]
+        }
+      ],
+      "links": [
+        {
+          "from": "sources",
+          "to": "ingest",
+          "label": "Filebeat / Wazuh Agent"
+        },
+        {
+          "from": "ingest",
+          "to": "backend",
+          "label": "OpenSearch query (2s timeout)"
+        },
+        {
+          "from": "backend",
+          "to": "enrich",
+          "label": "parallel, fail-soft (5s)"
+        },
+        {
+          "from": "enrich",
+          "to": "automate",
+          "label": "risk score + tags"
+        },
+        {
+          "from": "automate",
+          "to": "data",
+          "label": "cases, evidence, audit"
+        },
+        {
+          "from": "data",
+          "to": "experience",
+          "label": "FastAPI REST + JWT"
+        }
+      ],
+      "tree": {
+        "root": "CyberNest-Soar/",
+        "paths": [
+          "backend/",
+          "backend/app/",
+          "backend/app/ai/",
+          "backend/app/cache/",
+          "backend/app/client/",
+          "backend/app/collectors/",
+          "backend/app/config/",
+          "backend/app/controllers/",
+          "backend/app/core/",
+          "backend/app/middleware/",
+          "backend/app/models/",
+          "backend/app/phishing_sim_data/",
+          "backend/app/prompts/",
+          "backend/app/repository/",
+          "backend/app/routers/",
+          "backend/app/schemas/",
+          "backend/app/services/",
+          "backend/app/soar_backend/",
+          "backend/app/soar/",
+          "backend/app/static/",
+          "backend/app/vectorstores/",
+          "backend/infra/",
+          "backend/modules/",
+          "backend/modules/ai/",
+          "backend/modules/alerts/",
+          "backend/modules/auth/",
+          "backend/modules/chat/",
+          "backend/modules/dashboard/",
+          "backend/modules/data_outputs/",
+          "backend/modules/emails/",
+          "backend/modules/filtering/",
+          "backend/modules/graph/",
+          "backend/modules/incidents/",
+          "backend/modules/monitoring/",
+          "backend/modules/operations/",
+          "backend/modules/patch/",
+          "backend/modules/phishing/",
+          "backend/modules/pipeline_alerts/",
+          "backend/modules/playbook_config/",
+          "backend/modules/playbooks/",
+          "backend/modules/rag/",
+          "backend/modules/reports/",
+          "backend/modules/risk/",
+          "backend/modules/system/",
+          "backend/modules/taxii/",
+          "backend/modules/threat_intel/",
+          "backend/modules/ui_dashboard/",
+          "backend/scripts/",
+          "backend/sensors/",
+          "backend/sensors/edr/",
+          "backend/sensors/ndr/",
+          "backend/services/",
+          "backend/services/misp/",
+          "backend/services/orchestrator/",
+          "backend/siem/",
+          "backend/siem/dashboards/",
+          "backend/siem/wazuh/",
+          "backend/tests/",
+          "backend/tests/fixtures/",
+          "dataset_pipeline/",
+          "dataset_pipeline/attack_chains/",
+          "dataset_pipeline/augmentation/",
+          "dataset_pipeline/config/",
+          "dataset_pipeline/downloaders/",
+          "dataset_pipeline/enrichment/",
+          "dataset_pipeline/export/",
+          "dataset_pipeline/observability/",
+          "dataset_pipeline/parsers/",
+          "dataset_pipeline/soc_reasoning/",
+          "docs/",
+          "docs/audits/",
+          "documentation/",
+          "email-backend/",
+          "infra/",
+          "infra/k8s/",
+          "infra/monitoring/",
+          "infra/monitoring/grafana/",
+          "infra/monitoring/prometheus/",
+          "Integration_Stack/",
+          "Integration_Stack/suricata1/",
+          "NOISE_LLM/",
+          "playbooks/",
+          "playbooks/detection_to_enrichment/",
+          "playbooks/enrichment_to_remediation/",
+          "playbooks/phishing_response/",
+          "public/",
+          "scripts/",
+          "scripts/integration/",
+          "sensors/",
+          "sensors/edr/",
+          "sensors/edr/velociraptor/",
+          "sensors/forwarders/",
+          "sensors/ndr/",
+          "sensors/ndr/arkime/",
+          "sensors/ndr/suricata/",
+          "sensors/ndr/zeek/",
+          "services/",
+          "services/misp/",
+          "services/misp/config/",
+          "services/orchestrator/",
+          "services/orchestrator/thehive/",
+          "services/patch_engine/",
+          "services/patch_engine/data_prep/",
+          "services/patch_engine/lib/",
+          "services/patch_engine/models/",
+          "services/patch_engine/reports/",
+          "services/patch_engine/scoring/",
+          "siem/",
+          "siem/dashboards/",
+          "siem/dashboards/build-docker-images/",
+          "siem/dashboards/docs/",
+          "siem/dashboards/indexer-certs-creator/",
+          "siem/dashboards/multi-node/",
+          "siem/dashboards/single-node/",
+          "siem/dashboards/tools/",
+          "siem/dashboards/wazuh-agent/",
+          "siem/wazuh/",
+          "siem/wazuh/build-docker-images/",
+          "siem/wazuh/docs/",
+          "siem/wazuh/indexer-certs-creator/",
+          "siem/wazuh/multi-node/",
+          "siem/wazuh/single-node/",
+          "siem/wazuh/tools/",
+          "siem/wazuh/wazuh-agent/",
+          "simulation_engine/",
+          "simulation_engine/config/",
+          "simulation_engine/generators/",
+          "simulation_engine/pipelines/",
+          "simulation_engine/telemetry/",
+          "src/",
+          "src/api/",
+          "src/components/",
+          "src/components/landing/",
+          "src/components/playbook/",
+          "src/components/ui/",
+          "src/contexts/",
+          "src/hooks/",
+          "src/integrations/",
+          "src/integrations/supabase/",
+          "src/lib/",
+          "src/pages/",
+          "src/pages/admin/",
+          "src/pages/ai/",
+          "src/pages/assets/",
+          "src/pages/automation/",
+          "src/pages/intel/",
+          "src/pages/soc/",
+          "src/types/",
+          "src/utils/",
+          "supabase/",
+          "supabase/migrations/",
+          "threatintel/",
+          "threatintel/misp/",
+          "threatintel/phishtank/",
+          "threatintel/urlhaus/",
+          "ARCHITECTURE.md",
+          "backend/main.py",
+          "docker-compose.root.yml",
+          "docker-compose.yml",
+          "docs/api.md",
+          "docs/ARCHITECTURE.md",
+          "LICENSE",
+          "package.json",
+          "playbooks/engine.py",
+          "README.md",
+          "requirements.txt",
+          "src/api/client.ts",
+          "src/lib/api.ts",
+          "tailwind.config.ts",
+          "tsconfig.app.json",
+          "tsconfig.json",
+          "tsconfig.node.json",
+          "vite.config.ts"
+        ],
+        "notes": {
+          "backend/app/routers": "22 API routers",
+          "backend/app/services": "46 service modules",
+          "backend/app/collectors": "10 telemetry collectors",
+          "backend/app/middleware": "JWT auth + audit",
+          "backend/app/ai": "ML + RAG layer",
+          "backend/app/vectorstores": "Qdrant integration",
+          "backend/app/config": "unified settings",
+          "playbooks": "detection → enrichment → remediation",
+          "playbooks/detection_to_enrichment": "enrichment playbook",
+          "playbooks/enrichment_to_remediation": "response playbook",
+          "playbooks/phishing_response": "phishing playbook",
+          "sensors/ndr/suricata": "IDS + Filebeat",
+          "sensors/ndr/zeek": "NDR + Filebeat",
+          "sensors/edr/velociraptor": "EDR sensor",
+          "siem/wazuh": "manager + indexer",
+          "services/orchestrator": "TheHive + Cortex",
+          "services/misp": "threat intelligence",
+          "services/patch_engine": "risk scoring models",
+          "infra/k8s": "deployment manifests",
+          "infra/monitoring": "Prometheus + Grafana",
+          "src/pages": "React SPA pages",
+          "src/api": "typed API client",
+          "supabase": "auth migrations"
+        }
+      },
+      "image": null,
+      "slug": "cybernest-soar"
+    }
   },
   {
     "slug": "dlds-digital-forensics",

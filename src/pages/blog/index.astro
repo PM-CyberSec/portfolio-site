@@ -3,6 +3,7 @@ import Layout from '../../layouts/Layout.astro';
 import Nav from '../../components/Nav.astro';
 import Footer from '../../components/Footer.astro';
 import blog from '../../data/blog.json';
+import { getBlogTheme } from '../../lib/blog-theme';
 
 const base = import.meta.env.BASE_URL;
 const categories = [...new Set(blog.map(b => b.category))];
@@ -34,24 +35,35 @@ const categories = [...new Set(blog.map(b => b.category))];
 
   <section class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pb-24">
     <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4" id="blog-grid">
-      {blog.length > 0 ? blog.map(post => (
-        <a href={`${base}/blog/${post.slug}`} class:list={["group block bg-[var(--bg-card)] border border-[var(--border)] rounded-card overflow-hidden hover:border-[var(--border-strong)] transition blog-card"]} data-category={post.category}>
-          {post.pic && <img src={post.pic} alt={post.title} class="w-full h-40 object-cover" />}
+      {blog.length > 0 ? blog.map((post, index) => {
+        const theme = getBlogTheme(post.category);
+        return (
+        <a
+          href={`${base}/blog/${post.slug}`}
+          class:list={["group block bg-[var(--bg-card)] border border-[var(--border)] rounded-card overflow-hidden hover:border-[var(--border-strong)] transition blog-card"]}
+          data-category={post.category}
+          style={`--card-accent:${theme.accent};--card-soft:${theme.soft};--card-border:${theme.border};--card-glow:${theme.glow};--card-delay:${index * 45}ms;`}
+        >
+          {post.pic && <img src={post.pic} alt={post.title} loading="lazy" class="w-full h-40 object-cover" />}
           <div class="p-5">
           <div class="flex items-center gap-2 mb-2">
-            <span class="text-[10px] px-2 py-0.5 bg-accent/20 text-accent border border-accent/30 rounded-badge">{post.category}</span>
+            <span class="text-[10px] px-2 py-0.5 border rounded-badge blog-cat">{post.category}</span>
             <span class="text-[10px] text-[var(--text-dim)]">{post.readingTime} min</span>
           </div>
-          <h3 class="text-[var(--text)] font-semibold text-sm mb-2 group-hover:text-accent transition">{post.title}</h3>
+          <h3 class="blog-card-title text-[var(--text)] font-semibold text-sm mb-2 group-hover:text-accent transition">{post.title}</h3>
           <p class="text-sm text-[var(--text-muted)] mb-3 line-clamp-2">{post.description}</p>
           <div class="flex flex-wrap gap-1.5">
             {(post.tags||[]).slice(0, 3).map(t => (
               <span class="text-[10px] px-2 py-0.5 border border-[var(--border)] rounded-badge text-[var(--text-dim)] bg-[var(--bg-elevated)]">{t}</span>
             ))}
           </div>
+          <div class="mt-4 flex items-center gap-1 text-[11px] font-medium blog-read-more">
+            Read article <span aria-hidden="true">&rarr;</span>
+          </div>
           </div>
         </a>
-      )) : (
+        );
+      }) : (
         <p class="text-sm text-[var(--text-dim)] col-span-3 text-center py-12">Articles coming soon.</p>
       )}
     </div>
@@ -80,3 +92,44 @@ document.querySelectorAll('.filter-btn').forEach(btn => {
   });
 });
 </script>
+
+<style>
+.blog-card {
+  position: relative;
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+  animation: blog-card-in 0.35s ease both;
+  animation-delay: var(--card-delay, 0ms);
+}
+.blog-card::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto;
+  height: 2px;
+  background: linear-gradient(90deg, var(--card-accent), transparent 72%);
+  opacity: 0.8;
+  z-index: 1;
+  pointer-events: none;
+}
+.blog-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 22px 54px -40px var(--card-glow), 0 0 0 1px var(--card-border);
+}
+.blog-card:hover .blog-card-title { color: var(--card-accent); }
+.blog-cat {
+  color: var(--card-accent);
+  background: var(--card-soft);
+  border-color: var(--card-border);
+}
+.blog-read-more {
+  color: var(--card-accent);
+  opacity: 0.78;
+}
+.blog-card:hover .blog-read-more { opacity: 1; }
+@keyframes blog-card-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .blog-card { animation: none; }
+}
+</style>

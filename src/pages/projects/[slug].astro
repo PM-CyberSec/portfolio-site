@@ -2,6 +2,9 @@
 import Layout from '../../layouts/Layout.astro';
 import Nav from '../../components/Nav.astro';
 import Footer from '../../components/Footer.astro';
+import Card from '../../components/Card.astro';
+import ArchitectureFlow from '../../components/ArchitectureFlow.astro';
+import ProjectTree from '../../components/ProjectTree.astro';
 import projects from '../../data/projects.json';
 
 export function getStaticPaths() {
@@ -16,41 +19,55 @@ if (!project) {
   return Astro.redirect(`${base}/projects`);
 }
 
+const architecture = project.architecture;
+
+const assetUrl = (src: string) => {
+  if (!src) return '';
+  if (/^https?:\/\//.test(src)) return src;
+  if (src.startsWith(base)) return src;
+  return `${base}${src.replace(/^\//, '')}`;
+};
+
+const architectureImage = architecture?.image?.src ? assetUrl(architecture.image.src) : null;
+
 const relatedProjects = projects.filter(p => p.slug !== slug && p.technologies.some(t => project.technologies.includes(t))).slice(0, 2);
 ---
 <Layout title={`${project.title} · Projects`} description={project.description}>
   <Nav />
 
-  <article class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-24">
-    <div class="flex items-center gap-2 text-xs text-[var(--text-dim)] mb-6">
-      <a href={base} class="hover:text-accent transition">Profile</a>
-      <span>/</span>
-      <a href={`${base}/projects`} class="hover:text-accent transition">Projects</a>
-      <span>/</span>
-      <span class="text-[var(--text-muted)]">{project.title}</span>
-    </div>
+  <article id="main-content" class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-24">
+    <div class="max-w-3xl mx-auto">
+      <div class="flex items-center gap-2 text-xs text-[var(--text-dim)] mb-6">
+        <a href={base} class="hover:text-accent transition-all duration-300">Profile</a>
+        <span>/</span>
+        <a href={`${base}/projects`} class="hover:text-accent transition-all duration-300">Projects</a>
+        <span>/</span>
+        <span class="text-[var(--text-muted)]">{project.title}</span>
+      </div>
 
-    <div class="flex items-center gap-2 mb-4">
-      <span class:list={[
-        "text-[10px] px-2 py-0.5 border rounded-badge uppercase tracking-wider",
-        project.status === 'active' ? "bg-accent/20 text-accent border-accent/30" : "bg-[var(--bg-elevated)] text-[var(--text-dim)] border-[var(--border)]"
-      ]}>{project.status}</span>
-    </div>
+      <div class="flex items-center gap-2 mb-4">
+        <span class:list={[
+          "text-[10px] px-2 py-0.5 border rounded-badge uppercase tracking-wider",
+          project.status === 'active' ? "bg-accent/20 text-accent border-accent/30" : "bg-[var(--bg-elevated)] text-[var(--text-dim)] border-[var(--border)]"
+        ]}>{project.status}</span>
+      </div>
 
-    <h1 class="text-3xl font-bold text-[var(--text)] mb-2">{project.title}</h1>
-    {project.subtitle && <p class="text-accent text-sm font-medium mb-2">{project.subtitle}</p>}
-    <p class="text-sm text-[var(--text-dim)] mb-2">{project.role} · {project.timeline}</p>
-    <p class="text-[var(--text-muted)] text-sm mb-8">{project.description}</p>
+      <h1 class="text-3xl font-bold text-[var(--text)] mb-2">{project.title}</h1>
+      {project.subtitle && <p class="text-accent text-sm font-medium mb-2">{project.subtitle}</p>}
+      <p class="text-sm text-[var(--text-dim)] mb-2">{project.role} · {project.timeline}</p>
+      <p class="text-[var(--text-muted)] text-sm mb-8">{project.description}</p>
 
-    <!-- Tabs -->
-    <div class="flex gap-1 border-b border-[var(--border)] mb-8">
-      <button class="tab-btn text-sm px-4 py-2 text-accent border-b-2 border-accent -mb-px" data-tab="brief">Brief</button>
-      <button class="tab-btn text-sm px-4 py-2 text-[var(--text-dim)] border-b-2 border-transparent" data-tab="architecture">Architecture</button>
-      <button class="tab-btn text-sm px-4 py-2 text-[var(--text-dim)] border-b-2 border-transparent" data-tab="metrics">Metrics</button>
+      <!-- Tabs -->
+      <div class="flex gap-1 border-b border-[var(--border)] mb-8">
+        <button class="tab-btn text-sm px-4 py-2 text-accent border-b-2 border-accent -mb-px" data-tab="brief" aria-selected="true">Brief</button>
+        <button class="tab-btn text-sm px-4 py-2 text-[var(--text-dim)] border-b-2 border-transparent" data-tab="architecture" aria-selected="false">Architecture</button>
+        <button class="tab-btn text-sm px-4 py-2 text-[var(--text-dim)] border-b-2 border-transparent" data-tab="metrics" aria-selected="false">Metrics</button>
+        <button class="tab-btn text-sm px-4 py-2 text-[var(--text-dim)] border-b-2 border-transparent" data-tab="process" aria-selected="false">Process</button>
+      </div>
     </div>
 
     <!-- Tab: Brief -->
-    <div id="tab-brief" class="tab-content">
+    <div id="tab-brief" class="tab-content max-w-3xl mx-auto">
       <div class="space-y-6">
         <div>
           <h3 class="text-accent text-xs font-mono uppercase tracking-wider mb-2">Problem</h3>
@@ -69,23 +86,93 @@ const relatedProjects = projects.filter(p => p.slug !== slug && p.technologies.s
 
     <!-- Tab: Architecture -->
     <div id="tab-architecture" class="tab-content hidden">
-      <div class="bg-[var(--bg-card)] border border-[var(--border)] rounded-card p-5">
-        <h3 class="text-sm font-semibold text-[var(--text)] mb-3">Tech Stack</h3>
-        <div class="flex flex-wrap gap-2 mb-4">
-          {project.technologies.map(t => (
-            <span class="text-xs px-3 py-1 border border-[var(--border)] rounded-badge text-[var(--text-muted)] bg-[var(--bg-elevated)]">{t}</span>
-          ))}
+      {architecture ? (
+        <div class="space-y-6">
+          {architecture.summary && (
+            <div class="bg-[var(--bg-card)] border border-[var(--border)] rounded-card p-5">
+              <p class="text-sm text-[var(--text-muted)]">{architecture.summary}</p>
+            </div>
+          )}
+
+          {architecture.layers && architecture.layers.length > 0 && (
+            <section aria-labelledby="system-flow-heading">
+              <h3 id="system-flow-heading" class="text-accent text-xs font-mono uppercase tracking-wider mb-3">System Flow</h3>
+              <ArchitectureFlow layers={architecture.layers} links={architecture.links || []} />
+            </section>
+          )}
+
+          {architectureImage && (
+            <figure class="bg-[var(--bg-card)] border border-[var(--border)] rounded-card p-3">
+              <a href={architectureImage} target="_blank" rel="noopener noreferrer" class="group block">
+                <img
+                  src={architectureImage}
+                  alt={architecture.image?.alt || `${project.title} architecture diagram`}
+                  loading="lazy"
+                  decoding="async"
+                  class="w-full h-auto rounded-btn border border-[var(--border)] group-hover:border-[var(--border-strong)] transition-all duration-300"
+                />
+              </a>
+              <figcaption class="mt-2 flex flex-wrap items-center justify-between gap-2 text-[11px] text-[var(--text-dim)]">
+                <span>{architecture.image?.caption || `${project.title} architecture diagram`}</span>
+                <span class="font-mono">open full size &rarr;</span>
+              </figcaption>
+            </figure>
+          )}
+
+          <div class="grid lg:grid-cols-[minmax(0,1.55fr)_minmax(0,1fr)] gap-6 items-start">
+            {architecture.tree && architecture.tree.paths && architecture.tree.paths.length > 0 && (
+              <section aria-labelledby="project-structure-heading">
+                <h3 id="project-structure-heading" class="text-accent text-xs font-mono uppercase tracking-wider mb-3">Project Structure</h3>
+                <ProjectTree slug={project.slug} tree={architecture.tree} />
+              </section>
+            )}
+
+            <div class="space-y-4">
+              <div class="bg-[var(--bg-card)] border border-[var(--border)] rounded-card p-5">
+                <h3 class="text-sm font-semibold text-[var(--text)] mb-3">Tech Stack</h3>
+                <div class="flex flex-wrap gap-2">
+                  {project.technologies.map(t => (
+                    <span class="text-xs px-3 py-1 border border-[var(--border)] rounded-badge text-[var(--text-muted)] bg-[var(--bg-elevated)]">{t}</span>
+                  ))}
+                </div>
+                {project.github && (
+                  <a href={project.github} target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 mt-4 text-sm text-accent hover:underline">
+                    View on GitHub &rarr;
+                  </a>
+                )}
+              </div>
+
+              {architecture.tree?.notes && Object.keys(architecture.tree.notes).length > 0 && (
+                <div class="bg-[var(--bg-card)] border border-[var(--border)] rounded-card p-5">
+                  <h3 class="text-sm font-semibold text-[var(--text)] mb-2">Structure Notes</h3>
+                  <p class="text-xs text-[var(--text-muted)] mb-3">Annotated folders in the tree show what each part is responsible for.</p>
+                  <p class="font-mono text-[10px] text-[var(--text-dim)]">Use the filter to jump to a subsystem.</p>
+                </div>
+              )}
+            </div>
+          </div>
         </div>
-        {project.github && (
-          <a href={project.github} target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 mt-4 text-sm text-accent hover:underline">
-            View on GitHub &rarr;
-          </a>
-        )}
-      </div>
+      ) : (
+        <div class="max-w-3xl mx-auto">
+          <div class="bg-[var(--bg-card)] border border-[var(--border)] rounded-card p-5">
+            <h3 class="text-sm font-semibold text-[var(--text)] mb-3">Tech Stack</h3>
+            <div class="flex flex-wrap gap-2 mb-4">
+              {project.technologies.map(t => (
+                <span class="text-xs px-3 py-1 border border-[var(--border)] rounded-badge text-[var(--text-muted)] bg-[var(--bg-elevated)]">{t}</span>
+              ))}
+            </div>
+            {project.github && (
+              <a href={project.github} target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 mt-4 text-sm text-accent hover:underline">
+                View on GitHub &rarr;
+              </a>
+            )}
+          </div>
+        </div>
+      )}
     </div>
 
     <!-- Tab: Metrics -->
-    <div id="tab-metrics" class="tab-content hidden">
+    <div id="tab-metrics" class="tab-content hidden max-w-3xl mx-auto">
       {project.metrics && project.metrics.length > 0 ? (
         <div class="grid sm:grid-cols-2 gap-4">
           {project.metrics.map(m => (
@@ -108,16 +195,35 @@ const relatedProjects = projects.filter(p => p.slug !== slug && p.technologies.s
       )}
     </div>
 
+    <!-- Tab: Process -->
+    <div id="tab-process" class="tab-content hidden max-w-3xl mx-auto">
+      <div class="bg-[var(--bg-card)] border border-[var(--border)] rounded-card p-5">
+        <h3 class="text-accent text-xs font-mono uppercase tracking-wider mb-4">Building Process</h3>
+        {project.process && project.process.length > 0 ? (
+          <ul class="space-y-3">
+            {project.process.map(step => (
+              <li class="flex items-start gap-3">
+                <span class="mt-2 h-1.5 w-1.5 rounded-full bg-accent shrink-0"></span>
+                <span class="text-sm text-[var(--text-muted)]">{step}</span>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p class="text-sm text-[var(--text-muted)]">No process steps documented yet.</p>
+        )}
+      </div>
+    </div>
+
     <!-- Related Projects -->
     {relatedProjects.length > 0 && (
-      <div class="mt-16 border-t border-[var(--border)] pt-8">
+      <div class="max-w-3xl mx-auto mt-16 border-t border-[var(--border)] pt-8">
         <h3 class="text-sm font-semibold text-[var(--text)] mb-4">Related Projects</h3>
         <div class="grid sm:grid-cols-2 gap-4">
           {relatedProjects.map(rp => (
-            <a href={`${base}/projects/${rp.slug}`} class="group block bg-[var(--bg-card)] border border-[var(--border)] rounded-card p-4 hover:border-[var(--border-strong)] transition">
-              <h4 class="text-sm font-semibold text-[var(--text)] group-hover:text-accent transition">{rp.title}</h4>
+            <Card href={`${base}/projects/${rp.slug}`} padding="4" class="group block">
+              <h4 class="text-sm font-semibold text-[var(--text)] group-hover:text-accent transition-all duration-300">{rp.title}</h4>
               <p class="text-xs text-[var(--text-dim)]">{rp.role}</p>
-            </a>
+            </Card>
           ))}
         </div>
       </div>
@@ -128,16 +234,24 @@ const relatedProjects = projects.filter(p => p.slug !== slug && p.technologies.s
 </Layout>
 
 <script is:inline>
-document.querySelectorAll('.tab-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('.tab-btn').forEach(b => {
-      b.classList.remove('text-accent', 'border-accent');
-      b.classList.add('text-[var(--text-dim)]', 'border-transparent');
+(function(){
+  const container = document.querySelector('article[id="main-content"]');
+  if(!container) return;
+  const btns = container.querySelectorAll('.tab-btn');
+  const contents = container.querySelectorAll('.tab-content');
+  btns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      btns.forEach(b => {
+        b.classList.remove('text-accent', 'border-accent');
+        b.classList.add('text-[var(--text-dim)]', 'border-transparent');
+        b.setAttribute('aria-selected', 'false');
+      });
+      contents.forEach(c => c.classList.add('hidden'));
+      btn.classList.add('text-accent', 'border-accent');
+      btn.classList.remove('text-[var(--text-dim)]', 'border-transparent');
+      btn.setAttribute('aria-selected', 'true');
+      document.getElementById(`tab-${btn.dataset.tab}`)?.classList.remove('hidden');
     });
-    btn.classList.add('text-accent', 'border-accent');
-    btn.classList.remove('text-[var(--text-dim)]', 'border-transparent');
-    document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
-    document.getElementById(`tab-${btn.dataset.tab}`)?.classList.remove('hidden');
   });
-});
+})();
 </script>

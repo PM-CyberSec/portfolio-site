@@ -1,12 +1,14 @@
 import http from 'http';
 import fs from 'fs';
 import path from 'path';
+import { execFile } from 'child_process';
 import { fileURLToPath } from 'url';
 import { syncToSrc } from './content-loader.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.join(__dirname, '..');
 const DATA_DIR = path.join(ROOT, 'portfolio-data');
+const ARCH_DIR = path.join(DATA_DIR, 'architecture');
 const PORT = 4323;
 
 function readBody(req) {
@@ -39,6 +41,42 @@ function readJSON(filePath) {
 
 function writeJSON(filePath, data) {
   fs.writeFileSync(filePath, JSON.stringify(data, null, 2));
+}
+
+function getArchitecture(slug) {
+  return readJSON(path.join(ARCH_DIR, `${slug}.json`));
+}
+
+function saveArchitecture(slug, data, sync = true) {
+  ensureDir(ARCH_DIR);
+  writeJSON(path.join(ARCH_DIR, `${slug}.json`), { ...data, slug });
+  if (sync) syncToSrc();
+  return { updated: true, slug };
+}
+
+function deleteArchitecture(slug, sync = true) {
+  const file = path.join(ARCH_DIR, `${slug}.json`);
+  if (fs.existsSync(file)) fs.unlinkSync(file);
+  if (sync) syncToSrc();
+  return { deleted: true };
+}
+
+function runArchitectureSync(slug) {
+  return new Promise((resolve, reject) => {
+    execFile(
+      process.execPath,
+      [path.join(__dirname, 'sync-architecture.mjs'), '--slug', slug],
+      { cwd: ROOT },
+      (error, stdout, stderr) => {
+        if (error) {
+          const detail = (stderr || stdout || error.message || '').trim();
+          reject(new Error(detail || 'Architecture sync failed'));
+          return;
+        }
+        resolve({ output: stdout.trim() });
+      }
+    );
+  });
 }
 
 function listItems(type) {
@@ -89,6 +127,8 @@ function deleteItem(type, slug) {
   if (type === 'projects') {
     const fp = path.join(DATA_DIR, 'projects', `${slug}.json`);
     if (fs.existsSync(fp)) fs.unlinkSync(fp);
+    const archFile = path.join(ARCH_DIR, `${slug}.json`);
+    if (fs.existsSync(archFile)) fs.unlinkSync(archFile);
   } else {
     const dir = path.join(DATA_DIR, type, slug);
     if (fs.existsSync(dir)) fs.rmSync(dir, { recursive: true });
@@ -185,6 +225,39 @@ const server = http.createServer(async (req, res) => {
       fs.writeFileSync(file, body.content || '');
       syncToSrc();
       return json(res, { updated: true });
+    }
+  }
+
+  // Project architecture data
+  if (p[0] === 'api' && p[1] === 'architecture' && p[2]) {
+    const slug = p[2];
+    const doSync = url.searchParams.get('sync') !== '0';
+
+    if (p[3] === 'sync' && req.method === 'POST') {
+      try {
+        const result = await runArchitectureSync(slug);
+        return json(res, {
+          synced: true,
+          output: result.output,
+          architecture: getArchitecture(slug)
+        });
+      } catch (error) {
+        return json(res, { error: 'Sync failed', detail: error.message }, 500);
+      }
+    }
+
+    if (req.method === 'GET') {
+      const data = getArchitecture(slug);
+      return data ? json(res, data) : json(res, { error: 'Not found' }, 404);
+    }
+
+    if (req.method === 'PUT') {
+      const body = JSON.parse(await readBody(req));
+      return json(res, saveArchitecture(slug, body, doSync));
+    }
+
+    if (req.method === 'DELETE') {
+      return json(res, deleteArchitecture(slug, doSync));
     }
   }
 

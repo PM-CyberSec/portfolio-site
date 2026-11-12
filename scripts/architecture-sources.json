@@ -1,0 +1,62 @@
+{
+  "cybernest-soar": {
+    "type": "local",
+    "path": "../soar/CyberNest-Soar-private",
+    "rootLabel": "CyberNest-Soar/",
+    "maxDepth": 3,
+    "maxEntries": 250,
+    "mode": "dirs+key-files",
+    "includeFiles": [
+      "README.md",
+      "ARCHITECTURE.md",
+      "docker-compose.yml",
+      "package.json",
+      "requirements.txt",
+      "backend/main.py",
+      "playbooks/engine.py",
+      "src/lib/api.ts",
+      "src/api/client.ts",
+      "docs/ARCHITECTURE.md",
+      "docs/api.md"
+    ],
+    "excludeDirs": [
+      ".*",
+      "node_modules",
+      "__pycache__",
+      ".venv",
+      "venv",
+      ".pytest_cache",
+      ".mypy_cache",
+      ".ruff_cache",
+      "dist",
+      "build",
+      ".next",
+      ".vite",
+      ".astro",
+      "target",
+      ".idea",
+      ".vscode",
+      "coverage",
+      "logs",
+      "data",
+      "evidence",
+      "samples",
+      "archive"
+    ],
+    "excludeFiles": [
+      ".env*",
+      "*.whl",
+      "*.pyc",
+      "*.log",
+      "*.swp",
+      "*.swo",
+      ".DS_Store",
+      "*.pem",
+      "*.key",
+      "*.p12",
+      "*.sqlite",
+      "*.db",
+      "package-lock.json"
+    ]
+  }
+}

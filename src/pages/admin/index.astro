@@ -12,7 +12,7 @@
 <body>
 <div class="w">
   <div class="hd"><div class="hd-l"><div class="logo">PM</div><h1>Portfolio <span>Admin</span></h1></div><div class="env">Local Dev</div></div>
-  <div class="wb"><h2>Welcome back, Paula</h2><p>Click any item to edit it. Run <code>npm run build</code> after changes.</p></div>
+  <div class="wb"><h2>Welcome back, Paula</h2><p>Click any item to edit it. Changes sync automatically; run <code>npm run build</code> before deploying.</p></div>
   <div class="sts" id="sts"></div>
   <div class="tabs" id="tabs"></div>
   <div id="view"></div>
@@ -72,6 +72,16 @@ input:-webkit-autofill{-webkit-box-shadow:0 0 0 1000px #0B1426 inset!important;-
 .ps-h h3{font-size:14px;font-weight:600;display:flex;align-items:center;gap:8px}
 .ps-h .c{font-size:11px;color:var(--tx3);font-weight:400}
 .ps-b{padding:16px}
+.arch-details>summary{list-style:none}
+.arch-details>summary::-webkit-details-marker{display:none}
+.arch-chev{width:14px;height:14px;transition:transform .15s;color:var(--tx3);flex-shrink:0}
+.arch-details[open] .arch-chev{transform:rotate(90deg)}
+.arch-layer{border:1px solid var(--brd);border-radius:var(--rs);padding:12px;margin-bottom:10px;background:rgba(15,23,42,.45)}
+.arch-layer-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.arch-item{border:1px solid var(--brd);border-radius:var(--rs);padding:10px;margin-bottom:8px;background:var(--card)}
+.arch-sub{font-size:11px;color:var(--tx3);text-transform:uppercase;letter-spacing:.5px;margin:16px 0 8px;font-weight:600}
+.arch-toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.arch-layer .f:last-child,.arch-item .f:last-child{margin-bottom:0}
 .pi{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border:1px solid var(--brd);border-radius:var(--rs);margin-bottom:8px;transition:border-color .15s}
 .pi:hover{border-color:var(--brd2)}
 .pi .pf{flex:1}.pi .pt{font-size:13px;font-weight:600}.pi .pm{font-size:12px;color:var(--tx3)}
@@ -83,7 +93,7 @@ input:-webkit-autofill{-webkit-box-shadow:0 0 0 1000px #0B1426 inset!important;-
 @media(max-width:640px){.sts{grid-template-columns:repeat(2,1fr)}.fr{grid-template-columns:1fr}.w{padding:16px 16px 48px}}
 </style>
 <script>
-var API='http://localhost:4323/api',curTab='profile',editSlug=null,expandedSections={};
+var API='http://localhost:4323/api',curTab='profile',editSlug=null,expandedSections={},archState=null;
 // Restore state across Vite HMR reloads
 try{var saved=JSON.parse(localStorage.getItem('admin-state'));if(saved&&saved.tab)curTab=saved.tab;if(saved&&saved.sections)expandedSections=saved.sections;}catch(e){}
 function saveState(){try{localStorage.setItem('admin-state',JSON.stringify({tab:curTab,sections:expandedSections}));}catch(e){}}
@@ -156,21 +166,31 @@ function showList(){
   }).catch(function(){$('view').innerHTML='<div class="emp"><div class="ei">&#x26A0;</div><p><strong>API not running</strong></p><p><code>node scripts/api-server.mjs</code></p></div>'});
 }
 
+function renderForm(type,item){
+  $('view').innerHTML=buildForm(type,item);
+  if(type==='projects')renderArchEditor();
+}
+
 function showNew(){
   editSlug=null;
   var lbl=curTab==='projects'?'Project':curTab==='investigations'?'Investigation':'Blog Post';
-  $('view').innerHTML=buildForm(curTab,null);
+  renderForm(curTab,null);
   var fi=$('f-title');if(fi)fi.focus();
 }
 
 function showEdit(slug){
-  Promise.all([
+  var requests=[
     fetch(API+'/'+curTab+'/'+slug).then(function(r){return r.json()}),
     (curTab==='blogs'||curTab==='investigations')?fetch(API+'/'+curTab+'/'+slug+'/content').then(function(r){return r.json()}):Promise.resolve({content:''})
-  ]).then(function(res){
+  ];
+  if(curTab==='projects'){
+    requests.push(fetch(API+'/architecture/'+slug).then(function(r){return r.ok?r.json():null}).catch(function(){return null}));
+  }
+  Promise.all(requests).then(function(res){
     var item=res[0];item._content=res[1].content||'';
+    if(curTab==='projects')item._architecture=res[2]||null;
     editSlug=item.slug;
-    $('view').innerHTML=buildForm(curTab,item);
+    renderForm(curTab,item);
   }).catch(function(e){toast('Error loading','er')});
 }
 
@@ -178,7 +198,9 @@ function buildForm(type,it){
   var isE=!!it,lbl=type==='projects'?'Project':type==='investigations'?'Investigation':'Blog Post';
   var d=it||{};
   var f='';
+  if(type!=='projects')archState=null;
   if(type==='projects'){
+    archState=normalizeArch(d._architecture);
     f=inp('Title','f-title',d.title)
      +inp('Subtitle','f-sub',d.subtitle)
      +ta('Description','f-desc',d.description)
@@ -187,10 +209,12 @@ function buildForm(type,it){
      +ta('Problem','f-pr',d.problem)
      +ta('Approach','f-ap',d.approach)
      +ta('Results','f-re',d.results)
+     +ta('Building Process (one bullet per line)','f-process',linesText(d.process))
      +inp('Technologies','f-tc',arr(d.technologies),'Python, Docker','Comma-separated')
      +inp('Categories','f-ca',arr(d.categories),'SOAR, SIEM','Comma-separated')
      +inp('Metrics','f-mt',arr(d.metrics),'10k events/day, 99.9% uptime','Comma-separated')
-     +inp('GitHub URL','f-gh',d.github);
+     +inp('GitHub URL','f-gh',d.github)
+     +architectureForm(d._architecture);
   }else if(type==='investigations'){
     f=inp('Title','f-title',d.title)
      +row(sel('Category','f-ca',d.category,[['Windows','Windows'],['Linux','Linux'],['Network','Network'],['Threat Hunting','Threat Hunting']])+inp('Date','f-da',d.date,'','date'))
@@ -240,34 +264,304 @@ function sel(label,id,val,opts){
   return h+'</select></div>';
 }
 function arr(a){return Array.isArray(a)?a.join(', '):(a||'');}
+function linesText(a){return Array.isArray(a)?a.join('\n'):(a||'');}
+function lines(s){return String(s||'').split('\n').map(function(x){return x.trim();}).filter(Boolean);}
+
+// ---------- Project architecture editor ----------
+function normalizeArch(a){
+  a=a||{};
+  var tree=a.tree||{};
+  return {
+    summary:a.summary||'',
+    layers:Array.isArray(a.layers)?a.layers.map(function(layer){
+      return {
+        id:layer.id||'',
+        label:layer.label||'',
+        description:layer.description||'',
+        items:Array.isArray(layer.items)?layer.items.map(function(item){
+          return {name:item.name||'',role:item.role||'',note:item.note||''};
+        }):[]
+      };
+    }):[],
+    links:Array.isArray(a.links)?a.links.map(function(link){
+      return {from:link.from||'',to:link.to||'',label:link.label||''};
+    }):[],
+    tree:{
+      root:tree.root||'',
+      paths:Array.isArray(tree.paths)?tree.paths.slice():[],
+      notes:tree.notes||{},
+      source:tree.source||null
+    },
+    image:a.image||null
+  };
+}
+
+function hasArchData(a){
+  if(!a)return false;
+  var hasLayer=(a.layers||[]).some(function(layer){
+    return layer.id||layer.label||layer.description||(layer.items||[]).some(function(item){return item.name||item.role||item.note;});
+  });
+  var hasLink=(a.links||[]).some(function(link){return link.from||link.to||link.label;});
+  return !!(
+    (a.summary&&a.summary.trim()) ||
+    hasLayer ||
+    hasLink ||
+    (a.image&&a.image.src) ||
+    (a.tree&&((a.tree.paths&&a.tree.paths.length)||(a.tree.notes&&Object.keys(a.tree.notes).length)))
+  );
+}
+
+function notesText(notes){
+  notes=notes||{};
+  return Object.keys(notes).map(function(key){return key+': '+notes[key];}).join('\n');
+}
+
+function parseNotes(text){
+  var out={};
+  String(text||'').split('\n').forEach(function(line){
+    var i=line.indexOf(':');
+    if(i>0){
+      var key=line.slice(0,i).trim();
+      var value=line.slice(i+1).trim();
+      if(key)out[key]=value;
+    }
+  });
+  return out;
+}
+
+function archInput(label,field,value,ph){
+  return '<div class="f"><label>'+label+'</label><input data-lf="'+field+'" value="'+esc(value||'')+'" placeholder="'+(ph||'')+'"></div>';
+}
+
+function archField(parent,field){
+  var el=parent.querySelector('[data-lf="'+field+'"]');
+  return el?el.value.trim():'';
+}
+
+function architectureForm(a){
+  a=a||{};
+  var tree=a.tree||{};
+  var has=hasArchData(a);
+  var layerCount=(a.layers||[]).length;
+  var pathCount=(tree.paths||[]).length;
+  var h='<details class="ps arch-details"'+(has?' open':'')+'>';
+  h+='<summary class="ps-h"><h3><svg class="arch-chev" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M4 2l4 4-4 4" stroke-linecap="round" stroke-linejoin="round"/></svg> Architecture <span class="c">'+(has?'configured':'optional')+'</span></h3><span class="c">'+layerCount+' layers &middot; '+pathCount+' paths</span></summary>';
+  h+='<div class="ps-b">';
+  h+=ta('Architecture Summary','a-summary',a.summary||'');
+  h+=row(inp('Diagram Image URL','a-img-src',(a.image&&a.image.src)||'','images/projects/foo.svg')+inp('Diagram Alt Text','a-img-alt',(a.image&&a.image.alt)||''));
+  h+=inp('Diagram Caption','a-img-caption',(a.image&&a.image.caption)||'');
+
+  h+='<div class="arch-sub">System Layers</div>';
+  h+='<div id="a-layers"></div>';
+  h+='<div class="arch-toolbar"><button type="button" class="b sm" data-act="archAddLayer">+ Add Layer</button></div>';
+
+  h+='<div class="arch-sub">Layer Links</div>';
+  h+='<div id="a-links"></div>';
+  h+='<div class="arch-toolbar"><button type="button" class="b sm" data-act="archAddLink">+ Add Link</button></div>';
+
+  h+='<div class="arch-sub">Project Structure</div>';
+  h+=inp('Tree Root Label','a-tree-root',tree.root||'','my-project/');
+  h+=ta('Structure Paths (one per line)','a-tree-paths',(tree.paths||[]).join('\n'));
+  h+=ta('Structure Notes (path: note)','a-tree-notes',notesText(tree.notes));
+  h+=row(inp('Source Repo (owner/name)','a-tree-repo',(tree.source&&tree.source.repo)||'')+inp('Source Branch','a-tree-branch',(tree.source&&tree.source.branch)||''));
+  h+=inp('Source Subpath','a-tree-source-path',(tree.source&&tree.source.path)||'','Optional path inside repo');
+  h+='<div class="arch-toolbar"><button type="button" class="b sm e" data-act="syncArch">Sync structure from source</button><button type="button" class="b sm" data-act="archClear">Clear architecture</button></div>';
+  h+='<p class="h" style="margin-top:8px">Source fields add GitHub links to the tree. Sync uses the matching entry in <code>scripts/architecture-sources.json</code>. Saving writes <code>portfolio-data/architecture/&lt;slug&gt;.json</code> and syncs automatically.</p>';
+  h+='</div></details>';
+  return h;
+}
+
+function updateArchHeader(){
+  var details=document.querySelector('.arch-details');
+  if(!details)return;
+  var tags=details.querySelectorAll('.ps-h .c');
+  if(tags[0])tags[0].textContent=hasArchData(archState)?'configured':'optional';
+  if(tags[1])tags[1].textContent=(archState.layers||[]).length+' layers \u00b7 '+(((archState.tree||{}).paths)||[]).length+' paths';
+}
+
+function renderArchEditor(){
+  if(!archState)return;
+  var layersEl=$('a-layers'),linksEl=$('a-links');
+  if(!layersEl||!linksEl)return;
+
+  var h='';
+  var layers=archState.layers||[];
+  if(!layers.length)h+='<p class="h" style="margin-bottom:8px">No layers yet. Add one to build the system flow.</p>';
+  for(var l=0;l<layers.length;l++){
+    var layer=layers[l];
+    h+='<div class="arch-layer" data-layer="'+l+'">';
+    h+='<div class="arch-layer-h"><strong>Layer '+(l+1)+'</strong><button type="button" class="b sm x" data-act="archDelLayer" data-i="'+l+'">Remove Layer</button></div>';
+    h+='<div class="fr">'+archInput('Layer ID','id',layer.id,'sources')+archInput('Label','label',layer.label,'Telemetry Sources')+'</div>';
+    h+=archInput('Description','description',layer.description,'Short helper text');
+    h+='<div class="arch-sub">Items</div>';
+    var items=layer.items||[];
+    for(var k=0;k<items.length;k++){
+      var item=items[k];
+      h+='<div class="arch-item" data-item="'+k+'">';
+      h+='<div class="fr">'+archInput('Name','name',item.name,'Suricata')+archInput('Role','role',item.role,'IDS')+'</div>';
+      h+=archInput('Note','note',item.note,'eve.json → Filebeat');
+      h+='<div class="arch-toolbar"><button type="button" class="b sm x" data-act="archDelItem" data-i="'+l+'" data-j="'+k+'">Remove Item</button></div>';
+      h+='</div>';
+    }
+    h+='<div class="arch-toolbar"><button type="button" class="b sm" data-act="archAddItem" data-i="'+l+'">+ Add Item</button></div>';
+    h+='</div>';
+  }
+  layersEl.innerHTML=h;
+
+  var lh='';
+  var links=archState.links||[];
+  if(!links.length)lh+='<p class="h" style="margin-bottom:8px">No links yet. Add one to label the flow between layers.</p>';
+  for(var i=0;i<links.length;i++){
+    var link=links[i];
+    lh+='<div class="arch-item" data-link="'+i+'">';
+    lh+='<div class="fr">'+archInput('From Layer ID','from',link.from,'sources')+archInput('To Layer ID','to',link.to,'ingest')+'</div>';
+    lh+=archInput('Label','label',link.label,'Filebeat / Wazuh Agent');
+    lh+='<div class="arch-toolbar"><button type="button" class="b sm x" data-act="archDelLink" data-i="'+i+'">Remove Link</button></div>';
+    lh+='</div>';
+  }
+  linksEl.innerHTML=lh;
+  updateArchHeader();
+}
+
+function collectArchState(){
+  if(!archState)return;
+  archState.summary=val('a-summary');
+
+  var imageSrc=val('a-img-src');
+  archState.image=imageSrc?{
+    src:imageSrc,
+    alt:val('a-img-alt'),
+    caption:val('a-img-caption')
+  }:null;
+
+  var tree=archState.tree||{};
+  tree.root=val('a-tree-root');
+  tree.paths=val('a-tree-paths').split('\n').map(function(line){return line.trim();}).filter(Boolean);
+  tree.notes=parseNotes(val('a-tree-notes'));
+  var repo=val('a-tree-repo'),branch=val('a-tree-branch'),subPath=val('a-tree-source-path');
+  if(repo&&branch)tree.source={repo:repo,branch:branch,path:subPath};
+  else delete tree.source;
+  archState.tree=tree;
+
+  var layersEl=$('a-layers');
+  if(layersEl){
+    archState.layers=Array.prototype.map.call(layersEl.querySelectorAll('[data-layer]'),function(el){
+      var items=Array.prototype.map.call(el.querySelectorAll('[data-item]'),function(itemEl){
+        return {name:archField(itemEl,'name'),role:archField(itemEl,'role'),note:archField(itemEl,'note')};
+      });
+      return {
+        id:archField(el,'id'),
+        label:archField(el,'label'),
+        description:archField(el,'description'),
+        items:items
+      };
+    });
+  }
+
+  var linksEl=$('a-links');
+  if(linksEl){
+    archState.links=Array.prototype.map.call(linksEl.querySelectorAll('[data-link]'),function(el){
+      return {from:archField(el,'from'),to:archField(el,'to'),label:archField(el,'label')};
+    });
+  }
+}
+
+function clearArchFields(){
+  ['a-summary','a-img-src','a-img-alt','a-img-caption','a-tree-root','a-tree-paths','a-tree-notes','a-tree-repo','a-tree-branch','a-tree-source-path'].forEach(function(id){
+    var el=$(id);if(el)el.value='';
+  });
+  archState=normalizeArch(null);
+  renderArchEditor();
+  toast('Architecture cleared — save to apply');
+}
+
+function setTreeFields(tree){
+  tree=tree||{};
+  if($('a-tree-root'))$('a-tree-root').value=tree.root||'';
+  if($('a-tree-paths'))$('a-tree-paths').value=(tree.paths||[]).join('\n');
+  if($('a-tree-notes'))$('a-tree-notes').value=notesText(tree.notes);
+  if($('a-tree-repo'))$('a-tree-repo').value=(tree.source&&tree.source.repo)||'';
+  if($('a-tree-branch'))$('a-tree-branch').value=(tree.source&&tree.source.branch)||'';
+  if($('a-tree-source-path'))$('a-tree-source-path').value=(tree.source&&tree.source.path)||'';
+}
+
+function syncArchitecture(){
+  if(!archState)return;
+  if(!editSlug){toast('Save the project first, then sync','er');return;}
+  collectArchState();
+  var slug=editSlug;
+  var save=hasArchData(archState)
+    ? fetch(API+'/architecture/'+slug+'?sync=0',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(archState)})
+    : Promise.resolve();
+  save.then(function(){
+    return fetch(API+'/architecture/'+slug+'/sync',{method:'POST'});
+  }).then(function(response){
+    return response.json().then(function(data){return {ok:response.ok,data:data};});
+  }).then(function(result){
+    if(!result.ok){
+      toast('Sync failed: '+(result.data.detail||result.data.error||'unknown error'),'er');
+      return;
+    }
+    if(result.data.architecture){
+      archState=normalizeArch(result.data.architecture);
+      setTreeFields(archState.tree);
+      renderArchEditor();
+      toast('Structure synced from source');
+    }else{
+      toast('Synced, but no architecture data returned','er');
+    }
+  }).catch(function(error){toast(error.message,'er');});
+}
 
 function saveItem(editSlug){
   var isE=!!editSlug,d={},type=curTab;
   if(type==='projects'){
-    d.title=val('f-title');d.slug=editSlug||sl(d.title);d.subtitle=val('f-sub');d.description=val('f-desc');d.role=val('f-role');d.timeline=val('f-tl');d.status=val('f-st');d.featured=val('f-ft')==='true';d.problem=val('f-pr');d.approach=val('f-ap');d.results=val('f-re');d.technologies=csv(val('f-tc'));d.categories=csv(val('f-ca'));d.metrics=csv(val('f-mt'));d.github=val('f-gh');d.screenshots=[];d.team=[];d.relatedInvestigations=[];d.relatedBlogs=[];
+    d.title=val('f-title');d.slug=editSlug||sl(d.title);d.subtitle=val('f-sub');d.description=val('f-desc');d.role=val('f-role');d.timeline=val('f-tl');d.status=val('f-st');d.featured=val('f-ft')==='true';d.problem=val('f-pr');d.approach=val('f-ap');d.results=val('f-re');d.process=lines(val('f-process'));d.technologies=csv(val('f-tc'));d.categories=csv(val('f-ca'));d.metrics=csv(val('f-mt'));d.github=val('f-gh');d.screenshots=[];d.team=[];d.relatedInvestigations=[];d.relatedBlogs=[];
   }else if(type==='investigations'){
     d.title=val('f-title');d.slug=editSlug||sl(d.title);d.category=val('f-ca');d.date=val('f-da');d.pic=val('f-pic');d.summary=val('f-su');d.scenario=val('f-sc');d.objective=val('f-ob');d.environment=csv(val('f-ev'));d.keyFindings=csv(val('f-fi'));d.mitreTechniques=csv(val('f-mi'));d.tools=csv(val('f-to'));d.outcome=val('f-ou');d.reportFile='report.md';d.pdf=val('f-pdf');d.relatedProjects=csv(val('f-rp'));d.relatedBlogs=csv(val('f-rb'));
   }else{
     d.title=val('f-title');d.slug=editSlug||sl(d.title);d.description=val('f-desc');d.date=val('f-da');d.category=val('f-ca');d.pic=val('f-pic');d.tags=csv(val('f-ta'));d.readingTime=parseInt(val('f-rt'))||5;d.pdf=val('f-pdf');d.relatedInvestigations=csv(val('f-ri'));d.relatedProjects=csv(val('f-rp'));
   }
+  if(type==='projects')collectArchState();
   var mdContent=val('f-md');
-  fetch(API+'/'+type,{method:isE?'PUT':'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(d)}).then(function(r){
-    if(r.ok){
-      var afterSave=function(){toast(isE?'Updated':'Created');};
+
+  // Save architecture first without syncing; the project save below syncs both together.
+  var saveArch=Promise.resolve(),archFailed=false;
+  if(type==='projects'){
+    saveArch=hasArchData(archState)
+      ? fetch(API+'/architecture/'+d.slug+'?sync=0',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(archState)})
+      : fetch(API+'/architecture/'+d.slug+'?sync=0',{method:'DELETE'});
+    saveArch=saveArch.then(function(r){if(!r.ok)throw new Error('architecture save failed');return r;});
+  }
+
+  saveArch.catch(function(){archFailed=true;}).then(function(){
+    fetch(API+'/'+type,{method:isE?'PUT':'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(d)}).then(function(r){
+      if(!r.ok){
+        if(type==='projects'&&!isE)fetch(API+'/architecture/'+d.slug+'?sync=0',{method:'DELETE'}).catch(function(){});
+        toast('Error','er');
+        return;
+      }
+      var afterSave=function(){toast(archFailed?'Saved, but architecture failed':(isE?'Updated':'Created'),archFailed?'er':'ok');};
       if(mdContent&&(type==='blogs'||type==='investigations')){
         fetch(API+'/'+type+'/'+d.slug+'/content',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({content:mdContent})}).then(afterSave).catch(afterSave);
       }else{afterSave();}
+
       // Re-fetch item and re-render form (stays in place)
-      Promise.all([
+      var requests=[
         fetch(API+'/'+type+'/'+d.slug).then(function(r){return r.json()}),
         (type==='blogs'||type==='investigations')?fetch(API+'/'+type+'/'+d.slug+'/content').then(function(r){return r.json()}):Promise.resolve({content:''})
-      ]).then(function(res){
+      ];
+      if(type==='projects'){
+        requests.push(fetch(API+'/architecture/'+d.slug).then(function(r){return r.ok?r.json():null}).catch(function(){return null;}));
+      }
+      Promise.all(requests).then(function(res){
         var item=res[0];item._content=res[1].content||'';
+        if(type==='projects')item._architecture=res[2]||null;
         editSlug=item.slug;
-        $('view').innerHTML=buildForm(type,item);
+        renderForm(type,item);
       }).catch(function(){});
-    }else toast('Error','er');
-  }).catch(function(e){toast(e.message,'er')});
+    }).catch(function(e){toast(e.message,'er')});
+  });
 }
 
 function delItem(slug){
@@ -385,6 +679,14 @@ document.addEventListener('click',function(e){
   if(a==='edCt')edCt(i);
   if(a==='svCt')svCt(i);
   if(a==='dlCt')dlCt(i);
+  if(a==='archAddLayer'){collectArchState();archState.layers.push({id:'layer'+(archState.layers.length+1),label:'New Layer',description:'',items:[]});renderArchEditor();}
+  if(a==='archDelLayer'){collectArchState();archState.layers.splice(i,1);renderArchEditor();}
+  if(a==='archAddItem'){collectArchState();archState.layers[i].items.push({name:'New Item',role:'',note:''});renderArchEditor();}
+  if(a==='archDelItem'){var j=parseInt(t.dataset.j);collectArchState();archState.layers[i].items.splice(j,1);renderArchEditor();}
+  if(a==='archAddLink'){collectArchState();archState.links.push({from:'',to:'',label:''});renderArchEditor();}
+  if(a==='archDelLink'){collectArchState();archState.links.splice(i,1);renderArchEditor();}
+  if(a==='archClear')clearArchFields();
+  if(a==='syncArch')syncArchitecture();
 });
 
 initTabs();showList();

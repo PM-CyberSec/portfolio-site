@@ -1,0 +1,230 @@
+---
+import TreeBranch from './TreeBranch.astro';
+
+interface TreeSource {
+  repo?: string;
+  branch?: string;
+  path?: string;
+}
+
+interface TreeData {
+  root?: string;
+  paths?: string[];
+  notes?: Record<string, string>;
+  source?: TreeSource;
+}
+
+interface TreeNode {
+  name: string;
+  path: string;
+  type: 'dir' | 'file';
+  children: TreeNode[];
+  note?: string;
+  href?: string;
+}
+
+interface Props {
+  slug: string;
+  tree?: TreeData;
+}
+
+const { slug, tree = {} } = Astro.props;
+const rawPaths = Array.isArray(tree.paths) ? tree.paths : [];
+const source = tree.source;
+const treeId = `project-tree-${slug}`;
+
+const normalizePath = (value: string) => value.replace(/^\/+|\/+$/g, '');
+
+function buildTree(paths: string[]): TreeNode[] {
+  const roots: TreeNode[] = [];
+
+  for (const raw of paths) {
+    if (typeof raw !== 'string') continue;
+    const value = raw.trim();
+    if (!value) continue;
+
+    const isDir = value.endsWith('/');
+    const parts = normalizePath(value).split('/').filter(Boolean);
+    if (!parts.length) continue;
+
+    let level = roots;
+    let parentPath = '';
+
+    parts.forEach((part, index) => {
+      const isLast = index === parts.length - 1;
+      const type: 'dir' | 'file' = isLast && !isDir ? 'file' : 'dir';
+      const nodePath = parentPath ? `${parentPath}/${part}` : part;
+
+      let node = level.find(candidate => candidate.name === part && candidate.type === type);
+      if (!node) {
+        node = { name: part, path: nodePath, type, children: [] };
+        level.push(node);
+      }
+
+      if (type === 'dir') {
+        parentPath = nodePath;
+        level = node.children;
+      }
+    });
+  }
+
+  const sortNodes = (nodes: TreeNode[]) => {
+    nodes.sort((a, b) => {
+      if (a.type !== b.type) return a.type === 'dir' ? -1 : 1;
+      return a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: 'base' });
+    });
+    nodes.forEach(node => sortNodes(node.children));
+  };
+  sortNodes(roots);
+
+  return roots;
+}
+
+const nodes = buildTree(rawPaths);
+
+const noteEntries = Object.entries(tree.notes || {})
+  .filter(([path]) => typeof path === 'string' && path.trim())
+  .map(([path, note]) => [normalizePath(path), note] as const);
+const notes = Object.fromEntries(noteEntries);
+
+const repoBase = source?.repo ? `https://github.com/${source.repo}` : '';
+const subPath = normalizePath(source?.path || '');
+const branch = source?.branch || '';
+
+const makeHref = (node: TreeNode) => {
+  if (!repoBase || !branch) return undefined;
+  const relative = [subPath, node.path].filter(Boolean).join('/');
+  const encodedPath = relative.split('/').map(encodeURIComponent).join('/');
+  return `${repoBase}/${node.type === 'dir' ? 'tree' : 'blob'}/${encodeURIComponent(branch)}/${encodedPath}`;
+};
+
+const decorate = (items: TreeNode[]) => {
+  items.forEach(node => {
+    if (notes[node.path]) node.note = notes[node.path];
+    const href = makeHref(node);
+    if (href) node.href = href;
+    decorate(node.children);
+  });
+};
+decorate(nodes);
+
+const entryLabel = `${rawPaths.length} ${rawPaths.length === 1 ? 'entry' : 'entries'}`;
+---
+
+<section
+  id={treeId}
+  data-project-tree
+  class="bg-[var(--bg-card)] border border-[var(--border)] rounded-card overflow-hidden"
+>
+  <div class="flex flex-wrap items-center gap-2 border-b border-[var(--border)] bg-[var(--bg-elevated)] px-4 py-2.5">
+    <div class="flex items-center gap-2 min-w-0">
+      <svg class="w-4 h-4 text-accent shrink-0" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3" aria-hidden="true">
+        <path d="M1.5 4.5A1.5 1.5 0 0 1 3 3h3l1.5 1.5H13A1.5 1.5 0 0 1 14.5 6v6A1.5 1.5 0 0 1 13 13.5H3A1.5 1.5 0 0 1 1.5 12V4.5Z" stroke-linejoin="round" />
+      </svg>
+      <span class="font-mono text-sm text-[var(--text)] truncate">{tree.root || 'Project root'}</span>
+      <span class="font-mono text-[10px] text-[var(--text-dim)] shrink-0">{entryLabel}</span>
+    </div>
+    {repoBase && branch ? (
+      <a
+        href={`${repoBase}/tree/${encodeURIComponent(branch)}${subPath ? `/${subPath.split('/').map(encodeURIComponent).join('/')}` : ''}`}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="ml-auto font-mono text-[10px] text-accent hover:underline shrink-0"
+      >
+        GitHub &rarr;
+      </a>
+    ) : (
+      <span class="ml-auto font-mono text-[10px] text-[var(--text-dim)] shrink-0">curated snapshot</span>
+    )}
+  </div>
+
+  <div class="flex flex-wrap items-center gap-2 border-b border-[var(--border)] px-3 py-2">
+    <label class="sr-only" for={`${treeId}-search`}>Filter project structure</label>
+    <input
+      id={`${treeId}-search`}
+      data-tree-search
+      type="search"
+      placeholder="Filter paths..."
+      class="flex-1 min-w-[160px] bg-[var(--bg)] border border-[var(--border)] rounded-btn px-2.5 py-1.5 font-mono text-xs text-[var(--text)] placeholder:text-[var(--text-dim)] focus:border-accent focus:outline-none transition"
+    />
+    <button
+      type="button"
+      data-tree-action="expand"
+      class="text-[10px] font-mono px-2 py-1 border border-[var(--border)] rounded-btn text-[var(--text-dim)] hover:text-accent hover:border-[var(--border-strong)] transition"
+    >
+      Expand all
+    </button>
+    <button
+      type="button"
+      data-tree-action="collapse"
+      class="text-[10px] font-mono px-2 py-1 border border-[var(--border)] rounded-btn text-[var(--text-dim)] hover:text-accent hover:border-[var(--border-strong)] transition"
+    >
+      Collapse all
+    </button>
+  </div>
+
+  {nodes.length > 0 ? (
+    <div class="max-h-[30rem] overflow-auto px-3 py-3">
+      <ul class="list-none p-0 m-0">
+        <TreeBranch nodes={nodes} depth={0} />
+      </ul>
+    </div>
+  ) : (
+    <p class="px-4 py-6 text-xs text-[var(--text-dim)]">No structure data yet.</p>
+  )}
+</section>
+
+<script is:inline>
+  (function () {
+    document.querySelectorAll('[data-project-tree]').forEach(function (root) {
+      var getDetails = function () {
+        return Array.prototype.slice.call(root.querySelectorAll('details'));
+      };
+      var getRows = function () {
+        return Array.prototype.slice.call(root.querySelectorAll('li[data-path]'));
+      };
+
+      var expand = root.querySelector('[data-tree-action="expand"]');
+      var collapse = root.querySelector('[data-tree-action="collapse"]');
+      var search = root.querySelector('[data-tree-search]');
+
+      if (expand) {
+        expand.addEventListener('click', function () {
+          getDetails().forEach(function (item) { item.open = true; });
+        });
+      }
+
+      if (collapse) {
+        collapse.addEventListener('click', function () {
+          getDetails().forEach(function (item) { item.open = false; });
+        });
+      }
+
+      if (search) {
+        search.addEventListener('input', function () {
+          var query = search.value.trim().toLowerCase();
+
+          if (!query) {
+            getRows().forEach(function (row) { row.hidden = false; });
+            getDetails().forEach(function (item) {
+              item.open = item.getAttribute('data-open-default') === 'true';
+            });
+            return;
+          }
+
+          getDetails().forEach(function (item) { item.open = true; });
+          getRows().forEach(function (row) {
+            var ownMatch = (row.getAttribute('data-path') || '').toLowerCase().indexOf(query) !== -1;
+            var childMatch = ownMatch || Array.prototype.some.call(
+              row.querySelectorAll('li[data-path]'),
+              function (child) {
+                return (child.getAttribute('data-path') || '').toLowerCase().indexOf(query) !== -1;
+              }
+            );
+            row.hidden = !(ownMatch || childMatch);
+          });
+        });
+      }
+    });
+  })();
+</script>
